@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/db/models/purchase.dart';
+import 'package:vadavathoor_book_stall/screens/home.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  runApp(const MainApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(PurchaseModelAdapter().typeId)) {
+    Hive.registerAdapter(PurchaseModelAdapter());
+  }
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        useMaterial3: true,
       ),
+      home: HomeScreen(),
     );
   }
 }
