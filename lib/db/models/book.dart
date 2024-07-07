@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
-part 'purchase.g.dart';
+part 'book.g.dart';
 
 @HiveType(typeId: 1)
-class PurchaseModel {
+class BookSaleModel {
   @HiveField(0)
   int? id;
 
@@ -28,7 +28,7 @@ class PurchaseModel {
     };
   }
 
-  PurchaseModel(
+  BookSaleModel(
       {required this.bookName,
       required this.bookPrice,
       required this.personName,

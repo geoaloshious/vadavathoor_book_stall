@@ -1,25 +1,25 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/db/models/purchase.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/screens/book_sale.dart';
 
-ValueNotifier<List<PurchaseModel>> purchaseNotifier = ValueNotifier([]);
+ValueNotifier<List<BookSale>> purchaseNotifier = ValueNotifier([]);
 
-Future<void> addBookPurchase(PurchaseModel value) async {
-  final purchaseDB = await Hive.openBox<PurchaseModel>('purchase_db');
+Future<void> addBookPurchase(BookSale value) async {
+  final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
   await purchaseDB.add(value);
   updatePurchaseList();
 }
 
 Future<void> deleteBookPurchase(int id) async {
-  final purchaseDB = await Hive.openBox<PurchaseModel>('purchase_db');
+  final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
   await purchaseDB.delete(id);
   updatePurchaseList();
 }
 
 void updatePurchaseList() async {
-  final purchaseDB = await Hive.openBox<PurchaseModel>('purchase_db');
+  final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
   purchaseDB.values.forEach(
     (element) {
       print(jsonEncode(element));

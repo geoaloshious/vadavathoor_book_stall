@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'purchase.dart';
+part of 'book.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class PurchaseModelAdapter extends TypeAdapter<PurchaseModel> {
+class BookSaleModelAdapter extends TypeAdapter<BookSaleModel> {
   @override
   final int typeId = 1;
 
   @override
-  PurchaseModel read(BinaryReader reader) {
+  BookSaleModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return PurchaseModel(
+    return BookSaleModel(
       bookName: fields[1] as String,
       bookPrice: fields[2] as String,
       personName: fields[3] as String,
@@ -26,7 +26,7 @@ class PurchaseModelAdapter extends TypeAdapter<PurchaseModel> {
   }
 
   @override
-  void write(BinaryWriter writer, PurchaseModel obj) {
+  void write(BinaryWriter writer, BookSaleModel obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
@@ -47,7 +47,7 @@ class PurchaseModelAdapter extends TypeAdapter<PurchaseModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PurchaseModelAdapter &&
+      other is BookSaleModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
