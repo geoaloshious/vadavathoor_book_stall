@@ -4,7 +4,7 @@ part 'book_purchase.g.dart';
 @HiveType(typeId: 3)
 class BookPurchaseModel {
   @HiveField(0)
-  int? id;
+  final String purchaseID;
 
   @HiveField(1)
   final String publisherID;
@@ -29,7 +29,7 @@ class BookPurchaseModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'purchaseID': purchaseID,
       'publisherID': publisherID,
       'purchaseDate': purchaseDate,
       'bookID': bookID,
@@ -41,6 +41,7 @@ class BookPurchaseModel {
   }
 
   BookPurchaseModel({
+    required this.purchaseID,
     required this.publisherID,
     required this.purchaseDate,
     required this.bookID,
@@ -48,6 +49,5 @@ class BookPurchaseModel {
     required this.bookPrice,
     required this.createdDate,
     required this.modifiedDate,
-    this.id,
   });
 }

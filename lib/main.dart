@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
+import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/screens/home.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -16,6 +17,9 @@ Future<void> main() async {
   }
   if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
     Hive.registerAdapter(PurchaseAttachmentModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
+    Hive.registerAdapter(PublisherModelAdapter());
   }
 
   runApp(const MyApp());

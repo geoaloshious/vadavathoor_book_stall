@@ -1,7 +1,17 @@
+// import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:vadavathoor_book_stall/db/components/drop_down.dart';
+import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_card.dart';
+
+// List<Map<String, String>> PUBLISHERS = [
+//   {'id': '1', 'name': 'DC Books'},
+//   {'id': '2', 'name': 'Penguin publications'},
+//   {'id': '3', 'name': 'ABC Publishers'}
+// ];
 
 class BookPurchase extends StatefulWidget {
   const BookPurchase({super.key});
@@ -12,12 +22,11 @@ class BookPurchase extends StatefulWidget {
 
 class _BookPurchaseState extends State<BookPurchase> {
   final List<Map<String, dynamic>> _books = [];
-  final _publisherController = TextEditingController();
   final _bookNameController = TextEditingController();
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
-
+  String _publisherID = '';
   Map<String, bool> inputErrors = {};
 
   void _selectDate() async {
@@ -86,14 +95,21 @@ class _BookPurchaseState extends State<BookPurchase> {
               children: [
                 Expanded(
                   flex: 2,
-                  child: TextField(
-                    controller: _publisherController,
-                    decoration: const InputDecoration(
-                      labelText: 'Publisher',
-                      suffixIcon: Icon(Icons.arrow_drop_down),
-                    ),
-                    // Add auto-suggestion functionality here
-                  ),
+                  child: ValueListenableBuilder(
+                      valueListenable: publishersNotifier,
+                      builder: (ctx, publishers, child) {
+                        return CustomDropdown(
+                          items: publishers
+                              .map((i) => i.toDropdownData())
+                              .toList(),
+                          selectedValue: _publisherID,
+                          onValueChanged: (value) {
+                            setState(() {
+                              _publisherID = value;
+                            });
+                          },
+                        );
+                      }),
                 ),
                 const SizedBox(width: 16.0),
                 Expanded(

@@ -17,6 +17,7 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return BookPurchaseModel(
+      purchaseID: fields[0] as String,
       publisherID: fields[1] as String,
       purchaseDate: fields[2] as String,
       bookID: fields[3] as String,
@@ -24,7 +25,6 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       bookPrice: fields[4] as String,
       createdDate: fields[6] as String,
       modifiedDate: fields[7] as String,
-      id: fields[0] as int?,
     );
   }
 
@@ -33,7 +33,7 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
     writer
       ..writeByte(8)
       ..writeByte(0)
-      ..write(obj.id)
+      ..write(obj.purchaseID)
       ..writeByte(1)
       ..write(obj.publisherID)
       ..writeByte(2)
