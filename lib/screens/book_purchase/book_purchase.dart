@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:vadavathoor_book_stall/db/components/drop_down.dart';
+import 'package:vadavathoor_book_stall/components/drop_down.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_card.dart';
 
