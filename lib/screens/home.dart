@@ -39,41 +39,39 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-              flex: 1,
-              child: ListView.separated(
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return TextButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: currentPage == index
-                            ? Colors.lightBlue
-                            : Colors.white38 // Set the background color
-                        ),
-                    onPressed: () {
-                      setState(() {
-                        currentPage = index;
-                      });
-                    },
-                    child: ListTile(
-                      title: Text(a[index]!),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const Divider();
-                },
-              )),
-          Expanded(
-              flex: 3,
-              child: Container(
-                color: Colors.amber,
-                child: renderRightSide(),
-              ))
-        ],
-      ),
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 1,
+                  child: ListView.builder(
+                      itemCount: 4,
+                      itemBuilder: (context, index) {
+                        return TextButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor: currentPage == index
+                                  ? Colors.lightBlue
+                                  : Colors.white38 // Set the background color
+                              ),
+                          onPressed: () {
+                            setState(() {
+                              currentPage = index;
+                            });
+                          },
+                          child: ListTile(
+                            title: Text(a[index]!),
+                          ),
+                        );
+                      })),
+              Expanded(
+                  flex: 3,
+                  child: Container(
+                    color: Colors.amber,
+                    child: renderRightSide(),
+                  ))
+            ],
+          )),
     );
   }
 }

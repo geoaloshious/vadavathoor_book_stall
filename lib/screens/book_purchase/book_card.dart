@@ -24,14 +24,6 @@ class _BookCardState extends State<BookCard> {
   Map<String, bool> inputErrors = {};
   bool editMode = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _bookNameController = TextEditingController(text: widget.data['bookName']);
-    _quantityController = TextEditingController(text: widget.data['quantity']);
-    _priceController = TextEditingController(text: widget.data['bookPrice']);
-  }
-
   void _saveData() {
     final bookName = _bookNameController.text;
     final quantity = _quantityController.text;
@@ -91,6 +83,14 @@ class _BookCardState extends State<BookCard> {
         );
       },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _bookNameController = TextEditingController(text: widget.data['bookName']);
+    _quantityController = TextEditingController(text: widget.data['quantity']);
+    _priceController = TextEditingController(text: widget.data['bookPrice']);
   }
 
   @override

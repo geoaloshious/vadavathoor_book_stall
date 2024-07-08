@@ -1,17 +1,9 @@
-// import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_card.dart';
-
-// List<Map<String, String>> PUBLISHERS = [
-//   {'id': '1', 'name': 'DC Books'},
-//   {'id': '2', 'name': 'Penguin publications'},
-//   {'id': '3', 'name': 'ABC Publishers'}
-// ];
 
 class BookPurchase extends StatefulWidget {
   const BookPurchase({super.key});
@@ -81,6 +73,12 @@ class _BookPurchaseState extends State<BookPurchase> {
 
   void _addAttachment() {
     // Implement file upload functionality here
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updatePublishersList();
   }
 
   @override
@@ -227,11 +225,11 @@ class _BookPurchaseState extends State<BookPurchase> {
                 },
               ),
             ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _addAttachment,
-              child: const Text('Add Attachment'),
-            ),
+            // const SizedBox(height: 16.0),
+            // ElevatedButton(
+            //   onPressed: _addAttachment,
+            //   child: const Text('Add Attachment'),
+            // ),
           ],
         ),
       ),

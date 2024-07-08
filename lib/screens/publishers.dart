@@ -22,9 +22,13 @@ class _PublishersState extends State<Publishers> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     updatePublishersList();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
           padding: const EdgeInsets.all(16.0),
