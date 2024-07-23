@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
 import 'package:vadavathoor_book_stall/db/models/publisher.dart';
@@ -9,6 +10,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(BookModelAdapter().typeId)) {
+    Hive.registerAdapter(BookModelAdapter());
+  }
   if (!Hive.isAdapterRegistered(BookPurchaseModelAdapter().typeId)) {
     Hive.registerAdapter(BookPurchaseModelAdapter());
   }

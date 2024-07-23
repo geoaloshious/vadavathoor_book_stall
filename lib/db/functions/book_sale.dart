@@ -6,26 +6,26 @@ import 'package:vadavathoor_book_stall/screens/book_sale.dart';
 
 ValueNotifier<List<BookSale>> purchaseNotifier = ValueNotifier([]);
 
-Future<void> addBookPurchase(BookSale value) async {
-  final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
-  await purchaseDB.add(value);
-  updatePurchaseList();
+Future<void> addBookSale(BookSale value) async {
+  // final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
+  // await purchaseDB.add(value);
+  // updateBookSaleList();
 }
 
-Future<void> deleteBookPurchase(int id) async {
-  final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
-  await purchaseDB.delete(id);
-  updatePurchaseList();
+Future<void> deleteBookSale(int id) async {
+  // final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
+  // await purchaseDB.delete(id);
+  // updateBookSaleList();
 }
 
-void updatePurchaseList() async {
-  final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
-  purchaseDB.values.forEach(
-    (element) {
-      print(jsonEncode(element));
-    },
-  );
-  purchaseNotifier.value.clear();
-  purchaseNotifier.value.addAll(purchaseDB.values);
-  purchaseNotifier.notifyListeners();
+void updateBookSaleList() async {
+  // final purchaseDB = await Hive.openBox<BookSale>('purchase_db');
+  // purchaseDB.values.forEach(
+  //   (element) {
+  //     print(jsonEncode(element));
+  //   },
+  // );
+  // purchaseNotifier.value.clear();
+  // purchaseNotifier.value.addAll(purchaseDB.values);
+  // purchaseNotifier.notifyListeners();
 }

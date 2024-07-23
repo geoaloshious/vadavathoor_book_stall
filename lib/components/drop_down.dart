@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 class CustomDropdown extends StatefulWidget {
   final List<Map<String, String>> items;
   final String selectedValue;
+  final String label;
+  final bool hasError;
   final Function(String) onValueChanged;
 
-  const CustomDropdown({
-    super.key,
-    required this.items,
-    required this.selectedValue,
-    required this.onValueChanged,
-  });
+  const CustomDropdown(
+      {super.key,
+      required this.items,
+      required this.selectedValue,
+      required this.label,
+      required this.onValueChanged,
+      required this.hasError});
 
   @override
   _CustomPopupDropdownState createState() => _CustomPopupDropdownState();
@@ -19,10 +22,11 @@ class CustomDropdown extends StatefulWidget {
 class _CustomPopupDropdownState extends State<CustomDropdown> {
   String getSelectedItemName() {
     if (widget.selectedValue == '') {
-      return 'Publisher';
+      return widget.label;
     } else {
-      String? itemName = widget.items
-          .firstWhere((i) => i['id'] == widget.selectedValue)['name'];
+      String? itemName = widget.items.firstWhere(
+          (i) => i['id'] == widget.selectedValue,
+          orElse: () => {'name': ''})['name'];
       return itemName ?? '';
     }
   }
@@ -33,7 +37,7 @@ class _CustomPopupDropdownState extends State<CustomDropdown> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
+          border: Border.all(color: widget.hasError ? Colors.red : Colors.grey),
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Row(

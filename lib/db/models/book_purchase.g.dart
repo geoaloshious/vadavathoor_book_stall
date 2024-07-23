@@ -8,7 +8,7 @@ part of 'book_purchase.dart';
 
 class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
   @override
-  final int typeId = 3;
+  final int typeId = 2;
 
   @override
   BookPurchaseModel read(BinaryReader reader) {
@@ -25,13 +25,14 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       bookPrice: fields[4] as String,
       createdDate: fields[6] as String,
       modifiedDate: fields[7] as String,
+      deleted: fields[8] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, BookPurchaseModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.purchaseID)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       ..writeByte(6)
       ..write(obj.createdDate)
       ..writeByte(7)
-      ..write(obj.modifiedDate);
+      ..write(obj.modifiedDate)
+      ..writeByte(8)
+      ..write(obj.deleted);
   }
 
   @override

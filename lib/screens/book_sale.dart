@@ -19,7 +19,7 @@ class _BookSaleState extends State<BookSale> {
 
   @override
   Widget build(BuildContext context) {
-    updatePurchaseList();
+    updateBookSaleList();
 
     return Scaffold(
       body: Center(

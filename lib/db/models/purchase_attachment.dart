@@ -1,7 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 part 'purchase_attachment.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: ItemType.attachment)
 class PurchaseAttachmentModel {
   @HiveField(0)
   int? id;

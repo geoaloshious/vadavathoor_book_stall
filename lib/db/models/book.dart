@@ -1,37 +1,22 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 part 'book.g.dart';
 
-@HiveType(typeId: 1)
-class BookSaleModel {
+@HiveType(typeId: ItemType.book)
+class BookModel {
   @HiveField(0)
-  int? id;
+  final String bookID;
 
   @HiveField(1)
   final String bookName;
 
-  @HiveField(2)
-  final String bookPrice;
-
-  @HiveField(3)
-  final String personName;
-
-  @HiveField(4)
-  final String personBatch;
-
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'bookName': bookName,
-      'bookPrice': bookPrice,
-      'personName': personName,
-      'personBatch': personBatch
-    };
+    return {'bookID': bookID, 'bookName': bookName};
   }
 
-  BookSaleModel(
-      {required this.bookName,
-      required this.bookPrice,
-      required this.personName,
-      required this.personBatch,
-      this.id});
+  Map<String, String> toDropdownData() {
+    return {'id': bookID, 'name': bookName};
+  }
+
+  BookModel({required this.bookID, required this.bookName});
 }

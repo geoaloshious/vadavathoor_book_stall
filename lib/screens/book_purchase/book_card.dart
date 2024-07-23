@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 
 class BookCard extends StatefulWidget {
-  final Map<String, dynamic> data;
-  final void Function() deleteBook;
-  final void Function(Map<String, dynamic>) editBook;
+  final BookPurchaseListItemModel data;
 
-  const BookCard(
-      {super.key,
-      required this.data,
-      required this.deleteBook,
-      required this.editBook});
+  const BookCard({super.key, required this.data});
 
   @override
   State<BookCard> createState() => _BookCardState();
@@ -45,11 +42,11 @@ class _BookCardState extends State<BookCard> {
 
     setState(() {
       if (tempInputErrors.isEmpty) {
-        widget.editBook({
-          'bookName': bookName,
-          'quantity': quantity,
-          'bookPrice': price,
-        });
+        // widget.editBook({
+        //   'bookName': bookName,
+        //   'quantity': quantity,
+        //   'bookPrice': price,
+        // });
 
         editMode = false;
       } else {
@@ -58,13 +55,13 @@ class _BookCardState extends State<BookCard> {
     });
   }
 
-  void _deleteBook() {
+  void _deletePurchase() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this book?'),
+          content: const Text('Are you sure you want to delete this purchase?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -74,7 +71,7 @@ class _BookCardState extends State<BookCard> {
             ),
             ElevatedButton(
               onPressed: () {
-                widget.deleteBook();
+                deleteBookPurchase(widget.data.purchaseID);
                 Navigator.of(context).pop();
               },
               child: const Text('Delete'),
@@ -88,9 +85,9 @@ class _BookCardState extends State<BookCard> {
   @override
   void initState() {
     super.initState();
-    _bookNameController = TextEditingController(text: widget.data['bookName']);
-    _quantityController = TextEditingController(text: widget.data['quantity']);
-    _priceController = TextEditingController(text: widget.data['bookPrice']);
+    _bookNameController = TextEditingController(text: widget.data.bookName);
+    _quantityController = TextEditingController(text: widget.data.quantity);
+    _priceController = TextEditingController(text: widget.data.bookPrice);
   }
 
   @override
@@ -186,7 +183,7 @@ class _BookCardState extends State<BookCard> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: _deleteBook,
+                  onPressed: _deletePurchase,
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),

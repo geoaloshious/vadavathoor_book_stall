@@ -1,7 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 part 'publisher.g.dart';
 
-@HiveType(typeId: 4)
+@HiveType(typeId: ItemType.publisher)
 class PublisherModel {
   @HiveField(0)
   final String publisherID;

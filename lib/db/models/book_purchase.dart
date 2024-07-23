@@ -1,31 +1,35 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 part 'book_purchase.g.dart';
 
-@HiveType(typeId: 3)
+@HiveType(typeId: ItemType.bookPurchase)
 class BookPurchaseModel {
   @HiveField(0)
   final String purchaseID;
 
   @HiveField(1)
-  final String publisherID;
+  String publisherID;
 
   @HiveField(2)
-  final String purchaseDate;
+  String purchaseDate;
 
   @HiveField(3)
-  final String bookID;
+  String bookID;
 
   @HiveField(4)
-  final String bookPrice;
+  String bookPrice;
 
   @HiveField(5)
-  final String quantity;
+  String quantity;
 
   @HiveField(6)
   final String createdDate;
 
   @HiveField(7)
-  final String modifiedDate;
+  String modifiedDate;
+
+  @HiveField(8)
+  bool deleted;
 
   Map<String, dynamic> toJson() {
     return {
@@ -36,18 +40,19 @@ class BookPurchaseModel {
       'quantity': quantity,
       'bookPrice': bookPrice,
       'createdDate': createdDate,
-      'modifiedDate': modifiedDate
+      'modifiedDate': modifiedDate,
+      'deleted': deleted
     };
   }
 
-  BookPurchaseModel({
-    required this.purchaseID,
-    required this.publisherID,
-    required this.purchaseDate,
-    required this.bookID,
-    required this.quantity,
-    required this.bookPrice,
-    required this.createdDate,
-    required this.modifiedDate,
-  });
+  BookPurchaseModel(
+      {required this.purchaseID,
+      required this.publisherID,
+      required this.purchaseDate,
+      required this.bookID,
+      required this.quantity,
+      required this.bookPrice,
+      required this.createdDate,
+      required this.modifiedDate,
+      required this.deleted});
 }
