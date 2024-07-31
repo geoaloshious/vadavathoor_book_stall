@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
@@ -9,7 +11,18 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
+  // Get the current executable path
+  final executablePath = Directory.current.path;
+  final dbPath = Directory('$executablePath/database');
+
+  print('abcd : $dbPath');
+
+  // Create the database directory if it doesn't exist
+  if (!await dbPath.exists()) {
+    await dbPath.create(recursive: true);
+  }
+
+  await Hive.initFlutter(dbPath.path);
   if (!Hive.isAdapterRegistered(BookModelAdapter().typeId)) {
     Hive.registerAdapter(BookModelAdapter());
   }
