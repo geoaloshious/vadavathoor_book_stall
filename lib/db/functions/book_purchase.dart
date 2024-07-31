@@ -45,9 +45,36 @@ Future<void> addBookPurchase(
   updateBookPurchaseList();
 }
 
-// Future<void> editBookPurchase(String purchaseID){
+Future<void> editBookPurchase(
+    String purchaseID,
+    String publisherID,
+    String publisherName,
+    String bookID,
+    String bookName,
+    String quantity,
+    String bookPrice) async {
+  final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
 
-// }
+  for (int key in box.keys) {
+    BookPurchaseModel? existingData = box.get(key);
+    if (existingData != null && existingData.purchaseID == purchaseID) {
+      if (publisherID == '') {
+        publisherID = await addPublisher(publisherName, '');
+      }
+
+      if (bookID == '') {
+        bookID = await addBook(bookName);
+      }
+
+      existingData.publisherID = publisherID;
+      existingData.bookID = bookID;
+      existingData.quantity = quantity;
+      existingData.bookPrice = bookPrice;
+      await box.put(key, existingData);
+      break;
+    }
+  }
+}
 
 Future<void> deleteBookPurchase(String purchaseID) async {
   final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
@@ -84,8 +111,10 @@ void updateBookPurchaseList() async {
     if (book != null && publisher != null && !purchase.deleted) {
       joinedData.add(BookPurchaseListItemModel(
           purchaseID: purchase.purchaseID,
+          publisherID: purchase.publisherID,
           publisherName: publisher.publisherName,
           purchaseDate: purchase.purchaseDate,
+          bookID: book.bookID,
           bookName: book.bookName,
           quantity: purchase.quantity,
           bookPrice: purchase.bookPrice,

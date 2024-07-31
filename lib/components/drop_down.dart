@@ -5,6 +5,7 @@ class CustomDropdown extends StatefulWidget {
   final String selectedValue;
   final String label;
   final bool hasError;
+  final bool? disabled;
   final Function(String) onValueChanged;
 
   const CustomDropdown(
@@ -13,7 +14,8 @@ class CustomDropdown extends StatefulWidget {
       required this.selectedValue,
       required this.label,
       required this.onValueChanged,
-      required this.hasError});
+      required this.hasError,
+      this.disabled});
 
   @override
   _CustomPopupDropdownState createState() => _CustomPopupDropdownState();
@@ -34,6 +36,7 @@ class _CustomPopupDropdownState extends State<CustomDropdown> {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
+      enabled: widget.disabled == null || widget.disabled == false,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
@@ -43,7 +46,12 @@ class _CustomPopupDropdownState extends State<CustomDropdown> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(getSelectedItemName()),
+            Expanded(
+              child: Text(
+                getSelectedItemName(),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             const Icon(Icons.arrow_drop_down),
           ],
         ),

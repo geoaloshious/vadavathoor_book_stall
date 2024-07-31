@@ -1,7 +1,9 @@
 class BookPurchaseListItemModel {
   final String purchaseID;
+  final String publisherID;
   final String publisherName;
   final String purchaseDate;
+  final String bookID;
   final String bookName;
   final String bookPrice;
   final String quantity;
@@ -11,8 +13,10 @@ class BookPurchaseListItemModel {
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
+      'publisherID': publisherID,
       'publisherName': publisherName,
       'purchaseDate': purchaseDate,
+      'bookID': bookID,
       'bookName': bookName,
       'quantity': quantity,
       'bookPrice': bookPrice,
@@ -23,8 +27,10 @@ class BookPurchaseListItemModel {
 
   BookPurchaseListItemModel({
     required this.purchaseID,
+    required this.publisherID,
     required this.publisherName,
     required this.purchaseDate,
+    required this.bookID,
     required this.bookName,
     required this.quantity,
     required this.bookPrice,
