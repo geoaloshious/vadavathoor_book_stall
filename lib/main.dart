@@ -15,8 +15,6 @@ Future<void> main() async {
   final executablePath = Directory.current.path;
   final dbPath = Directory('$executablePath/database');
 
-  print('abcd : $dbPath');
-
   // Create the database directory if it doesn't exist
   if (!await dbPath.exists()) {
     await dbPath.create(recursive: true);
@@ -31,6 +29,9 @@ Future<void> main() async {
   }
   if (!Hive.isAdapterRegistered(BookSaleModelAdapter().typeId)) {
     Hive.registerAdapter(BookSaleModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(BookSaleItemModelAdapter().typeId)) {
+    Hive.registerAdapter(BookSaleItemModelAdapter());
   }
   if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
     Hive.registerAdapter(PurchaseAttachmentModelAdapter());

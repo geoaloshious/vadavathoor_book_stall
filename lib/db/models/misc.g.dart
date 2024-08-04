@@ -1,38 +1,35 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'publisher.dart';
+part of 'misc.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
+class MiscModelAdapter extends TypeAdapter<MiscModel> {
   @override
-  final int typeId = 5;
+  final int typeId = 7;
 
   @override
-  PublisherModel read(BinaryReader reader) {
+  MiscModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return PublisherModel(
-      publisherID: fields[0] as String,
-      publisherName: fields[1] as String,
-      publisherAddress: fields[2] as String,
+    return MiscModel(
+      itemKey: fields[0] as String,
+      itemValue: fields[1] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, PublisherModel obj) {
+  void write(BinaryWriter writer, MiscModel obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.publisherID)
-      ..writeByte(1)
-      ..write(obj.publisherName)
       ..writeByte(2)
-      ..write(obj.publisherAddress);
+      ..writeByte(0)
+      ..write(obj.itemKey)
+      ..writeByte(1)
+      ..write(obj.itemValue);
   }
 
   @override
@@ -41,7 +38,7 @@ class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PublisherModelAdapter &&
+      other is MiscModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

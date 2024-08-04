@@ -6,6 +6,7 @@ class CustomDropdown extends StatefulWidget {
   final String label;
   final bool hasError;
   final bool? disabled;
+  final List<String>? excludeIDs;
   final Function(String) onValueChanged;
 
   const CustomDropdown(
@@ -15,6 +16,7 @@ class CustomDropdown extends StatefulWidget {
       required this.label,
       required this.onValueChanged,
       required this.hasError,
+      this.excludeIDs,
       this.disabled});
 
   @override
@@ -57,7 +59,13 @@ class _CustomPopupDropdownState extends State<CustomDropdown> {
         ),
       ),
       itemBuilder: (BuildContext context) {
-        return widget.items.map((value) {
+        return widget.items.where((i) {
+          if (widget.excludeIDs != null) {
+            return widget.excludeIDs!.contains(i['id']) == false;
+          } else {
+            return true;
+          }
+        }).map((value) {
           return PopupMenuItem<String>(
             value: value['id'],
             child: Text(value['name']!),

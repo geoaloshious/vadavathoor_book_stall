@@ -20,13 +20,13 @@ class BookPurchaseModel {
   String bookPrice;
 
   @HiveField(5)
-  String quantity;
+  int quantity;
 
   @HiveField(6)
-  final String createdDate;
+  final int createdDate;
 
   @HiveField(7)
-  String modifiedDate;
+  int modifiedDate;
 
   @HiveField(8)
   bool deleted;

@@ -18,16 +18,16 @@ Future<void> addBookPurchase(
     String bookID,
     String bookName,
     String bookPrice,
-    String quantity) async {
+    int quantity) async {
   String purchaseID = generateID(ItemType.bookPurchase);
-  String createdDate = '';
-  String modifiedDate = '';
+  final currentTS = getCurrentTimestamp();
+
   if (publisherID == '') {
     publisherID = await addPublisher(publisherName, '');
   }
 
   if (bookID == '') {
-    bookID = await addBook(bookName);
+    bookID = await addBook(bookName, bookPrice, quantity);
   }
 
   final db = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
@@ -38,8 +38,8 @@ Future<void> addBookPurchase(
       bookID: bookID,
       quantity: quantity,
       bookPrice: bookPrice,
-      createdDate: createdDate,
-      modifiedDate: modifiedDate,
+      createdDate: currentTS,
+      modifiedDate: currentTS,
       deleted: false));
 
   updateBookPurchaseList();
@@ -51,7 +51,7 @@ Future<void> editBookPurchase(
     String publisherName,
     String bookID,
     String bookName,
-    String quantity,
+    int quantity,
     String bookPrice) async {
   final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
 
@@ -63,13 +63,14 @@ Future<void> editBookPurchase(
       }
 
       if (bookID == '') {
-        bookID = await addBook(bookName);
+        bookID = await addBook(bookName, bookPrice, quantity);
       }
 
       existingData.publisherID = publisherID;
       existingData.bookID = bookID;
       existingData.quantity = quantity;
       existingData.bookPrice = bookPrice;
+      existingData.modifiedDate = getCurrentTimestamp();
       await box.put(key, existingData);
       break;
     }
@@ -118,8 +119,7 @@ void updateBookPurchaseList() async {
           bookName: book.bookName,
           quantity: purchase.quantity,
           bookPrice: purchase.bookPrice,
-          createdDate: purchase.createdDate,
-          modifiedDate: purchase.modifiedDate));
+          createdDate: formatTimestamp(purchase.createdDate)));
     }
   }
 

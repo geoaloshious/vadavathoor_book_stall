@@ -9,7 +9,7 @@ part of 'purchase_attachment.dart';
 class PurchaseAttachmentModelAdapter
     extends TypeAdapter<PurchaseAttachmentModel> {
   @override
-  final int typeId = 5;
+  final int typeId = 6;
 
   @override
   PurchaseAttachmentModel read(BinaryReader reader) {

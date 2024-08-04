@@ -1,0 +1,255 @@
+import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/db/functions/book.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
+import 'package:vadavathoor_book_stall/screens/sales/new_book_sale_item.dart';
+
+class NewSaleWidget extends StatefulWidget {
+  const NewSaleWidget({super.key});
+
+  @override
+  State<NewSaleWidget> createState() => _NewSaleState();
+}
+
+class _NewSaleState extends State<NewSaleWidget> {
+  final _customerNameController = TextEditingController();
+  final _customerBatchController = TextEditingController();
+  Map<String, bool> inputErrors = {};
+  bool _isStationaryChecked = false;
+  bool _isBookChecked = false;
+  List<BookSaleItemModel> selectedBooks = [];
+  double grandTotal = 0;
+  List<String> selectedBookIDs = [];
+
+  Future<void> _handleSubmit() async {
+    if (_isBookChecked || _isStationaryChecked) {
+      if (selectedBookIDs.isNotEmpty) {
+        // selectedBooks.forEach((i) {
+        //   if (i.soldPrice == '' || double.tryParse(i.soldPrice) == 0) {
+        //     i.soldPrice = i.originalPrice;
+        //   }
+        // });
+
+        await addBookSale(
+            selectedBooks,
+            grandTotal,
+            _customerNameController.text.trim(),
+            _customerBatchController.text.trim());
+
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  void _updateGrandTotal() {
+    double tempTotal = 0;
+
+    for (BookSaleItemModel i in selectedBooks) {
+      if (i.bookID != '') {
+        tempTotal = tempTotal +
+            ((int.tryParse(i.soldPrice != '' ? i.soldPrice : i.originalPrice) ??
+                    0) *
+                i.quantity);
+      }
+    }
+
+    setState(() {
+      grandTotal = tempTotal;
+    });
+  }
+
+  void _updateSelectedBookIDs() {
+    final List<String> tempArr = [];
+
+    for (BookSaleItemModel i in selectedBooks) {
+      if (i.bookID != '') {
+        tempArr.add(i.bookID);
+      }
+    }
+
+    setState(() {
+      selectedBookIDs = tempArr;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateBooksList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'New Sale',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: 'Close',
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Confirmation'),
+                        content: const Text(
+                            'Are you sure you want to discard this sale?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Discard'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Book'),
+                value: _isBookChecked,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool? value) {
+                  setState(() {
+                    selectedBooks.clear();
+                    if (value == true) {
+                      selectedBooks.add(emptyBookSaleItem());
+                    }
+                    _updateSelectedBookIDs();
+
+                    _isBookChecked = value ?? false;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Stationary'),
+                enabled: false,
+                value: _isStationaryChecked,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isStationaryChecked = value ?? false;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10.0),
+        Visibility(
+          visible: _isBookChecked,
+          child: Column(
+            children: [
+              ValueListenableBuilder(
+                  valueListenable: booksNotifier,
+                  builder: (ctx, books, child) {
+                    return Column(
+                        children: List.generate(
+                      selectedBooks.length,
+                      (index) {
+                        return NewBookSaleItemWidget(
+                          key: Key(selectedBooks[index].id.toString()),
+                          books: books,
+                          selectedBookIDs: selectedBookIDs,
+                          updateData: (
+                              {String? bkId,
+                              String? prc,
+                              String? dsPr,
+                              int? qty}) {
+                            if (bkId != null && prc != null) {
+                              selectedBooks[index].bookID = bkId;
+                              selectedBooks[index].originalPrice = prc;
+
+                              _updateSelectedBookIDs();
+                            }
+                            if (dsPr != null) {
+                              selectedBooks[index].soldPrice = dsPr;
+                            }
+                            if (qty != null) {
+                              selectedBooks[index].quantity = qty;
+                            }
+
+                            _updateGrandTotal();
+                          },
+                          onClickDelete: () {
+                            setState(() {
+                              selectedBooks.removeAt(index);
+                            });
+
+                            _updateGrandTotal();
+                            _updateSelectedBookIDs();
+                          },
+                        );
+                      },
+                    ));
+                  }),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedBooks.add(emptyBookSaleItem());
+                    });
+                  },
+                  child: const Text('Add item')),
+            ],
+          ),
+        ),
+        const SizedBox(height: 30),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(), hintText: 'Customer name'),
+                controller: _customerNameController,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(), hintText: 'Customer batch'),
+                controller: _customerBatchController,
+              ),
+            )
+          ],
+        ),
+        const SizedBox(height: 20),
+        Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'Grand Total : $grandTotal',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            )),
+        const SizedBox(height: 20),
+        ElevatedButton(
+            onPressed: _handleSubmit,
+            child: const Text(
+              'Submit',
+              style: TextStyle(fontSize: 20),
+            )),
+      ],
+    );
+  }
+}

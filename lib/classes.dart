@@ -6,9 +6,8 @@ class BookPurchaseListItemModel {
   final String bookID;
   final String bookName;
   final String bookPrice;
-  final String quantity;
+  final int quantity;
   final String createdDate;
-  final String modifiedDate;
 
   Map<String, dynamic> toJson() {
     return {
@@ -21,7 +20,6 @@ class BookPurchaseListItemModel {
       'quantity': quantity,
       'bookPrice': bookPrice,
       'createdDate': createdDate,
-      'modifiedDate': modifiedDate
     };
   }
 
@@ -35,6 +33,28 @@ class BookPurchaseListItemModel {
     required this.quantity,
     required this.bookPrice,
     required this.createdDate,
-    required this.modifiedDate,
+  });
+}
+
+class BookSaleListItemModel {
+  final String bookName;
+  final int quantity;
+  final String date;
+  final double grandTotal;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'bookName': bookName,
+      'quantity': quantity,
+      'date': date,
+      'grandTotal': grandTotal
+    };
+  }
+
+  BookSaleListItemModel({
+    required this.bookName,
+    required this.quantity,
+    required this.date,
+    required this.grandTotal,
   });
 }

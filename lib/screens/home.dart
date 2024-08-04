@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
-import 'package:vadavathoor_book_stall/screens/book_sale.dart';
-import 'package:vadavathoor_book_stall/screens/publishers.dart';
-import 'package:vadavathoor_book_stall/screens/stationary.dart';
+// import 'package:vadavathoor_book_stall/screens/publishers.dart';
+import 'package:vadavathoor_book_stall/screens/sales/sales.dart';
+// import 'package:vadavathoor_book_stall/screens/stationary.dart';
+import 'package:vadavathoor_book_stall/screens/under_development.dart';
 
 final a = {
   0: 'Book purchases',
-  1: 'Book sales',
-  2: 'Publishers',
-  3: 'Stationary items'
+  1: 'Sales',
+  2: 'Stationary purchases',
+  3: 'Publishers',
 };
 
 class HomeScreen extends StatefulWidget {
@@ -26,11 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return const BookPurchase();
       case 1:
-        return const BookSale();
+        return const SalesWidget();
       case 2:
-        return const Publishers();
+        // return const Publishers();
+        return UnderDevelopment();
       case 3:
-        return const Stationary();
+        // return const Stationary();
+        return UnderDevelopment();
       default:
         return;
     }
@@ -64,10 +67,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       })),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 0.2, color: Colors.blueGrey),
+                        // shape: BoxShape.circle,
+                        boxShadow: const [
+                      BoxShadow(
+                        color: Colors.blueGrey,
+                        blurRadius: 4,
+                      ),
+                    ])),
+              ),
               Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Container(
-                    color: Colors.amber,
                     child: renderRightSide(),
                   ))
             ],

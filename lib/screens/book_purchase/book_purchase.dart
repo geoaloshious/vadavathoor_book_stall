@@ -20,6 +20,7 @@ class _BookPurchaseState extends State<BookPurchase> {
   final _bookNameController = TextEditingController();
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
+
   DateTime _selectedDate = DateTime.now();
   String _publisherID = '';
   String _bookID = '';
@@ -44,7 +45,7 @@ class _BookPurchaseState extends State<BookPurchase> {
   void _addBook() {
     final publisherName = _publisherController.text.trim();
     final bookName = _bookNameController.text.trim();
-    final quantity = _quantityController.text.trim();
+    final quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
     final price = _priceController.text.trim();
 
     Map<String, bool> tempInputErrors = {};
@@ -69,7 +70,7 @@ class _BookPurchaseState extends State<BookPurchase> {
       }
     }
 
-    if (quantity == '' || quantity == '0') {
+    if (quantity == 0) {
       tempInputErrors['quantity'] = true;
     }
 
@@ -145,11 +146,10 @@ class _BookPurchaseState extends State<BookPurchase> {
                 ),
               ],
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 10.0),
             Row(
               children: [
                 Expanded(
-                  flex: 2,
                   child: _isPublisherChecked
                       ? ValueListenableBuilder(
                           valueListenable: publishersNotifier,
@@ -197,26 +197,6 @@ class _BookPurchaseState extends State<BookPurchase> {
                 ),
                 const SizedBox(width: 16.0),
                 Expanded(
-                  flex: 1,
-                  child: GestureDetector(
-                    onTap: _selectDate,
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Date',
-                        suffixIcon: Icon(Icons.calendar_today),
-                        border: OutlineInputBorder(),
-                      ),
-                      child:
-                          Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              children: [
-                Expanded(
                   child: _isBookChecked
                       ? ValueListenableBuilder(
                           valueListenable: booksNotifier,
@@ -258,7 +238,11 @@ class _BookPurchaseState extends State<BookPurchase> {
                           },
                         ),
                 ),
-                const SizedBox(width: 16.0),
+              ],
+            ),
+            const SizedBox(height: 10.0),
+            Row(
+              children: [
                 Expanded(
                   child: TextField(
                     controller: _quantityController,
@@ -307,23 +291,39 @@ class _BookPurchaseState extends State<BookPurchase> {
                   ),
                 ),
                 const SizedBox(width: 16.0),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: _addBook,
+                Expanded(
+                  child: GestureDetector(
+                    onTap: _selectDate,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Purchase Date',
+                        suffixIcon: Icon(Icons.calendar_today),
+                        border: OutlineInputBorder(),
+                      ),
+                      child:
+                          Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+                    ),
+                  ),
                 ),
+                // const SizedBox(width: 16.0),
+                // IconButton(
+                //   icon: const Icon(Icons.add),
+                //   onPressed: _addBook,
+                // ),
               ],
             ),
-            const SizedBox(height: 16.0),
+
+            const SizedBox(height: 10.0),
+            ElevatedButton(onPressed: _addBook, child: const Text('Submit')),
+            const SizedBox(height: 20.0),
+
             Expanded(
                 child: ValueListenableBuilder(
                     valueListenable: purchaseNotifier,
-                    builder: (ctx, purchases, child) {
-                      return ListView.builder(
-                          itemCount: purchases.length,
-                          itemBuilder: (context, index) {
-                            return BookCard(data: purchases[index]);
-                          });
-                    }))
+                    builder: (ctx, purchases, child) => ListView.builder(
+                        itemCount: purchases.length,
+                        itemBuilder: (context, index) =>
+                            BookCard(data: purchases[index]))))
 
             // const SizedBox(height: 16.0),
             // ElevatedButton(
