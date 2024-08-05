@@ -1,19 +1,24 @@
-name: Flutter Desktop Deployment
-
+name: Manually Triggered Workflow
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch
+        
 jobs:
   windows:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
+      - name: Support longpaths
+        run: git config --system core.longpaths true
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
+          # optional parameters follow
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
+          pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache of dart pub get dependencies
+          pub-cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
       - name: Install project dependencies
         run: flutter pub get
       - name: Generate intermediates
@@ -22,16 +27,8 @@ jobs:
         run: flutter config --enable-windows-desktop
       - name: Build artifacts
         run: flutter build windows --release
-      - name: Package Release
-        uses: thedoctor0/zip-release@master
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          type: 'zip'
-          filename: local_api_server-${{github.ref_name}}-windows.zip
-          directory: build/windows/runner/Release
-      - name: Release to github
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{github.ref_name}}
-          files: build/windows/runner/Release/local_api_server-${{github.ref_name}}-windows.zip
+          name: bookstall
+          path: build/windows/x64/runner/Release
