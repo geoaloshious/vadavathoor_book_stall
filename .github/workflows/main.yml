@@ -1,15 +1,23 @@
-name: Flutter Desktop Deployment
-
+name: Manually Triggered Workflow
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'warning'
+      environment:
+        description: 'Environment to deploy'
+        required: false
+        default: 'staging'
+        
 jobs:
   windows:
     runs-on: windows-latest
 
     steps:
+      - name: Support longpaths
+        run: git config --system core.longpaths true
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
         with:
