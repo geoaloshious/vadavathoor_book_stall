@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Support longpaths
         run: git config --system core.longpaths true
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
       - name: Install project dependencies
@@ -27,10 +27,5 @@ jobs:
           type: 'zip'
           filename: local_api_server-${{github.ref_name}}-windows.zip
           directory: build/windows/x64/runner/Release
-      - name: Release to github
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{github.ref_name}}
-          files: build/windows/x64/runner/Release/local_api_server-${{github.ref_name}}-windows.zip
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
