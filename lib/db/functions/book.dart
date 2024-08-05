@@ -5,15 +5,10 @@ import 'package:vadavathoor_book_stall/utils.dart';
 
 final booksNotifier = ValueNotifier<List<BookModel>>([]);
 
-Future<String> addBook(String name, String bookPrice, int inStockCount) async {
+Future<String> addBook(String name) async {
   String bookID = generateID(ItemType.book);
   final bookDB = await Hive.openBox<BookModel>(DBNames.book);
-  await bookDB.add(BookModel(
-      bookID: bookID,
-      bookName: name,
-      price: bookPrice,
-      discountPrice: '',
-      inStockCount: inStockCount));
+  await bookDB.add(BookModel(bookID: bookID, bookName: name));
 
   await updateBooksList();
 

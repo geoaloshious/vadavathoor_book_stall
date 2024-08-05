@@ -27,7 +27,7 @@ Future<void> addBookPurchase(
   }
 
   if (bookID == '') {
-    bookID = await addBook(bookName, bookPrice, quantity);
+    bookID = await addBook(bookName);
   }
 
   final db = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
@@ -63,7 +63,7 @@ Future<void> editBookPurchase(
       }
 
       if (bookID == '') {
-        bookID = await addBook(bookName, bookPrice, quantity);
+        bookID = await addBook(bookName);
       }
 
       existingData.publisherID = publisherID;
