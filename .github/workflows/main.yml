@@ -27,16 +27,8 @@ jobs:
         run: flutter config --enable-windows-desktop
       - name: Build artifacts
         run: flutter build windows --release
-      - name: Package Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: software.zip
-          directory: build/windows/x64/runner/Release
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bookstall
-          path: build/windows/x64/runner
-      - name: Download a single artifact
-        uses: actions/download-artifact@v4
+          path: build/windows/x64/runner/Release
