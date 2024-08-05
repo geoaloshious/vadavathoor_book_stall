@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
-import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/screens/sales/new_sale.dart';
-
-BookModel emptyBookModel() => BookModel(
-    bookID: '', bookName: '', price: '', discountPrice: '', inStockCount: 0);
 
 class SalesWidget extends StatefulWidget {
   const SalesWidget({super.key});
