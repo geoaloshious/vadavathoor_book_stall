@@ -31,7 +31,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: local_api_server-${{github.ref_name}}-windows.zip
+          filename: software.zip
           directory: build/windows/x64/runner/Release
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bookstall
+          path: build/windows/x64/runner
       - name: Download a single artifact
         uses: actions/download-artifact@v4
