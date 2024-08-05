@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class UnderDevelopment extends StatelessWidget {
+  const UnderDevelopment({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Column(mainAxisAlignment: MainAxisAlignment.center, children: [

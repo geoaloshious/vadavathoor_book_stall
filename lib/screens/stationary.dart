@@ -10,6 +10,6 @@ class Stationary extends StatefulWidget {
 class _StationaryState extends State<Stationary> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Text('Stationary'));
+    return const Scaffold(body: Text('Stationary'));
   }
 }

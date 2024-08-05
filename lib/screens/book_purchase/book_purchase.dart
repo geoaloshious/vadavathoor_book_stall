@@ -15,7 +15,6 @@ class BookPurchase extends StatefulWidget {
 }
 
 class _BookPurchaseState extends State<BookPurchase> {
-  final List<Map<String, dynamic>> _books = [];
   final _publisherController = TextEditingController();
   final _bookNameController = TextEditingController();
   final _quantityController = TextEditingController();
@@ -94,10 +93,6 @@ class _BookPurchaseState extends State<BookPurchase> {
         inputErrors = tempInputErrors;
       }
     });
-  }
-
-  void _addAttachment() {
-    // Implement file upload functionality here
   }
 
   @override
