@@ -14,10 +14,10 @@ ValueNotifier<List<BookPurchaseListItemModel>> purchaseNotifier =
 Future<void> addBookPurchase(
     String publisherID,
     String publisherName,
-    DateTime purchaseDate,
+    int purchaseDate,
     String bookID,
     String bookName,
-    String bookPrice,
+    double bookPrice,
     int quantity) async {
   String purchaseID = generateID(ItemType.bookPurchase);
   final currentTS = getCurrentTimestamp();
@@ -34,7 +34,7 @@ Future<void> addBookPurchase(
   await db.add(BookPurchaseModel(
       purchaseID: purchaseID,
       publisherID: publisherID,
-      purchaseDate: purchaseDate.toString(),
+      purchaseDate: purchaseDate,
       bookID: bookID,
       quantity: quantity,
       bookPrice: bookPrice,
@@ -52,7 +52,7 @@ Future<void> editBookPurchase(
     String bookID,
     String bookName,
     int quantity,
-    String bookPrice) async {
+    double bookPrice) async {
   final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
 
   for (int key in box.keys) {

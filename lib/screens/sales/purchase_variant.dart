@@ -3,25 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
 
-class NewBookSaleItemWidget extends StatefulWidget {
-  final List<ForNewSaleBookItem> books;
-  final List<String> selectedBookIDs;
-  final VoidCallback onClickDelete;
-  final void Function({String? bkId, String? prc, String? dsPr, int? qty})
-      updateData;
+class PurchaseVariantWidget extends StatefulWidget {
+  final void Function({String? dsPr, int? qty}) updateData;
 
-  const NewBookSaleItemWidget(
-      {super.key,
-      required this.books,
-      required this.selectedBookIDs,
-      required this.onClickDelete,
-      required this.updateData});
+  const PurchaseVariantWidget({super.key, required this.updateData});
 
   @override
-  State<NewBookSaleItemWidget> createState() => _NewBookSaleItemState();
+  State<PurchaseVariantWidget> createState() => _PurchaseVariantState();
 }
 
-class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
+class _PurchaseVariantState extends State<PurchaseVariantWidget> {
   final TextEditingController _discountPriceController =
       TextEditingController();
   ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
@@ -29,6 +20,26 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
   int inStockCount = 0;
   double originalPrice = 0;
   String discountPrice = '';
+
+  void incrementQuantity() {
+    if (_quantity < inStockCount) {
+      setState(() {
+        _quantity++;
+      });
+
+      widget.updateData(qty: _quantity);
+    }
+  }
+
+  void decrementQuantity() {
+    if (_quantity > 0) {
+      setState(() {
+        _quantity--;
+      });
+
+      widget.updateData(qty: _quantity);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -23,7 +23,7 @@ class _SalesState extends State<SalesWidget> {
       builder: (BuildContext context) {
         Size screenSize = MediaQuery.of(context).size;
         double dialogWidth = screenSize.width * 0.8;
-        double dialogHeight = screenSize.height * 0.6;
+        double dialogHeight = screenSize.height * 0.7;
 
         return Dialog(
           child: Container(
