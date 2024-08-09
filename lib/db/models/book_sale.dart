@@ -2,50 +2,52 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 part 'book_sale.g.dart';
 
-BookSaleItemModel emptyBookSaleItem() => BookSaleItemModel(
-    id: DateTime.now().millisecondsSinceEpoch,
-    bookID: '',
-    originalPrice: '',
-    soldPrice: '',
-    quantity: 0,
-    itemType: SaleItemType.book);
+SaleItemBookModel emptyBookSaleItem() =>
+    SaleItemBookModel(bookID: '', purchaseVariants: []);
 
-@HiveType(typeId: ItemType.bookSaleItem)
-class BookSaleItemModel {
+SaleItemBookPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
+    SaleItemBookPurchaseVariantModel(
+        purchaseID: '', originalPrice: '', soldPrice: '', quantity: 0);
+
+@HiveType(typeId: ItemType.saleItemBookPurchaseVariant)
+class SaleItemBookPurchaseVariantModel {
   @HiveField(0)
-  final int id;
+  String purchaseID;
 
   @HiveField(1)
-  String bookID;
-
-  @HiveField(2)
   String originalPrice;
 
-  @HiveField(3)
+  @HiveField(2)
   String soldPrice;
 
-  @HiveField(4)
+  @HiveField(3)
   int quantity;
 
-  @HiveField(5)
-  int itemType;
-
-  BookSaleItemModel(
-      {required this.id,
-      required this.bookID,
+  SaleItemBookPurchaseVariantModel(
+      {required this.purchaseID,
       required this.originalPrice,
       required this.soldPrice,
-      required this.quantity,
-      required this.itemType});
+      required this.quantity});
 }
 
-@HiveType(typeId: ItemType.bookSale)
+@HiveType(typeId: ItemType.saleItemBook)
+class SaleItemBookModel {
+  @HiveField(0)
+  String bookID;
+
+  @HiveField(1)
+  final List<SaleItemBookPurchaseVariantModel> purchaseVariants;
+
+  SaleItemBookModel({required this.bookID, required this.purchaseVariants});
+}
+
+@HiveType(typeId: ItemType.sale)
 class BookSaleModel {
   @HiveField(0)
   final String saleID;
 
   @HiveField(1)
-  final List<BookSaleItemModel> items;
+  final List<SaleItemBookModel> books;
 
   @HiveField(2)
   final double grandTotal;
@@ -66,7 +68,7 @@ class BookSaleModel {
   final bool deleted;
 
   BookSaleModel(
-      {required this.items,
+      {required this.books,
       required this.grandTotal,
       required this.customerName,
       required this.customerBatch,

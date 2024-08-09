@@ -2,10 +2,10 @@ class BookPurchaseListItemModel {
   final String purchaseID;
   final String publisherID;
   final String publisherName;
-  final String purchaseDate;
+  final int purchaseDate;
   final String bookID;
   final String bookName;
-  final String bookPrice;
+  final double bookPrice;
   final int quantity;
   final String createdDate;
 
@@ -36,7 +36,7 @@ class BookPurchaseListItemModel {
   });
 }
 
-class BookSaleListItemModel {
+class SaleListItemModel {
   final String bookName;
   final int quantity;
   final String date;
@@ -51,7 +51,7 @@ class BookSaleListItemModel {
     };
   }
 
-  BookSaleListItemModel({
+  SaleListItemModel({
     required this.bookName,
     required this.quantity,
     required this.date,

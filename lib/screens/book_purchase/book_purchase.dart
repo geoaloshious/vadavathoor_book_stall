@@ -45,7 +45,7 @@ class _BookPurchaseState extends State<BookPurchase> {
     final publisherName = _publisherController.text.trim();
     final bookName = _bookNameController.text.trim();
     final quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
-    final price = _priceController.text.trim();
+    final price = double.tryParse(_priceController.text.trim()) ?? 0;
 
     Map<String, bool> tempInputErrors = {};
 
@@ -73,14 +73,20 @@ class _BookPurchaseState extends State<BookPurchase> {
       tempInputErrors['quantity'] = true;
     }
 
-    if (price == '' || double.tryParse(price) == 0) {
+    if (price == 0) {
       tempInputErrors['bookPrice'] = true;
     }
 
     setState(() {
       if (tempInputErrors.isEmpty) {
-        addBookPurchase(_publisherID, publisherName, _selectedDate, _bookID,
-            bookName, price, quantity);
+        addBookPurchase(
+            _publisherID,
+            publisherName,
+            _selectedDate.millisecondsSinceEpoch,
+            _bookID,
+            bookName,
+            price,
+            quantity);
 
         _publisherController.clear();
         _bookNameController.clear();

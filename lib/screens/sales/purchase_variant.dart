@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
-import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 
-class NewBookSaleItemWidget extends StatefulWidget {
-  final List<BookModel> books;
-  final List<String> selectedBookIDs;
-  final VoidCallback onClickDelete;
-  final void Function({String? bkId, String? prc, String? dsPr, int? qty})
-      updateData;
+class PurchaseVariantWidget extends StatefulWidget {
+  final bool selected;
+  final SaleItemBookPurchaseVariantModel data;
+  final void Function({String? dsPr, int? qty}) updateData;
 
-  const NewBookSaleItemWidget(
+  const PurchaseVariantWidget(
       {super.key,
-      required this.books,
-      required this.selectedBookIDs,
-      required this.onClickDelete,
+      required this.data,
+      required this.selected,
       required this.updateData});
 
   @override
-  State<NewBookSaleItemWidget> createState() => _NewBookSaleItemState();
+  State<PurchaseVariantWidget> createState() => _PurchaseVariantState();
 }
 
-class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
-  TextEditingController _discountPriceController = TextEditingController();
-  BookModel selectedBook = emptyBookModel();
+class _PurchaseVariantState extends State<PurchaseVariantWidget> {
+  final TextEditingController _discountPriceController =
+      TextEditingController();
+  ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
   int _quantity = 0;
+  int inStockCount = 0;
+  double originalPrice = 0;
   String discountPrice = '';
 
   void incrementQuantity() {
-    if (_quantity < selectedBook.inStockCount) {
+    if (_quantity < inStockCount) {
       setState(() {
         _quantity++;
       });
@@ -59,7 +60,6 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                 child: CustomDropdown(
                   items: widget.books.map((i) => i.toDropdownData()).toList(),
                   selectedValue: selectedBook.bookID,
-                  excludeIDs: widget.selectedBookIDs,
                   label: 'Select Book',
                   hasError: false,
                   onValueChanged: (value) {
@@ -67,27 +67,40 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                       if (value != selectedBook.bookID) {
                         selectedBook = widget.books.firstWhere(
                             (i) => i.bookID == value,
-                            orElse: emptyBookModel);
+                            orElse: emptyForNewSaleBookItem);
 
-                        _quantity = selectedBook.inStockCount > 0 ? 1 : 0;
+                        _quantity = selectedBook.purchases.isNotEmpty ? 1 : 0;
 
-                        _discountPriceController = TextEditingController(
-                            text: selectedBook.discountPrice);
+                        _discountPriceController.clear();
 
                         widget.updateData(
-                            bkId: selectedBook.bookID,
-                            prc: selectedBook.price,
-                            qty: _quantity);
+                            bkId: selectedBook.bookID, qty: _quantity);
                       }
                     });
                   },
                 )),
+            CheckboxListTile(
+              title: const Text('Book'),
+              value: widget.selected,
+              controlAffinity: ListTileControlAffinity.leading,
+              onChanged: (bool? value) {
+                setState(() {
+                  selectedBooks.clear();
+                  if (value == true) {
+                    selectedBooks.add(emptyBookSaleItem());
+                  }
+                  _updateSelectedBookIDs();
+
+                  _isBookChecked = value ?? false;
+                });
+              },
+            ),
             const SizedBox(width: 20),
             Expanded(
               flex: 4,
               child: Row(
                 children: [
-                  Text('Price : ${selectedBook.price}'),
+                  Text('Price : $originalPrice'),
                   const SizedBox(width: 10),
                   Expanded(
                       child: TextField(
@@ -131,17 +144,16 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                       Expanded(
                         child: Center(
                           child: Text(
-                            '$_quantity / ${selectedBook.inStockCount}',
+                            '$_quantity / $inStockCount',
                           ),
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
                         iconSize: 14,
-                        onPressed: _quantity < selectedBook.inStockCount
-                            ? incrementQuantity
-                            : null,
-                        color: _quantity < selectedBook.inStockCount
+                        onPressed:
+                            _quantity < inStockCount ? incrementQuantity : null,
+                        color: _quantity < inStockCount
                             ? Colors.blue
                             : Colors.grey,
                       ),

@@ -32,7 +32,7 @@ class _BookCardState extends State<BookCard> {
     final publisherName = _publisherController.text.trim();
     final bookName = _bookNameController.text.trim();
     final quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
-    final price = _priceController.text.trim();
+    final price = double.tryParse(_priceController.text.trim()) ?? 0;
 
     Map<String, bool> tempInputErrors = {};
 
@@ -60,7 +60,7 @@ class _BookCardState extends State<BookCard> {
       tempInputErrors['quantity'] = true;
     }
 
-    if (price == '' || double.tryParse(price) == 0) {
+    if (price == 0) {
       tempInputErrors['bookPrice'] = true;
     }
 
@@ -110,7 +110,8 @@ class _BookCardState extends State<BookCard> {
     _bookNameController = TextEditingController(text: widget.data.bookName);
     _quantityController =
         TextEditingController(text: widget.data.quantity.toString());
-    _priceController = TextEditingController(text: widget.data.bookPrice);
+    _priceController =
+        TextEditingController(text: widget.data.bookPrice.toString());
   }
 
   @override
