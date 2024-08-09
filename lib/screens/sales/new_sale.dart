@@ -3,7 +3,7 @@ import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
-import 'package:vadavathoor_book_stall/screens/sales/new_book_sale_item.dart';
+import 'package:vadavathoor_book_stall/screens/sales/new_sale_item_book.dart';
 
 class NewSaleWidget extends StatefulWidget {
   const NewSaleWidget({super.key});
@@ -18,7 +18,7 @@ class _NewSaleState extends State<NewSaleWidget> {
   Map<String, bool> inputErrors = {};
   bool _isStationaryChecked = false;
   bool _isBookChecked = false;
-  List<BookSaleItemModel> selectedBooks = [];
+  List<SaleItemBookModel> selectedBooks = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
 
@@ -41,12 +41,16 @@ class _NewSaleState extends State<NewSaleWidget> {
   void _updateGrandTotal() {
     double tempTotal = 0;
 
-    for (BookSaleItemModel i in selectedBooks) {
+    for (SaleItemBookModel i in selectedBooks) {
       if (i.bookID != '') {
-        tempTotal = tempTotal +
-            ((int.tryParse(i.soldPrice != '' ? i.soldPrice : i.originalPrice) ??
-                    0) *
-                i.quantity);
+        for (var pv in i.purchaseVariants) {
+          tempTotal = tempTotal +
+              ((int.tryParse(pv.soldPrice != ''
+                          ? pv.soldPrice
+                          : pv.originalPrice) ??
+                      0) *
+                  pv.quantity);
+        }
       }
     }
 
@@ -55,10 +59,11 @@ class _NewSaleState extends State<NewSaleWidget> {
     });
   }
 
+  /// Store selected books for using in excludeIDS
   void _updateSelectedBookIDs() {
     final List<String> tempArr = [];
 
-    for (BookSaleItemModel i in selectedBooks) {
+    for (SaleItemBookModel i in selectedBooks) {
       if (i.bookID != '') {
         tempArr.add(i.bookID);
       }
@@ -170,23 +175,48 @@ class _NewSaleState extends State<NewSaleWidget> {
                 selectedBooks.length,
                 (index) {
                   return NewBookSaleItemWidget(
-                    key: Key(selectedBooks[index].id.toString()),
+                    key: Key(index.toString()),
                     books: books,
                     selectedBookIDs: selectedBookIDs,
+                    bookDataToSave: selectedBooks[index],
                     updateData: (
-                        {String? bkId, String? prc, String? dsPr, int? qty}) {
-                      if (bkId != null && prc != null) {
+                        {String? bkId,
+                        String? prchID,
+                        String? add,
+                        String? remove,
+                        String? prc,
+                        String? dsPr,
+                        int? qty}) {
+                      if (bkId != null) {
                         selectedBooks[index].bookID = bkId;
                         _updateSelectedBookIDs();
                       }
-                      if (prc != null) {
-                        selectedBooks[index].originalPrice = prc;
-                      }
-                      if (dsPr != null) {
-                        selectedBooks[index].soldPrice = dsPr;
-                      }
-                      if (qty != null) {
-                        selectedBooks[index].quantity = qty;
+                      if (prchID != null) {
+                        if (add != null && prc != null) {
+                          selectedBooks[index].purchaseVariants.add(
+                              SaleItemBookPurchaseVariantModel(
+                                  purchaseID: prchID,
+                                  originalPrice: prc,
+                                  soldPrice: '',
+                                  quantity: 0));
+                        } else {
+                          if (remove != null) {
+                            selectedBooks[index]
+                                .purchaseVariants
+                                .removeWhere((pv) => pv.purchaseID == prchID);
+                          } else {
+                            var pvItm = selectedBooks[index]
+                                .purchaseVariants
+                                .firstWhere((pv) => pv.purchaseID == prchID,
+                                    orElse: emptySaleItemBookPurchaseVariant);
+                            if (dsPr != null) {
+                              pvItm.soldPrice = dsPr;
+                            }
+                            if (qty != null) {
+                              pvItm.quantity = qty;
+                            }
+                          }
+                        }
                       }
 
                       _updateGrandTotal();

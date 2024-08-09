@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 
 class PurchaseVariantWidget extends StatefulWidget {
+  final bool selected;
+  final SaleItemBookPurchaseVariantModel data;
   final void Function({String? dsPr, int? qty}) updateData;
 
-  const PurchaseVariantWidget({super.key, required this.updateData});
+  const PurchaseVariantWidget(
+      {super.key,
+      required this.data,
+      required this.selected,
+      required this.updateData});
 
   @override
   State<PurchaseVariantWidget> createState() => _PurchaseVariantState();
@@ -72,6 +79,22 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                     });
                   },
                 )),
+            CheckboxListTile(
+              title: const Text('Book'),
+              value: widget.selected,
+              controlAffinity: ListTileControlAffinity.leading,
+              onChanged: (bool? value) {
+                setState(() {
+                  selectedBooks.clear();
+                  if (value == true) {
+                    selectedBooks.add(emptyBookSaleItem());
+                  }
+                  _updateSelectedBookIDs();
+
+                  _isBookChecked = value ?? false;
+                });
+              },
+            ),
             const SizedBox(width: 20),
             Expanded(
               flex: 4,
