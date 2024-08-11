@@ -23,6 +23,15 @@ class SaleItemBookPurchaseVariantModel {
   @HiveField(3)
   int quantity;
 
+  Map<String, dynamic> toJson() {
+    return {
+      'purchaseID': purchaseID,
+      'originalPrice': originalPrice,
+      'soldPrice': soldPrice,
+      'quantity': quantity
+    };
+  }
+
   SaleItemBookPurchaseVariantModel(
       {required this.purchaseID,
       required this.originalPrice,
@@ -37,6 +46,13 @@ class SaleItemBookModel {
 
   @HiveField(1)
   List<SaleItemBookPurchaseVariantModel> purchaseVariants;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'bookID': bookID,
+      'purchaseVariants': purchaseVariants.map((b) => b.toJson()).toString()
+    };
+  }
 
   SaleItemBookModel({required this.bookID, required this.purchaseVariants});
 }
@@ -66,6 +82,19 @@ class SaleModel {
 
   @HiveField(7)
   final bool deleted;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'saleID': saleID,
+      'grandTotal': grandTotal,
+      'customerName': customerName,
+      'customerBatch': customerBatch,
+      'createdDate': createdDate,
+      'modifiedDate': modifiedDate,
+      'deleted': deleted,
+      'books': books.map((b) => b.toJson()).toString()
+    };
+  }
 
   SaleModel(
       {required this.books,
