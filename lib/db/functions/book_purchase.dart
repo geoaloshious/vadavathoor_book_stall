@@ -119,7 +119,7 @@ void updateBookPurchaseList() async {
           bookName: book.bookName,
           quantity: purchase.quantity,
           bookPrice: purchase.bookPrice,
-          createdDate: formatTimestamp(purchase.createdDate)));
+          createdDate: formatTimestamp(timestamp: purchase.createdDate)));
     }
   }
 

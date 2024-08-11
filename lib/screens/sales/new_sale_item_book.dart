@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
-import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/screens/sales/purchase_variant.dart';
 
 class NewBookSaleItemWidget extends StatefulWidget {
@@ -48,12 +46,14 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                       selectedValue: selectedBook.bookID,
                       label: 'Select Book',
                       hasError: false,
+                      excludeIDs: widget.selectedBookIDs,
                       onValueChanged: (value) {
                         setState(() {
                           if (value != selectedBook.bookID) {
-                            selectedBook = widget.books.firstWhere(
-                                (i) => i.bookID == value,
-                                orElse: emptyForNewSaleBookItem);
+                            selectedBook = widget.books
+                                .firstWhere((i) => i.bookID == value,
+                                    orElse: emptyForNewSaleBookItem)
+                                .clone();
 
                             widget.updateData(bkId: selectedBook.bookID);
                           }
@@ -74,6 +74,12 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                   key: Key(index.toString()),
                   data: selectedBook.purchases[index],
                   updateData: ({bool? selected, double? dsPr, int? qty}) {
+                    if (selected != null) {
+                      setState(() {
+                        selectedBook.purchases[index].selected = selected;
+                      });
+                    }
+
                     widget.updateData(
                         prchID: selectedBook.purchases[index].purchaseID,
                         selected: selected,

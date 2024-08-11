@@ -36,7 +36,7 @@ class DBNames {
 //   static const int stationary = 2;
 // }
 
-void registerDB() async {
+Future<void> initializeHiveDB() async {
   // Get the current executable path
   final executablePath = Directory.current.path;
   final dbPath = Directory('$executablePath/database');
@@ -70,7 +70,7 @@ void registerDB() async {
     Hive.registerAdapter(PublisherModelAdapter());
   }
 
-  return;
+  // return;
 }
 
 String generateID(int type) {
@@ -82,8 +82,8 @@ int getCurrentTimestamp() {
   return DateTime.now().millisecondsSinceEpoch;
 }
 
-String formatTimestamp(int timestamp) {
+String formatTimestamp({required int timestamp, String? format}) {
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy hh:mm a');
+  DateFormat dateFormat = DateFormat(format ?? 'dd/MM/yyyy hh:mm a');
   return dateFormat.format(dateTime);
 }

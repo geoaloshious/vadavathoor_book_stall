@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
-import 'package:vadavathoor_book_stall/components/drop_down.dart';
-import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 
 class PurchaseVariantWidget extends StatefulWidget {
-  // final bool selected;
   final ForNewSaleBookPurchaseVariant data;
   final void Function({bool? selected, double? dsPr, int? qty}) updateData;
 
   const PurchaseVariantWidget(
-      {super.key,
-      required this.data,
-      // required this.selected,
-      required this.updateData});
+      {super.key, required this.data, required this.updateData});
 
   @override
   State<PurchaseVariantWidget> createState() => _PurchaseVariantState();
@@ -24,12 +18,10 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
       TextEditingController();
   ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
   int _quantity = 0;
-  int inStockCount = 0;
-  double originalPrice = 0;
   String discountPrice = '';
 
   void incrementQuantity() {
-    if (_quantity < inStockCount) {
+    if (_quantity < widget.data.inStockCount) {
       setState(() {
         _quantity++;
       });
@@ -74,10 +66,11 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
               flex: 4,
               child: Row(
                 children: [
-                  Text('Price : $originalPrice'),
+                  Text('Price : ${widget.data.originalPrice}'),
                   const SizedBox(width: 10),
                   Expanded(
                       child: TextField(
+                    enabled: widget.data.selected,
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Discount price'),
@@ -97,43 +90,46 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
             const SizedBox(width: 20),
             Expanded(
                 flex: 3,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Quantity'),
-                      const SizedBox(width: 2),
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        iconSize: 14,
-                        onPressed: _quantity > 0 ? decrementQuantity : null,
-                        color: _quantity > 0 ? Colors.blue : Colors.grey,
+                child: AbsorbPointer(
+                    absorbing: !widget.data.selected,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            '$_quantity / $inStockCount',
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Quantity'),
+                          const SizedBox(width: 2),
+                          IconButton(
+                            icon: const Icon(Icons.remove),
+                            iconSize: 14,
+                            onPressed: _quantity > 0 ? decrementQuantity : null,
+                            color: _quantity > 0 ? Colors.blue : Colors.grey,
                           ),
-                        ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                '$_quantity / ${widget.data.inStockCount}',
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            iconSize: 14,
+                            onPressed: _quantity < widget.data.inStockCount
+                                ? incrementQuantity
+                                : null,
+                            color: _quantity < widget.data.inStockCount
+                                ? Colors.blue
+                                : Colors.grey,
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        iconSize: 14,
-                        onPressed:
-                            _quantity < inStockCount ? incrementQuantity : null,
-                        color: _quantity < inStockCount
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                    ],
-                  ),
-                )),
+                    ))),
           ],
         ),
       ),

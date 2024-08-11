@@ -32,6 +32,7 @@ Future<void> addBookSale(List<SaleItemBookModel> items, double grandTotal,
       final match = items.firstWhere((i) => i.bookID == existingData.bookID,
           orElse: emptyBookSaleItem);
 
+//#pending reduce stock count from purchaese db
       // if (match.bookID != '') {
       //   existingData.discountPrice = match.soldPrice;
       //   existingData.inStockCount = existingData.inStockCount - match.quantity;
@@ -60,9 +61,9 @@ void updateBookSaleList() async {
         if (book != null) {
           joinedData.add(SaleListItemModel(
               bookName: book.bookName,
-              quantity: 0, //need to calculate from purchase variants
+              quantity: 0, //#pending need to calculate from purchase variants
               grandTotal: sale.grandTotal,
-              date: formatTimestamp(sale.createdDate)));
+              date: formatTimestamp(timestamp: sale.createdDate)));
         }
       }
     }
@@ -89,10 +90,10 @@ Future<List<ForNewSaleBookItem>> getBooksWithPurchaseVariants() async {
             .where((pr) => pr.bookID == bk.bookID && pr.quantity > 0)
             .map((pr) => ForNewSaleBookPurchaseVariant(
                 purchaseID: pr.purchaseID,
-                purchaseDate: formatTimestamp(pr.purchaseDate),
-                quantity: pr.quantity,
+                purchaseDate: formatTimestamp(
+                    timestamp: pr.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
+                inStockCount: pr.quantity,
                 originalPrice: pr.bookPrice,
-                soldPrice: 0,
                 selected: false))
             .toList()));
   }

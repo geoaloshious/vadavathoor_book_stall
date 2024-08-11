@@ -17,7 +17,7 @@ class _NewSaleState extends State<NewSaleWidget> {
   Map<String, bool> inputErrors = {};
   bool _isStationaryChecked = false;
   bool _isBookChecked = false;
-  List<SaleItemBookModel> selectedBooks = [];
+  List<SaleItemBookModel> booksToCheckout = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
 
@@ -25,9 +25,11 @@ class _NewSaleState extends State<NewSaleWidget> {
 
   Future<void> _handleSubmit() async {
     if (_isBookChecked || _isStationaryChecked) {
-      if (selectedBookIDs.isNotEmpty) {
+      if (booksToCheckout
+          .where((bk) => bk.purchaseVariants.isNotEmpty)
+          .isNotEmpty) {
         await addBookSale(
-            selectedBooks,
+            booksToCheckout,
             grandTotal,
             _customerNameController.text.trim(),
             _customerBatchController.text.trim());
@@ -40,7 +42,7 @@ class _NewSaleState extends State<NewSaleWidget> {
   void _updateGrandTotal() {
     double tempTotal = 0;
 
-    for (SaleItemBookModel i in selectedBooks) {
+    for (SaleItemBookModel i in booksToCheckout) {
       if (i.bookID != '') {
         for (var pv in i.purchaseVariants) {
           tempTotal = tempTotal +
@@ -59,7 +61,7 @@ class _NewSaleState extends State<NewSaleWidget> {
   void _updateSelectedBookIDs() {
     final List<String> tempArr = [];
 
-    for (SaleItemBookModel i in selectedBooks) {
+    for (SaleItemBookModel i in booksToCheckout) {
       if (i.bookID != '') {
         tempArr.add(i.bookID);
       }
@@ -135,9 +137,9 @@ class _NewSaleState extends State<NewSaleWidget> {
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool? value) {
                   setState(() {
-                    selectedBooks.clear();
+                    booksToCheckout.clear();
                     if (value == true) {
-                      selectedBooks.add(emptyBookSaleItem());
+                      booksToCheckout.add(emptyBookSaleItem());
                     }
                     _updateSelectedBookIDs();
 
@@ -168,13 +170,12 @@ class _NewSaleState extends State<NewSaleWidget> {
             children: [
               Column(
                   children: List.generate(
-                selectedBooks.length,
+                booksToCheckout.length,
                 (index) {
                   return NewBookSaleItemWidget(
                     key: Key(index.toString()),
                     books: books,
                     selectedBookIDs: selectedBookIDs,
-                    // bookDataToSave: selectedBooks[index],
                     updateData: (
                         {String? bkId,
                         String? prchID,
@@ -183,27 +184,29 @@ class _NewSaleState extends State<NewSaleWidget> {
                         double? dsPr,
                         int? qty}) {
                       if (bkId != null) {
-                        selectedBooks[index].bookID = bkId;
-                        selectedBooks[index].purchaseVariants = [];
+                        booksToCheckout[index].bookID = bkId;
+                        booksToCheckout[index].purchaseVariants = [];
                         _updateSelectedBookIDs();
                       }
 
                       if (prchID != null) {
                         if (selected != null) {
                           if (selected) {
-                            selectedBooks[index].purchaseVariants.add(
+                            booksToCheckout[index].purchaseVariants.add(
                                 SaleItemBookPurchaseVariantModel(
                                     purchaseID: prchID,
                                     originalPrice: prc ?? 0,
                                     soldPrice: 0,
                                     quantity: 0));
                           } else {
-                            selectedBooks[index]
+                            booksToCheckout[index]
                                 .purchaseVariants
                                 .removeWhere((pv) => pv.purchaseID == prchID);
                           }
+
+                          print(books.map((b) => b.toJson()));
                         } else {
-                          var pvItm = selectedBooks[index]
+                          var pvItm = booksToCheckout[index]
                               .purchaseVariants
                               .firstWhere((pv) => pv.purchaseID == prchID,
                                   orElse: emptySaleItemBookPurchaseVariant);
@@ -220,7 +223,7 @@ class _NewSaleState extends State<NewSaleWidget> {
                     },
                     onClickDelete: () {
                       setState(() {
-                        selectedBooks.removeAt(index);
+                        booksToCheckout.removeAt(index);
                       });
 
                       _updateGrandTotal();
@@ -233,7 +236,7 @@ class _NewSaleState extends State<NewSaleWidget> {
               ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      selectedBooks.add(emptyBookSaleItem());
+                      booksToCheckout.add(emptyBookSaleItem());
                     });
                   },
                   child: const Text('Add item')),
