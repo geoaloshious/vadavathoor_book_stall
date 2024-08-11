@@ -9,14 +9,14 @@ import 'package:vadavathoor_book_stall/utils.dart';
 
 ValueNotifier<List<SaleListItemModel>> salesNotifier = ValueNotifier([]);
 
-Future<void> addBookSale(List<BookSaleItemModel> items, double grandTotal,
+Future<void> addBookSale(List<SaleItemBookModel> items, double grandTotal,
     String customerName, String customerBatch) async {
-  final saleBox = await Hive.openBox<BookSaleModel>(DBNames.bookSale);
+  final saleBox = await Hive.openBox<SaleModel>(DBNames.sale);
   final currentTS = getCurrentTimestamp();
 
-  saleBox.add(BookSaleModel(
-      saleID: generateID(ItemType.bookSale),
-      items: items,
+  saleBox.add(SaleModel(
+      saleID: generateID(ItemType.sale),
+      books: items,
       grandTotal: grandTotal,
       customerName: customerName,
       customerBatch: customerBatch,
@@ -29,10 +29,7 @@ Future<void> addBookSale(List<BookSaleItemModel> items, double grandTotal,
   for (int key in bookBox.keys) {
     BookModel? existingData = bookBox.get(key);
     if (existingData != null) {
-      final match = items.firstWhere(
-          (i) =>
-              i.itemType == SaleItemType.book &&
-              i.bookID == existingData.bookID,
+      final match = items.firstWhere((i) => i.bookID == existingData.bookID,
           orElse: emptyBookSaleItem);
 
       // if (match.bookID != '') {
@@ -49,22 +46,21 @@ Future<void> addBookSale(List<BookSaleItemModel> items, double grandTotal,
 }
 
 void updateBookSaleList() async {
-  final sales =
-      (await Hive.openBox<BookSaleModel>(DBNames.bookSale)).values.toList();
+  final sales = (await Hive.openBox<SaleModel>(DBNames.sale)).values.toList();
   final books = (await Hive.openBox<BookModel>(DBNames.book)).values.toList();
 
   List<SaleListItemModel> joinedData = [];
 
-  for (BookSaleModel sale in sales) {
+  for (SaleModel sale in sales) {
     if (!sale.deleted) {
-      for (BookSaleItemModel saleItem in sale.items) {
+      for (SaleItemBookModel saleItem in sale.books) {
         final book =
             books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
 
         if (book != null) {
           joinedData.add(SaleListItemModel(
               bookName: book.bookName,
-              quantity: saleItem.quantity,
+              quantity: 0, //need to calculate from purchase variants
               grandTotal: sale.grandTotal,
               date: formatTimestamp(sale.createdDate)));
         }
@@ -93,9 +89,11 @@ Future<List<ForNewSaleBookItem>> getBooksWithPurchaseVariants() async {
             .where((pr) => pr.bookID == bk.bookID && pr.quantity > 0)
             .map((pr) => ForNewSaleBookPurchaseVariant(
                 purchaseID: pr.purchaseID,
-                purchaseDate: pr.purchaseDate,
+                purchaseDate: formatTimestamp(pr.purchaseDate),
                 quantity: pr.quantity,
-                price: pr.bookPrice))
+                originalPrice: pr.bookPrice,
+                soldPrice: 0,
+                selected: false))
             .toList()));
   }
 

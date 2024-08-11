@@ -1,4 +1,12 @@
+import 'dart:io';
+
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/models/publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
 
 class ItemType {
   static const int book = 1;
@@ -23,27 +31,51 @@ class DBNames {
   static const String misc = 'misc_db';
 }
 
-class SaleItemType {
-  static const int book = 1;
-  static const int stationary = 2;
+// class SaleItemType {
+//   static const int book = 1;
+//   static const int stationary = 2;
+// }
+
+void registerDB() async {
+  // Get the current executable path
+  final executablePath = Directory.current.path;
+  final dbPath = Directory('$executablePath/database');
+
+  // Create the database directory if it doesn't exist
+  if (!await dbPath.exists()) {
+    await dbPath.create(recursive: true);
+  }
+
+  await Hive.initFlutter(dbPath.path);
+  if (!Hive.isAdapterRegistered(BookModelAdapter().typeId)) {
+    Hive.registerAdapter(BookModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(BookPurchaseModelAdapter().typeId)) {
+    Hive.registerAdapter(BookPurchaseModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(SaleModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(SaleItemBookModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemBookModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(
+      SaleItemBookPurchaseVariantModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemBookPurchaseVariantModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
+    Hive.registerAdapter(PurchaseAttachmentModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
+    Hive.registerAdapter(PublisherModelAdapter());
+  }
+
+  return;
 }
 
 String generateID(int type) {
   int timestamp = DateTime.now().millisecondsSinceEpoch;
   return timestamp.toString();
-
-  // switch (type) {
-  //   case ItemType.book:
-  //     return 'bk_$timestamp';
-  //   case ItemType.bookPurchase:
-  //     return 'bkp_$timestamp';
-  //   case ItemType.bookSale:
-  //     return 'bks_$timestamp';
-  //   case ItemType.publisher:
-  //     return 'pbr_$timestamp';
-  //   default:
-  //     return '$timestamp';
-  // }
 }
 
 int getCurrentTimestamp() {

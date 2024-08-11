@@ -1,20 +1,22 @@
 class ForNewSaleBookPurchaseVariant {
   final String purchaseID;
-  final int purchaseDate;
+  final String purchaseDate;
   final int quantity;
-  final double price;
+  final double originalPrice;
+  final double soldPrice;
+  final bool selected;
 
   ForNewSaleBookPurchaseVariant(
       {required this.purchaseID,
       required this.purchaseDate,
       required this.quantity,
-      required this.price});
+      required this.originalPrice,
+      required this.soldPrice,
+      required this.selected});
 }
 
-ForNewSaleBookItem emptyForNewSaleBookItem() => ForNewSaleBookItem(
-    bookID: '',
-    bookName: '',
-    purchases: []);
+ForNewSaleBookItem emptyForNewSaleBookItem() =>
+    ForNewSaleBookItem(bookID: '', bookName: '', purchases: []);
 
 class ForNewSaleBookItem {
   final String bookID;

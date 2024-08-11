@@ -7,22 +7,19 @@ import 'package:vadavathoor_book_stall/screens/sales/purchase_variant.dart';
 
 class NewBookSaleItemWidget extends StatefulWidget {
   final List<ForNewSaleBookItem> books;
-  final SaleItemBookModel bookDataToSave;
   final List<String> selectedBookIDs;
   final VoidCallback onClickDelete;
   final void Function(
       {String? bkId,
       String? prchID,
-      String? add,
-      String? remove,
-      String? prc,
-      String? dsPr,
+      bool? selected,
+      double? prc,
+      double? dsPr,
       int? qty}) updateData;
 
   const NewBookSaleItemWidget(
       {super.key,
       required this.books,
-      required this.bookDataToSave,
       required this.selectedBookIDs,
       required this.onClickDelete,
       required this.updateData});
@@ -32,13 +29,7 @@ class NewBookSaleItemWidget extends StatefulWidget {
 }
 
 class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
-  final TextEditingController _discountPriceController =
-      TextEditingController();
   ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
-  int _quantity = 0;
-  int inStockCount = 0;
-  double originalPrice = 0;
-  String discountPrice = '';
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +55,7 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                                 (i) => i.bookID == value,
                                 orElse: emptyForNewSaleBookItem);
 
-                            _quantity =
-                                selectedBook.purchases.isNotEmpty ? 1 : 0;
-
-                            _discountPriceController.clear();
-
-                            widget.updateData(
-                                bkId: selectedBook.bookID, qty: _quantity);
+                            widget.updateData(bkId: selectedBook.bookID);
                           }
                         });
                       },
@@ -87,15 +72,14 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
               children: List.generate(selectedBook.purchases.length, (index) {
                 return PurchaseVariantWidget(
                   key: Key(index.toString()),
-                  data: widget.books,
-                  selected: widget.bookDataToSave.purchaseVariants
-                      .where((pv) =>
-                          pv.purchaseID ==
-                          selectedBook.purchases[index].purchaseID)
-                      .isNotEmpty,
-                  updateData: ({String? dsPr, int? qty}) {
+                  data: selectedBook.purchases[index],
+                  updateData: ({bool? selected, double? dsPr, int? qty}) {
                     widget.updateData(
                         prchID: selectedBook.purchases[index].purchaseID,
+                        selected: selected,
+                        prc: selected == true
+                            ? selectedBook.purchases[index].originalPrice
+                            : null,
                         dsPr: dsPr,
                         qty: qty);
                   },

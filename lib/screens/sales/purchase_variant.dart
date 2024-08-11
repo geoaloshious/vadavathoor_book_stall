@@ -5,14 +5,14 @@ import 'package:vadavathoor_book_stall/components/drop_down.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 
 class PurchaseVariantWidget extends StatefulWidget {
-  final bool selected;
-  final SaleItemBookPurchaseVariantModel data;
-  final void Function({String? dsPr, int? qty}) updateData;
+  // final bool selected;
+  final ForNewSaleBookPurchaseVariant data;
+  final void Function({bool? selected, double? dsPr, int? qty}) updateData;
 
   const PurchaseVariantWidget(
       {super.key,
       required this.data,
-      required this.selected,
+      // required this.selected,
       required this.updateData});
 
   @override
@@ -57,44 +57,18 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
           children: [
             Expanded(
                 flex: 5,
-                child: CustomDropdown(
-                  items: widget.books.map((i) => i.toDropdownData()).toList(),
-                  selectedValue: selectedBook.bookID,
-                  label: 'Select Book',
-                  hasError: false,
-                  onValueChanged: (value) {
+                child: CheckboxListTile(
+                  title: Text(widget.data.purchaseDate),
+                  value: widget.data.selected,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: (bool? value) {
                     setState(() {
-                      if (value != selectedBook.bookID) {
-                        selectedBook = widget.books.firstWhere(
-                            (i) => i.bookID == value,
-                            orElse: emptyForNewSaleBookItem);
-
-                        _quantity = selectedBook.purchases.isNotEmpty ? 1 : 0;
-
-                        _discountPriceController.clear();
-
-                        widget.updateData(
-                            bkId: selectedBook.bookID, qty: _quantity);
-                      }
+                      _quantity = 0;
+                      _discountPriceController.clear();
+                      widget.updateData(selected: value == true);
                     });
                   },
                 )),
-            CheckboxListTile(
-              title: const Text('Book'),
-              value: widget.selected,
-              controlAffinity: ListTileControlAffinity.leading,
-              onChanged: (bool? value) {
-                setState(() {
-                  selectedBooks.clear();
-                  if (value == true) {
-                    selectedBooks.add(emptyBookSaleItem());
-                  }
-                  _updateSelectedBookIDs();
-
-                  _isBookChecked = value ?? false;
-                });
-              },
-            ),
             const SizedBox(width: 20),
             Expanded(
               flex: 4,
@@ -114,7 +88,7 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
                     ],
                     onChanged: (value) {
-                      widget.updateData(dsPr: value);
+                      widget.updateData(dsPr: double.tryParse(value) ?? 0);
                     },
                   ))
                 ],
@@ -160,12 +134,6 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                     ],
                   ),
                 )),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              tooltip: 'Delete',
-              onPressed: widget.onClickDelete,
-            ),
           ],
         ),
       ),

@@ -7,7 +7,7 @@ SaleItemBookModel emptyBookSaleItem() =>
 
 SaleItemBookPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
     SaleItemBookPurchaseVariantModel(
-        purchaseID: '', originalPrice: '', soldPrice: '', quantity: 0);
+        purchaseID: '', originalPrice: 0, soldPrice: 0, quantity: 0);
 
 @HiveType(typeId: ItemType.saleItemBookPurchaseVariant)
 class SaleItemBookPurchaseVariantModel {
@@ -15,10 +15,10 @@ class SaleItemBookPurchaseVariantModel {
   String purchaseID;
 
   @HiveField(1)
-  String originalPrice;
+  double originalPrice;
 
   @HiveField(2)
-  String soldPrice;
+  double soldPrice;
 
   @HiveField(3)
   int quantity;
@@ -36,13 +36,13 @@ class SaleItemBookModel {
   String bookID;
 
   @HiveField(1)
-  final List<SaleItemBookPurchaseVariantModel> purchaseVariants;
+  List<SaleItemBookPurchaseVariantModel> purchaseVariants;
 
   SaleItemBookModel({required this.bookID, required this.purchaseVariants});
 }
 
 @HiveType(typeId: ItemType.sale)
-class BookSaleModel {
+class SaleModel {
   @HiveField(0)
   final String saleID;
 
@@ -67,7 +67,7 @@ class BookSaleModel {
   @HiveField(7)
   final bool deleted;
 
-  BookSaleModel(
+  SaleModel(
       {required this.books,
       required this.grandTotal,
       required this.customerName,

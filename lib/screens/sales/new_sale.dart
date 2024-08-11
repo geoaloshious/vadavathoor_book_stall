@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
-import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/screens/sales/new_sale_item_book.dart';
@@ -45,11 +44,8 @@ class _NewSaleState extends State<NewSaleWidget> {
       if (i.bookID != '') {
         for (var pv in i.purchaseVariants) {
           tempTotal = tempTotal +
-              ((int.tryParse(pv.soldPrice != ''
-                          ? pv.soldPrice
-                          : pv.originalPrice) ??
-                      0) *
-                  pv.quantity);
+              (pv.soldPrice != 0 ? pv.soldPrice : pv.originalPrice) *
+                  pv.quantity;
         }
       }
     }
@@ -178,43 +174,44 @@ class _NewSaleState extends State<NewSaleWidget> {
                     key: Key(index.toString()),
                     books: books,
                     selectedBookIDs: selectedBookIDs,
-                    bookDataToSave: selectedBooks[index],
+                    // bookDataToSave: selectedBooks[index],
                     updateData: (
                         {String? bkId,
                         String? prchID,
-                        String? add,
-                        String? remove,
-                        String? prc,
-                        String? dsPr,
+                        bool? selected,
+                        double? prc,
+                        double? dsPr,
                         int? qty}) {
                       if (bkId != null) {
                         selectedBooks[index].bookID = bkId;
+                        selectedBooks[index].purchaseVariants = [];
                         _updateSelectedBookIDs();
                       }
+
                       if (prchID != null) {
-                        if (add != null && prc != null) {
-                          selectedBooks[index].purchaseVariants.add(
-                              SaleItemBookPurchaseVariantModel(
-                                  purchaseID: prchID,
-                                  originalPrice: prc,
-                                  soldPrice: '',
-                                  quantity: 0));
-                        } else {
-                          if (remove != null) {
+                        if (selected != null) {
+                          if (selected) {
+                            selectedBooks[index].purchaseVariants.add(
+                                SaleItemBookPurchaseVariantModel(
+                                    purchaseID: prchID,
+                                    originalPrice: prc ?? 0,
+                                    soldPrice: 0,
+                                    quantity: 0));
+                          } else {
                             selectedBooks[index]
                                 .purchaseVariants
                                 .removeWhere((pv) => pv.purchaseID == prchID);
-                          } else {
-                            var pvItm = selectedBooks[index]
-                                .purchaseVariants
-                                .firstWhere((pv) => pv.purchaseID == prchID,
-                                    orElse: emptySaleItemBookPurchaseVariant);
-                            if (dsPr != null) {
-                              pvItm.soldPrice = dsPr;
-                            }
-                            if (qty != null) {
-                              pvItm.quantity = qty;
-                            }
+                          }
+                        } else {
+                          var pvItm = selectedBooks[index]
+                              .purchaseVariants
+                              .firstWhere((pv) => pv.purchaseID == prchID,
+                                  orElse: emptySaleItemBookPurchaseVariant);
+                          if (dsPr != null) {
+                            pvItm.soldPrice = dsPr;
+                          }
+                          if (qty != null) {
+                            pvItm.quantity = qty;
                           }
                         }
                       }
