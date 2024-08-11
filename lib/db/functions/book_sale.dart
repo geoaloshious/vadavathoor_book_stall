@@ -9,14 +9,14 @@ import 'package:vadavathoor_book_stall/utils.dart';
 
 ValueNotifier<List<SaleListItemModel>> salesNotifier = ValueNotifier([]);
 
-Future<void> addBookSale(List<SaleItemBookModel> items, double grandTotal,
-    String customerName, String customerBatch) async {
+Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
+    double grandTotal, String customerName, String customerBatch) async {
   final saleBox = await Hive.openBox<SaleModel>(DBNames.sale);
   final currentTS = getCurrentTimestamp();
 
   saleBox.add(SaleModel(
       saleID: generateID(ItemType.sale),
-      books: items,
+      books: booksToCheckout,
       grandTotal: grandTotal,
       customerName: customerName,
       customerBatch: customerBatch,
@@ -24,22 +24,23 @@ Future<void> addBookSale(List<SaleItemBookModel> items, double grandTotal,
       modifiedDate: currentTS,
       deleted: false));
 
-  final bookBox = await Hive.openBox<BookModel>(DBNames.book);
+  final purchaseBox =
+      await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+  Map<String, int> purchaseKeys = {};
+  for (int key in purchaseBox.keys) {
+    String? pID = purchaseBox.get(key)?.purchaseID;
+    if (pID != null) {
+      purchaseKeys[pID] = key;
+    }
+  }
 
-  for (int key in bookBox.keys) {
-    BookModel? existingData = bookBox.get(key);
-    if (existingData != null) {
-      final match = items.firstWhere((i) => i.bookID == existingData.bookID,
-          orElse: emptyBookSaleItem);
-
-//#pending reduce stock count from purchaese db
-      // if (match.bookID != '') {
-      //   existingData.discountPrice = match.soldPrice;
-      //   existingData.inStockCount = existingData.inStockCount - match.quantity;
-      // }
-
-      await bookBox.put(key, existingData);
-      break;
+  for (var book in booksToCheckout) {
+    for (var pv in book.purchaseVariants) {
+      BookPurchaseModel? existingData =
+          purchaseBox.get(purchaseKeys[pv.purchaseID]);
+      if (existingData != null) {
+        existingData.quantity = existingData.quantity - pv.quantity;
+      }
     }
   }
 
