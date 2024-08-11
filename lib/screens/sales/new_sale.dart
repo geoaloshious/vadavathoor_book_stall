@@ -25,7 +25,12 @@ class _NewSaleState extends State<NewSaleWidget> {
 
   Future<void> _handleSubmit() async {
     if (_isBookChecked || _isStationaryChecked) {
-      //Below statement do 2 things: Checks whether any books added, copy original price to sold price if not specified.
+      /**
+       * Below statement following things:
+       * Checks whether any purchases selected
+       * Checks whether quantity > 0 in purchases
+       * Copy original price to sold price if not specified.
+       */
       bool hasBooks = booksToCheckout.where((bk) {
         for (var pv in bk.purchaseVariants) {
           if (pv.soldPrice == 0) {
@@ -33,7 +38,7 @@ class _NewSaleState extends State<NewSaleWidget> {
           }
         }
 
-        return bk.purchaseVariants.isNotEmpty;
+        return bk.purchaseVariants.where((p) => p.quantity > 0).isNotEmpty;
       }).isNotEmpty;
 
       if (hasBooks) {
@@ -44,6 +49,24 @@ class _NewSaleState extends State<NewSaleWidget> {
             _customerBatchController.text.trim());
 
         Navigator.of(context).pop();
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Please add/complete book details'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                )
+              ],
+            );
+          },
+        );
       }
     }
   }

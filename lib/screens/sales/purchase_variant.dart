@@ -16,27 +16,32 @@ class PurchaseVariantWidget extends StatefulWidget {
 class _PurchaseVariantState extends State<PurchaseVariantWidget> {
   final TextEditingController _discountPriceController =
       TextEditingController();
+  final TextEditingController _quantityController =
+      TextEditingController(text: '0');
   ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
-  int _quantity = 0;
   String discountPrice = '';
 
   void incrementQuantity() {
-    if (_quantity < widget.data.inStockCount) {
-      setState(() {
-        _quantity++;
-      });
+    if (widget.data.selected) {
+      int quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
 
-      widget.updateData(qty: _quantity);
+      if (quantity < widget.data.inStockCount) {
+        quantity++;
+        _quantityController.text = quantity.toString();
+        widget.updateData(qty: quantity);
+      }
     }
   }
 
   void decrementQuantity() {
-    if (_quantity > 0) {
-      setState(() {
-        _quantity--;
-      });
+    if (widget.data.selected) {
+      int quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
 
-      widget.updateData(qty: _quantity);
+      if (quantity > 0) {
+        quantity--;
+        _quantityController.text = quantity.toString();
+        widget.updateData(qty: quantity);
+      }
     }
   }
 
@@ -55,7 +60,7 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                   controlAffinity: ListTileControlAffinity.leading,
                   onChanged: (bool? value) {
                     setState(() {
-                      _quantity = 0;
+                      _quantityController.text = '0';
                       _discountPriceController.clear();
                       widget.updateData(selected: value == true);
                     });
@@ -63,7 +68,7 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                 )),
             const SizedBox(width: 20),
             Expanded(
-              flex: 4,
+              flex: 3,
               child: Row(
                 children: [
                   Text('Price : ${widget.data.originalPrice}'),
@@ -107,26 +112,41 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                           IconButton(
                             icon: const Icon(Icons.remove),
                             iconSize: 14,
-                            onPressed: _quantity > 0 ? decrementQuantity : null,
-                            color: _quantity > 0 ? Colors.blue : Colors.grey,
+                            onPressed: decrementQuantity,
+                            color: Colors.blue,
                           ),
                           Expanded(
-                            child: Center(
-                              child: Text(
-                                '$_quantity / ${widget.data.inStockCount}',
-                              ),
-                            ),
-                          ),
+                              child: Center(
+                                  child: Row(children: [
+                            Expanded(
+                                child: TextField(
+                                    controller: _quantityController,
+                                    enabled: widget.data.selected,
+                                    decoration: const InputDecoration(
+                                        fillColor: Colors.white),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    onChanged: (value) {
+                                      int numVal = int.tryParse(value) ?? 0;
+                                      if (numVal > widget.data.inStockCount) {
+                                        numVal = widget.data.inStockCount;
+                                        _quantityController.text =
+                                            numVal.toString();
+                                      }
+                                      widget.updateData(qty: numVal);
+                                    })),
+                            Expanded(
+                                child: Text('/ ${widget.data.inStockCount}')),
+                          ]))),
                           IconButton(
-                            icon: const Icon(Icons.add),
-                            iconSize: 14,
-                            onPressed: _quantity < widget.data.inStockCount
-                                ? incrementQuantity
-                                : null,
-                            color: _quantity < widget.data.inStockCount
-                                ? Colors.blue
-                                : Colors.grey,
-                          ),
+                              icon: const Icon(Icons.add),
+                              iconSize: 14,
+                              onPressed: incrementQuantity,
+                              color: Colors.blue),
                         ],
                       ),
                     ))),
