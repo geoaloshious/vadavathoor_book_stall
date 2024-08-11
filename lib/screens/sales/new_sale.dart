@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/db/functions/book.dart';
+import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
-import 'package:vadavathoor_book_stall/screens/sales/new_book_sale_item.dart';
+import 'package:vadavathoor_book_stall/screens/sales/new_sale_item_book.dart';
 
 class NewSaleWidget extends StatefulWidget {
   const NewSaleWidget({super.key});
@@ -17,21 +17,19 @@ class _NewSaleState extends State<NewSaleWidget> {
   Map<String, bool> inputErrors = {};
   bool _isStationaryChecked = false;
   bool _isBookChecked = false;
-  List<BookSaleItemModel> selectedBooks = [];
+  List<SaleItemBookModel> booksToCheckout = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
 
+  List<ForNewSaleBookItem> books = [];
+
   Future<void> _handleSubmit() async {
     if (_isBookChecked || _isStationaryChecked) {
-      if (selectedBookIDs.isNotEmpty) {
-        // selectedBooks.forEach((i) {
-        //   if (i.soldPrice == '' || double.tryParse(i.soldPrice) == 0) {
-        //     i.soldPrice = i.originalPrice;
-        //   }
-        // });
-
+      if (booksToCheckout
+          .where((bk) => bk.purchaseVariants.isNotEmpty)
+          .isNotEmpty) {
         await addBookSale(
-            selectedBooks,
+            booksToCheckout,
             grandTotal,
             _customerNameController.text.trim(),
             _customerBatchController.text.trim());
@@ -44,12 +42,13 @@ class _NewSaleState extends State<NewSaleWidget> {
   void _updateGrandTotal() {
     double tempTotal = 0;
 
-    for (BookSaleItemModel i in selectedBooks) {
+    for (SaleItemBookModel i in booksToCheckout) {
       if (i.bookID != '') {
-        tempTotal = tempTotal +
-            ((int.tryParse(i.soldPrice != '' ? i.soldPrice : i.originalPrice) ??
-                    0) *
-                i.quantity);
+        for (var pv in i.purchaseVariants) {
+          tempTotal = tempTotal +
+              (pv.soldPrice != 0 ? pv.soldPrice : pv.originalPrice) *
+                  pv.quantity;
+        }
       }
     }
 
@@ -58,10 +57,11 @@ class _NewSaleState extends State<NewSaleWidget> {
     });
   }
 
+  /// Store selected books for using in excludeIDS
   void _updateSelectedBookIDs() {
     final List<String> tempArr = [];
 
-    for (BookSaleItemModel i in selectedBooks) {
+    for (SaleItemBookModel i in booksToCheckout) {
       if (i.bookID != '') {
         tempArr.add(i.bookID);
       }
@@ -72,10 +72,17 @@ class _NewSaleState extends State<NewSaleWidget> {
     });
   }
 
+  void setBooks() async {
+    final tempBooks = await getBooksWithPurchaseVariants();
+    setState(() {
+      books = tempBooks;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    updateBooksList();
+    setBooks();
   }
 
   @override
@@ -130,9 +137,9 @@ class _NewSaleState extends State<NewSaleWidget> {
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool? value) {
                   setState(() {
-                    selectedBooks.clear();
+                    booksToCheckout.clear();
                     if (value == true) {
-                      selectedBooks.add(emptyBookSaleItem());
+                      booksToCheckout.add(emptyBookSaleItem());
                     }
                     _updateSelectedBookIDs();
 
@@ -161,54 +168,75 @@ class _NewSaleState extends State<NewSaleWidget> {
           visible: _isBookChecked,
           child: Column(
             children: [
-              ValueListenableBuilder(
-                  valueListenable: booksNotifier,
-                  builder: (ctx, books, child) {
-                    return Column(
-                        children: List.generate(
-                      selectedBooks.length,
-                      (index) {
-                        return NewBookSaleItemWidget(
-                          key: Key(selectedBooks[index].id.toString()),
-                          books: books,
-                          selectedBookIDs: selectedBookIDs,
-                          updateData: (
-                              {String? bkId,
-                              String? prc,
-                              String? dsPr,
-                              int? qty}) {
-                            if (bkId != null && prc != null) {
-                              selectedBooks[index].bookID = bkId;
-                              selectedBooks[index].originalPrice = prc;
+              Column(
+                  children: List.generate(
+                booksToCheckout.length,
+                (index) {
+                  return NewBookSaleItemWidget(
+                    key: Key(index.toString()),
+                    books: books,
+                    selectedBookIDs: selectedBookIDs,
+                    updateData: (
+                        {String? bkId,
+                        String? prchID,
+                        bool? selected,
+                        double? prc,
+                        double? dsPr,
+                        int? qty}) {
+                      if (bkId != null) {
+                        booksToCheckout[index].bookID = bkId;
+                        booksToCheckout[index].purchaseVariants = [];
+                        _updateSelectedBookIDs();
+                      }
 
-                              _updateSelectedBookIDs();
-                            }
-                            if (dsPr != null) {
-                              selectedBooks[index].soldPrice = dsPr;
-                            }
-                            if (qty != null) {
-                              selectedBooks[index].quantity = qty;
-                            }
+                      if (prchID != null) {
+                        if (selected != null) {
+                          if (selected) {
+                            booksToCheckout[index].purchaseVariants.add(
+                                SaleItemBookPurchaseVariantModel(
+                                    purchaseID: prchID,
+                                    originalPrice: prc ?? 0,
+                                    soldPrice: 0,
+                                    quantity: 0));
+                          } else {
+                            booksToCheckout[index]
+                                .purchaseVariants
+                                .removeWhere((pv) => pv.purchaseID == prchID);
+                          }
 
-                            _updateGrandTotal();
-                          },
-                          onClickDelete: () {
-                            setState(() {
-                              selectedBooks.removeAt(index);
-                            });
+                          print(books.map((b) => b.toJson()));
+                        } else {
+                          var pvItm = booksToCheckout[index]
+                              .purchaseVariants
+                              .firstWhere((pv) => pv.purchaseID == prchID,
+                                  orElse: emptySaleItemBookPurchaseVariant);
+                          if (dsPr != null) {
+                            pvItm.soldPrice = dsPr;
+                          }
+                          if (qty != null) {
+                            pvItm.quantity = qty;
+                          }
+                        }
+                      }
 
-                            _updateGrandTotal();
-                            _updateSelectedBookIDs();
-                          },
-                        );
-                      },
-                    ));
-                  }),
+                      _updateGrandTotal();
+                    },
+                    onClickDelete: () {
+                      setState(() {
+                        booksToCheckout.removeAt(index);
+                      });
+
+                      _updateGrandTotal();
+                      _updateSelectedBookIDs();
+                    },
+                  );
+                },
+              )),
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      selectedBooks.add(emptyBookSaleItem());
+                      booksToCheckout.add(emptyBookSaleItem());
                     });
                   },
                   child: const Text('Add item')),

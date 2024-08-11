@@ -2,6 +2,17 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 part 'book_purchase.g.dart';
 
+BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
+    purchaseID: '',
+    publisherID: '',
+    purchaseDate: 0,
+    bookID: '',
+    quantity: 0,
+    bookPrice: 0,
+    createdDate: 0,
+    modifiedDate: 0,
+    deleted: false);
+
 @HiveType(typeId: ItemType.bookPurchase)
 class BookPurchaseModel {
   @HiveField(0)
@@ -11,13 +22,13 @@ class BookPurchaseModel {
   String publisherID;
 
   @HiveField(2)
-  String purchaseDate;
+  int purchaseDate;
 
   @HiveField(3)
   String bookID;
 
   @HiveField(4)
-  String bookPrice;
+  double bookPrice;
 
   @HiveField(5)
   int quantity;

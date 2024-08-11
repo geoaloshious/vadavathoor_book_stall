@@ -8,7 +8,7 @@ part of 'publisher.dart';
 
 class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
   @override
-  final int typeId = 5;
+  final int typeId = 6;
 
   @override
   PublisherModel read(BinaryReader reader) {

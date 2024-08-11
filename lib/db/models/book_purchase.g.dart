@@ -19,10 +19,10 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
     return BookPurchaseModel(
       purchaseID: fields[0] as String,
       publisherID: fields[1] as String,
-      purchaseDate: fields[2] as String,
+      purchaseDate: fields[2] as int,
       bookID: fields[3] as String,
       quantity: fields[5] as int,
-      bookPrice: fields[4] as String,
+      bookPrice: fields[4] as double,
       createdDate: fields[6] as int,
       modifiedDate: fields[7] as int,
       deleted: fields[8] as bool,
