@@ -39,7 +39,7 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
       BookPurchaseModel? existingData =
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
       if (existingData != null) {
-        existingData.quantity = existingData.quantity - pv.quantity;
+        existingData.quantityLeft = existingData.quantityLeft - pv.quantity;
         existingData.modifiedDate = currentTS;
         await purchaseBox.put(purchaseKeys[pv.purchaseID], existingData);
       }
@@ -96,12 +96,12 @@ Future<List<ForNewSaleBookItem>> getBooksWithPurchaseVariants() async {
         bookID: bk.bookID,
         bookName: bk.bookName,
         purchases: purchases
-            .where((pr) => pr.bookID == bk.bookID && pr.quantity > 0)
+            .where((pr) => pr.bookID == bk.bookID && pr.quantityLeft > 0)
             .map((pr) => ForNewSaleBookPurchaseVariant(
                 purchaseID: pr.purchaseID,
                 purchaseDate: formatTimestamp(
                     timestamp: pr.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-                inStockCount: pr.quantity,
+                inStockCount: pr.quantityLeft,
                 originalPrice: pr.bookPrice,
                 selected: false))
             .toList()));

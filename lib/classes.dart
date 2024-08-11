@@ -1,13 +1,25 @@
+BookPurchaseListItemModel emptyBookPurchaseListItem() =>
+    BookPurchaseListItemModel(
+        purchaseID: '',
+        publisherID: '',
+        publisherName: '',
+        purchaseDate: 0,
+        formattedPurchaseDate: '',
+        bookID: '',
+        bookName: '',
+        quantityPurchased: 0,
+        bookPrice: 0);
+
 class BookPurchaseListItemModel {
   final String purchaseID;
   final String publisherID;
   final String publisherName;
   final int purchaseDate;
+  final String formattedPurchaseDate;
   final String bookID;
   final String bookName;
   final double bookPrice;
-  final int quantity;
-  final String createdDate;
+  final int quantityPurchased;
 
   Map<String, dynamic> toJson() {
     return {
@@ -15,11 +27,11 @@ class BookPurchaseListItemModel {
       'publisherID': publisherID,
       'publisherName': publisherName,
       'purchaseDate': purchaseDate,
+      'formattedPurchaseDate': formattedPurchaseDate,
       'bookID': bookID,
       'bookName': bookName,
-      'quantity': quantity,
+      'quantityPurchased': quantityPurchased,
       'bookPrice': bookPrice,
-      'createdDate': createdDate,
     };
   }
 
@@ -28,11 +40,11 @@ class BookPurchaseListItemModel {
     required this.publisherID,
     required this.publisherName,
     required this.purchaseDate,
+    required this.formattedPurchaseDate,
     required this.bookID,
     required this.bookName,
-    required this.quantity,
+    required this.quantityPurchased,
     required this.bookPrice,
-    required this.createdDate,
   });
 }
 

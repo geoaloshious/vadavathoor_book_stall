@@ -64,6 +64,21 @@ class _DbViewerState extends State<DbViewer> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Database viewer',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: 'Close',
+                onPressed: () {
+                  Navigator.of(context).pop();
+                }),
+          ],
+        ),
         ExpansionTile(
           title: const Text('Purchases'),
           children: [Text(purchases)],

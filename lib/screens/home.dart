@@ -10,8 +10,7 @@ final a = {
   0: 'Book purchases',
   1: 'Sales',
   2: 'Stationary purchases',
-  3: 'Publishers',
-  4: 'View Database'
+  3: 'Publishers'
 };
 
 class HomeScreen extends StatefulWidget {
@@ -23,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentPage = 0;
+  bool showDBViewer = false;
 
   renderRightSide() {
     switch (currentPage) {
@@ -36,11 +36,35 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         // return const Stationary();
         return const UnderDevelopment();
-      case 4:
-        return const DbViewer();
       default:
         return;
     }
+  }
+
+  void openDBViewer() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        Size screenSize = MediaQuery.of(context).size;
+
+        return Dialog(
+          child: Container(
+            constraints: BoxConstraints(
+              minHeight: screenSize.height,
+              maxWidth: screenSize.width * 0.8,
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                //#pending - while scrolling, header and submit should be sticky
+                child: DbViewer(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -53,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                   flex: 1,
                   child: ListView.builder(
-                      itemCount: 5,
+                      itemCount: 4,
                       itemBuilder: (context, index) {
                         return TextButton(
                           style: TextButton.styleFrom(
@@ -91,6 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ))
             ],
           )),
+      floatingActionButton: showDBViewer
+          ? FloatingActionButton(
+              onPressed: openDBViewer,
+              child: const Icon(Icons.table_view_sharp),
+            )
+          : null,
     );
   }
 }
