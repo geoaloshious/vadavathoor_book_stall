@@ -62,19 +62,21 @@ class _DbViewerState extends State<DbViewer> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      ExpansionTile(
-        title: const Text('Purchases'),
-        children: [Text(purchases)],
-      ),
-      ExpansionTile(
-        title: const Text('Sales'),
-        children: [Text(sales)],
-      ),
-      ExpansionTile(
-        title: const Text('Books'),
-        children: [Text(books)],
-      )
-    ]);
+    return SingleChildScrollView(
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ExpansionTile(
+          title: const Text('Purchases'),
+          children: [Text(purchases)],
+        ),
+        ExpansionTile(
+          title: const Text('Sales'),
+          children: [Text(sales)],
+        ),
+        ExpansionTile(
+          title: const Text('Books'),
+          children: [Text(books)],
+        )
+      ]),
+    );
   }
 }

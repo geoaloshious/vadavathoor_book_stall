@@ -41,6 +41,7 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
       if (existingData != null) {
         existingData.quantity = existingData.quantity - pv.quantity;
         existingData.modifiedDate = currentTS;
+        await purchaseBox.put(purchaseKeys[pv.purchaseID], existingData);
       }
     }
   }
