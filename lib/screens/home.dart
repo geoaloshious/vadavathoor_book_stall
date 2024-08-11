@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
+import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 // import 'package:vadavathoor_book_stall/screens/publishers.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales.dart';
 // import 'package:vadavathoor_book_stall/screens/stationary.dart';
@@ -10,6 +11,7 @@ final a = {
   1: 'Sales',
   2: 'Stationary purchases',
   3: 'Publishers',
+  4: 'View Database'
 };
 
 class HomeScreen extends StatefulWidget {
@@ -34,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         // return const Stationary();
         return const UnderDevelopment();
+      case 4:
+        return const DbViewer();
       default:
         return;
     }
@@ -49,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                   flex: 1,
                   child: ListView.builder(
-                      itemCount: 4,
+                      itemCount: 5,
                       itemBuilder: (context, index) {
                         return TextButton(
                           style: TextButton.styleFrom(
