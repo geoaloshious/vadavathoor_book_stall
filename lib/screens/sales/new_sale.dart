@@ -25,9 +25,18 @@ class _NewSaleState extends State<NewSaleWidget> {
 
   Future<void> _handleSubmit() async {
     if (_isBookChecked || _isStationaryChecked) {
-      if (booksToCheckout
-          .where((bk) => bk.purchaseVariants.isNotEmpty)
-          .isNotEmpty) {
+      //Below statement do 2 things: Checks whether any books added, copy original price to sold price if not specified.
+      bool hasBooks = booksToCheckout.where((bk) {
+        for (var pv in bk.purchaseVariants) {
+          if (pv.soldPrice == 0) {
+            pv.soldPrice = pv.originalPrice;
+          }
+        }
+
+        return bk.purchaseVariants.isNotEmpty;
+      }).isNotEmpty;
+
+      if (hasBooks) {
         await addBookSale(
             booksToCheckout,
             grandTotal,
@@ -203,8 +212,6 @@ class _NewSaleState extends State<NewSaleWidget> {
                                 .purchaseVariants
                                 .removeWhere((pv) => pv.purchaseID == prchID);
                           }
-
-                          print(books.map((b) => b.toJson()));
                         } else {
                           var pvItm = booksToCheckout[index]
                               .purchaseVariants

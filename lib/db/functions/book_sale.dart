@@ -40,6 +40,7 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
       if (existingData != null) {
         existingData.quantity = existingData.quantity - pv.quantity;
+        existingData.modifiedDate = currentTS;
       }
     }
   }
@@ -59,10 +60,16 @@ void updateBookSaleList() async {
         final book =
             books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
 
+        int totalQty = 0;
+
+        for (var pv in saleItem.purchaseVariants) {
+          totalQty = totalQty + pv.quantity;
+        }
+
         if (book != null) {
           joinedData.add(SaleListItemModel(
               bookName: book.bookName,
-              quantity: 0, //#pending need to calculate from purchase variants
+              quantity: totalQty,
               grandTotal: sale.grandTotal,
               date: formatTimestamp(timestamp: sale.createdDate)));
         }
