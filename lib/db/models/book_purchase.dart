@@ -7,7 +7,8 @@ BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
     publisherID: '',
     purchaseDate: 0,
     bookID: '',
-    quantity: 0,
+    quantityPurchased: 0,
+    quantityLeft: 0,
     bookPrice: 0,
     createdDate: 0,
     modifiedDate: 0,
@@ -31,15 +32,18 @@ class BookPurchaseModel {
   double bookPrice;
 
   @HiveField(5)
-  int quantity;
+  int quantityPurchased;
 
   @HiveField(6)
-  final int createdDate;
+  int quantityLeft;
 
   @HiveField(7)
-  int modifiedDate;
+  final int createdDate;
 
   @HiveField(8)
+  int modifiedDate;
+
+  @HiveField(9)
   bool deleted;
 
   Map<String, dynamic> toJson() {
@@ -48,7 +52,8 @@ class BookPurchaseModel {
       'publisherID': publisherID,
       'purchaseDate': purchaseDate,
       'bookID': bookID,
-      'quantity': quantity,
+      'quantityPurchased': quantityPurchased,
+      'quantityLeft': quantityLeft,
       'bookPrice': bookPrice,
       'createdDate': createdDate,
       'modifiedDate': modifiedDate,
@@ -61,7 +66,8 @@ class BookPurchaseModel {
       required this.publisherID,
       required this.purchaseDate,
       required this.bookID,
-      required this.quantity,
+      required this.quantityPurchased,
+      required this.quantityLeft,
       required this.bookPrice,
       required this.createdDate,
       required this.modifiedDate,

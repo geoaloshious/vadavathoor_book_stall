@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
@@ -7,9 +6,6 @@ import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
-
-ValueNotifier<List<BookPurchaseListItemModel>> purchaseNotifier =
-    ValueNotifier([]);
 
 Future<void> addBookPurchase(
     String publisherID,
@@ -36,13 +32,12 @@ Future<void> addBookPurchase(
       publisherID: publisherID,
       purchaseDate: purchaseDate,
       bookID: bookID,
-      quantity: quantity,
+      quantityPurchased: quantity,
+      quantityLeft: quantity,
       bookPrice: bookPrice,
       createdDate: currentTS,
       modifiedDate: currentTS,
       deleted: false));
-
-  updateBookPurchaseList();
 }
 
 Future<void> editBookPurchase(
@@ -52,7 +47,8 @@ Future<void> editBookPurchase(
     String bookID,
     String bookName,
     int quantity,
-    double bookPrice) async {
+    double bookPrice,
+    int purchaseDate) async {
   final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
 
   for (int key in box.keys) {
@@ -68,8 +64,11 @@ Future<void> editBookPurchase(
 
       existingData.publisherID = publisherID;
       existingData.bookID = bookID;
-      existingData.quantity = quantity;
+      existingData.quantityPurchased = quantity;
+      existingData.quantityLeft =
+          quantity; //#pending - If editing after a sale is done, then data will conflict
       existingData.bookPrice = bookPrice;
+      existingData.purchaseDate = purchaseDate;
       existingData.modifiedDate = getCurrentTimestamp();
       await box.put(key, existingData);
       break;
@@ -88,11 +87,9 @@ Future<void> deleteBookPurchase(String purchaseID) async {
       break;
     }
   }
-
-  updateBookPurchaseList();
 }
 
-void updateBookPurchaseList() async {
+Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
   final purchases =
       (await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase))
           .values
@@ -115,14 +112,14 @@ void updateBookPurchaseList() async {
           publisherID: purchase.publisherID,
           publisherName: publisher.publisherName,
           purchaseDate: purchase.purchaseDate,
+          formattedPurchaseDate: formatTimestamp(
+              timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
           bookID: book.bookID,
           bookName: book.bookName,
-          quantity: purchase.quantity,
-          bookPrice: purchase.bookPrice,
-          createdDate: formatTimestamp(timestamp: purchase.createdDate)));
+          quantityPurchased: purchase.quantityPurchased,
+          bookPrice: purchase.bookPrice));
     }
   }
 
-  purchaseNotifier.value = joinedData;
-  purchaseNotifier.notifyListeners();
+  return joinedData;
 }
