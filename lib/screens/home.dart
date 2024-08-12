@@ -6,12 +6,12 @@ import 'package:vadavathoor_book_stall/screens/sales/sales.dart';
 // import 'package:vadavathoor_book_stall/screens/stationary.dart';
 import 'package:vadavathoor_book_stall/screens/under_development.dart';
 
-final a = {
-  0: 'Book purchases',
-  1: 'Sales',
-  2: 'Stationary purchases',
-  3: 'Publishers'
-};
+final leftItems = [
+  {'label': 'Book Purchases', 'icon': Icons.book},
+  {'label': 'Sales', 'icon': Icons.monetization_on},
+  {'label': 'Stationary purchases', 'icon': Icons.image},
+  {'label': 'Publishers', 'icon': Icons.house}
+];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentPage = 0;
-  bool showDBViewer = false;
+  bool showDBViewer = true;
   bool _isDrawerOpen = true;
 
   renderRightSide() {
@@ -71,37 +71,72 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          elevation: 1,
-          leading: IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                setState(() {
-                  _isDrawerOpen = !_isDrawerOpen;
-                });
-              })),
-      body: Row(
-        children: [
-          AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              width: _isDrawerOpen ? 250.0 : 0.0,
-              decoration: BoxDecoration(color: Colors.blueGrey, boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    spreadRadius: 1,
-                    blurRadius: 2)
-              ]),
-              child: _isDrawerOpen
-                  ? ListView.builder(
-                      itemCount: 4,
-                      itemBuilder: (context, index) {
-                        return TextButton(
+        appBar: AppBar(
+            elevation: 1,
+            leading: IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  setState(() {
+                    _isDrawerOpen = !_isDrawerOpen;
+                  });
+                }),
+            actions: [
+              showDBViewer
+                  ? IconButton(
+                      icon: const Icon(Icons.table_view),
+                      onPressed: openDBViewer)
+                  : const SizedBox.shrink(),
+              PopupMenuButton<int>(
+                  icon: const Icon(Icons.account_circle),
+                  onSelected: (value) {
+                    if (value == 1) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                                title: const Text('Login'),
+                                content: const Text('Login button clicked!'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Close'))
+                                ]);
+                          });
+                    }
+                  },
+                  itemBuilder: (context) =>
+                      [const PopupMenuItem(value: 1, child: Text('Log In'))])
+            ]),
+        body: Row(
+          children: [
+            AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: _isDrawerOpen ? 250.0 : 60.0,
+                decoration: BoxDecoration(color: Colors.blueGrey, boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 2)
+                ]),
+                child: ListView.builder(
+                    itemCount: leftItems.length,
+                    itemBuilder: (context, index) {
+                      Color backgroundColor, textColor;
+                      if (currentPage == index) {
+                        backgroundColor = Colors.white;
+                        textColor = Colors.blueGrey;
+                      } else {
+                        backgroundColor = Colors.blueGrey;
+                        textColor = Colors.white;
+                      }
+
+                      return TextButton(
                           style: TextButton.styleFrom(
                               alignment: Alignment.centerLeft,
                               padding: const EdgeInsets.all(20),
-                              backgroundColor: currentPage == index
-                                  ? Colors.white
-                                  : Colors.blueGrey,
+                              backgroundColor: backgroundColor,
                               shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.zero)),
                           onPressed: () {
@@ -109,26 +144,18 @@ class _HomeScreenState extends State<HomeScreen> {
                               currentPage = index;
                             });
                           },
-                          child: Text(a[index]!,
-                              style: TextStyle(
-                                  color: currentPage == index
-                                      ? Colors.blueGrey
-                                      : Colors.white)),
-                        );
-                      })
-                  : null),
-          Expanded(
-              child: Container(
-            child: renderRightSide(),
-          ))
-        ],
-      ),
-      floatingActionButton: showDBViewer
-          ? FloatingActionButton(
-              onPressed: openDBViewer,
-              child: const Icon(Icons.table_view_sharp),
-            )
-          : null,
-    );
+                          child: Row(children: [
+                            Icon(leftItems[index]['icon'] as IconData,
+                                color: textColor),
+                            if (_isDrawerOpen) ...[
+                              const SizedBox(width: 10),
+                              Text(leftItems[index]['label'] as String,
+                                  style: TextStyle(color: textColor))
+                            ]
+                          ]));
+                    })),
+            Expanded(child: Container(child: renderRightSide()))
+          ],
+        ));
   }
 }
