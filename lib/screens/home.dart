@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int currentPage = 0;
   bool showDBViewer = false;
+  bool _isDrawerOpen = true;
 
   renderRightSide() {
     switch (currentPage) {
@@ -70,51 +71,58 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 1,
-                  child: ListView.builder(
+      appBar: AppBar(
+          elevation: 1,
+          leading: IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                setState(() {
+                  _isDrawerOpen = !_isDrawerOpen;
+                });
+              })),
+      body: Row(
+        children: [
+          AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: _isDrawerOpen ? 250.0 : 0.0,
+              decoration: BoxDecoration(color: Colors.blueGrey, boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: 1,
+                    blurRadius: 2)
+              ]),
+              child: _isDrawerOpen
+                  ? ListView.builder(
                       itemCount: 4,
                       itemBuilder: (context, index) {
                         return TextButton(
                           style: TextButton.styleFrom(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.all(20),
                               backgroundColor: currentPage == index
-                                  ? Colors.lightBlue
-                                  : Colors.white38 // Set the background color
-                              ),
+                                  ? Colors.white
+                                  : Colors.blueGrey,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero)),
                           onPressed: () {
                             setState(() {
                               currentPage = index;
                             });
                           },
-                          child: ListTile(
-                            title: Text(a[index]!),
-                          ),
+                          child: Text(a[index]!,
+                              style: TextStyle(
+                                  color: currentPage == index
+                                      ? Colors.blueGrey
+                                      : Colors.white)),
                         );
-                      })),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 0.2, color: Colors.blueGrey),
-                        // shape: BoxShape.circle,
-                        boxShadow: const [
-                      BoxShadow(
-                        color: Colors.blueGrey,
-                        blurRadius: 4,
-                      ),
-                    ])),
-              ),
-              Expanded(
-                  flex: 4,
-                  child: Container(
-                    child: renderRightSide(),
-                  ))
-            ],
-          )),
+                      })
+                  : null),
+          Expanded(
+              child: Container(
+            child: renderRightSide(),
+          ))
+        ],
+      ),
       floatingActionButton: showDBViewer
           ? FloatingActionButton(
               onPressed: openDBViewer,

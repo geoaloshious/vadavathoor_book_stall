@@ -58,74 +58,68 @@ class _BookPurchaseState extends State<BookPurchase> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Purchases',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  ElevatedButton(
-                      onPressed: newPurchase,
-                      child: const Text('New purchase')),
-                ],
+              const Text(
+                'Purchases',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 20),
-              const Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    'Book',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  )),
-                  Expanded(
-                      child: Text(
-                    'Publisher',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  )),
-                  Expanded(
-                      child: Text(
-                    'Quantity',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  )),
-                  Expanded(
-                      child: Text(
-                    'Price',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  )),
-                  Expanded(
-                      child: Text(
-                    'Purchase date',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  )),
-                  SizedBox(width: 80)
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 0.2, color: Colors.blueGrey))),
-              ),
-              Expanded(
-                  child: purchases.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: purchases.length,
-                          itemBuilder: (context, index) => PurchasedBookWidget(
-                              data: purchases[index], updateUI: setData))
-                      : const Text(
-                          "No records found. Click 'New purchase' button to add."))
-              // BookCard(data: purchases[index]))))
+              ElevatedButton(
+                  onPressed: newPurchase, child: const Text('New purchase')),
             ],
           ),
-        ),
+          const SizedBox(height: 20),
+          const Row(
+            children: [
+              Expanded(
+                  child: Text(
+                'Book',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              )),
+              Expanded(
+                  child: Text(
+                'Publisher',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              )),
+              Expanded(
+                  child: Text(
+                'Quantity',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              )),
+              Expanded(
+                  child: Text(
+                'Price',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              )),
+              Expanded(
+                  child: Text(
+                'Purchase date',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              )),
+              SizedBox(width: 80)
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 10),
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 0.2, color: Colors.blueGrey))),
+          ),
+          Expanded(
+              child: purchases.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: purchases.length,
+                      itemBuilder: (context, index) => PurchasedBookWidget(
+                          data: purchases[index], updateUI: setData))
+                  : const Text(
+                      "No records found. Click 'New purchase' button to add."))
+          // BookCard(data: purchases[index]))))
+        ],
       ),
     );
   }
