@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
+import 'package:vadavathoor_book_stall/db/models/users.dart';
 
 class ItemType {
   static const int book = 1;
@@ -17,6 +19,7 @@ class ItemType {
   static const int publisher = 6;
   static const int attachment = 7;
   static const int misc = 8;
+  static const int users = 9;
 }
 
 class DBNames {
@@ -29,6 +32,7 @@ class DBNames {
   static const String publisher = 'publisher_db';
   static const String attachment = 'attachment_db';
   static const String misc = 'misc_db';
+  static const String users = 'users_db';
 }
 
 // class SaleItemType {
@@ -69,11 +73,15 @@ Future<void> initializeHiveDB() async {
   if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
     Hive.registerAdapter(PublisherModelAdapter());
   }
+  if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
+    Hive.registerAdapter(UserModelAdapter());
+  }
 
-  // return;
+  //#pending - might need to add user to table in TGDB.
+  await addAdminUserIfEmpty();
 }
 
-String generateID(int type) {
+String generateID() {
   int timestamp = DateTime.now().millisecondsSinceEpoch;
   return timestamp.toString();
 }

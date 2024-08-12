@@ -44,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void openDBViewer() {
     showDialog(
-      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         Size screenSize = MediaQuery.of(context).size;

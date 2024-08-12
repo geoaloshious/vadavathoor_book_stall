@@ -5,9 +5,21 @@ import 'package:vadavathoor_book_stall/utils.dart';
 
 final publishersNotifier = ValueNotifier<List<PublisherModel>>([]);
 
+Future<Box<PublisherModel>> getPublishersBox() async {
+  Box<PublisherModel> box;
+
+  if (Hive.isBoxOpen(DBNames.publisher)) {
+    box = Hive.box<PublisherModel>(DBNames.publisher);
+  } else {
+    box = await Hive.openBox<PublisherModel>(DBNames.publisher);
+  }
+
+  return box;
+}
+
 Future<String> addPublisher(String name, String address) async {
-  String publisherID = generateID(ItemType.publisher);
-  final db = await Hive.openBox<PublisherModel>(DBNames.publisher);
+  String publisherID = generateID();
+  final db = await getPublishersBox();
 
   await db.add(PublisherModel(
       publisherID: publisherID,
@@ -19,7 +31,7 @@ Future<String> addPublisher(String name, String address) async {
 }
 
 Future<void> updatePublishersList() async {
-  final db = await Hive.openBox<PublisherModel>(DBNames.publisher);
+  final db = await getPublishersBox();
   publishersNotifier.value = db.values.toList();
   publishersNotifier.notifyListeners();
 }
