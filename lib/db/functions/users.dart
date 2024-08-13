@@ -1,7 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/db/constants.dart';
 
 import '../../utils.dart';
 import '../models/users.dart';
+import 'utils.dart';
 
 Future<Box<UserModel>> getUsersBox() async {
   Box<UserModel> box;
@@ -33,4 +35,29 @@ Future<void> addAdminUserIfEmpty() async {
         modifiedDate: currentTS,
         modifiedBy: 0));
   }
+}
+
+Future<Map<String, String>> login(String username, String password) async {
+  final box = await getUsersBox();
+
+  final users =
+      box.values.where((u) => u.username == username && u.password == password);
+
+  if (users.isNotEmpty) {
+    String userID = users.first.userID;
+
+    await updateMiscValue(MiscDBKeys.currentlyLoggedInUserID, userID);
+    await updateMiscValue(MiscDBKeys.lastLogInTime,
+        DateTime.now().millisecondsSinceEpoch.toString());
+    await addLoginHistory(userID);
+
+    return {};
+  } else {
+    return {'error': 'Incorrect Username / Password'};
+  }
+}
+
+Future<void> logout() async {
+  await updateMiscValue(MiscDBKeys.currentlyLoggedInUserID, '');
+  await updateLogoutHistory();
 }

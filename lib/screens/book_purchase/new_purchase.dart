@@ -216,7 +216,6 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
                                 ? const BorderSide(color: Colors.red, width: 1)
                                 : const BorderSide(
                                     color: Colors.grey, width: 1)),
-                        // Add auto-suggestion functionality here
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -257,7 +256,6 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
                                 ? const BorderSide(color: Colors.red, width: 1)
                                 : const BorderSide(
                                     color: Colors.grey, width: 1)),
-                        // Add auto-suggestion functionality here
                       ),
                       onChanged: (value) {
                         setState(() {

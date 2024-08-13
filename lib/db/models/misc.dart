@@ -8,7 +8,7 @@ class MiscModel {
   final String itemKey;
 
   @HiveField(1)
-  final String itemValue;
+  String itemValue;
 
   MiscModel({required this.itemKey, required this.itemValue});
 }

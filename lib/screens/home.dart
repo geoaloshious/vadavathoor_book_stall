@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 // import 'package:vadavathoor_book_stall/screens/publishers.dart';
@@ -85,28 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: const Icon(Icons.table_view),
                       onPressed: openDBViewer)
                   : const SizedBox.shrink(),
-              PopupMenuButton<int>(
-                  icon: const Icon(Icons.account_circle),
-                  onSelected: (value) {
-                    if (value == 1) {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                                title: const Text('Login'),
-                                content: const Text('Login button clicked!'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Close'))
-                                ]);
-                          });
-                    }
-                  },
-                  itemBuilder: (context) =>
-                      [const PopupMenuItem(value: 1, child: Text('Log In'))])
+              UserProfileWidget()
             ]),
         body: Row(
           children: [

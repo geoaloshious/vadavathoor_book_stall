@@ -6,6 +6,8 @@ import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/models/login_history.dart';
+import 'package:vadavathoor_book_stall/db/models/misc.dart';
 import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
@@ -20,6 +22,7 @@ class ItemType {
   static const int attachment = 7;
   static const int misc = 8;
   static const int users = 9;
+  static const int loginHistory = 9;
 }
 
 class DBNames {
@@ -33,6 +36,7 @@ class DBNames {
   static const String attachment = 'attachment_db';
   static const String misc = 'misc_db';
   static const String users = 'users_db';
+  static const String loginHistory = 'login_history_db';
 }
 
 // class SaleItemType {
@@ -75,6 +79,12 @@ Future<void> initializeHiveDB() async {
   }
   if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
     Hive.registerAdapter(UserModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(LoginHistoryModelAdapter().typeId)) {
+    Hive.registerAdapter(LoginHistoryModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(MiscModelAdapter().typeId)) {
+    Hive.registerAdapter(MiscModelAdapter());
   }
 
   //#pending - might need to add user to table in TGDB.
