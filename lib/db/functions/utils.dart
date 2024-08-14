@@ -28,10 +28,21 @@ Future<Box<LoginHistoryModel>> getLoginHistoryBox() async {
   return box;
 }
 
+Future<String> readMiscValue(String itemKey) async {
+  final miscBox = await getMiscBox();
+  final items = miscBox.values.where((i) => i.itemKey == itemKey);
+  if (items.isNotEmpty) {
+    return items.first.itemValue;
+  } else {
+    return '';
+  }
+}
+
 Future<void> updateMiscValue(String itemKey, String itemValue) async {
   final miscBox = await getMiscBox();
 
   final items = miscBox.values.where((i) => i.itemKey == itemKey);
+
   if (items.isEmpty) {
     miscBox.add(MiscModel(itemKey: itemKey, itemValue: itemValue));
   } else {
@@ -39,7 +50,7 @@ Future<void> updateMiscValue(String itemKey, String itemValue) async {
       MiscModel? existingData = miscBox.get(key);
       if (existingData != null && existingData.itemKey == itemKey) {
         existingData.itemValue = itemValue;
-        await miscBox.put(itemKey, existingData);
+        await miscBox.put(key, existingData);
         break;
       }
     }

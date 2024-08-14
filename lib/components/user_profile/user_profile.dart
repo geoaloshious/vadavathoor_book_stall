@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/components/user_profile/login.dart';
+import 'package:provider/provider.dart';
+
+import '../../db/functions/users.dart';
+import '../../providers/user.dart';
+import 'login.dart';
 
 class UserProfileWidget extends StatefulWidget {
   const UserProfileWidget({super.key});
@@ -9,7 +13,7 @@ class UserProfileWidget extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfileWidget> {
-  void onPressProfile() {
+  void onPressLogin() {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -25,19 +29,80 @@ class _UserProfileState extends State<UserProfileWidget> {
         });
   }
 
+  void onPressLogout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title: const Text('Confirm'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await logout(context);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void onSelected(int value) {
     switch (value) {
       case 1:
-        onPressProfile();
+        onPressLogin();
+      case 2:
+        onPressLogout();
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadUserProviderValue(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<int>(
-        icon: const Icon(Icons.account_circle),
-        onSelected: onSelected,
-        itemBuilder: (context) =>
-            [const PopupMenuItem(value: 1, child: Text('Log In'))]);
+    return Consumer<UserProvider>(builder: (context, user, child) {
+      return PopupMenuButton<int>(
+          padding: const EdgeInsets.all(5),
+          icon: user.user.userID == ''
+              ? const Icon(
+                  Icons.account_circle,
+                  size: 35,
+                )
+              : Container(
+                  width: 35,
+                  height: 35,
+                  decoration: const BoxDecoration(
+                    color: Colors.blueGrey,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(user.user.firstName[0] + user.user.lastName[0],
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+          tooltip: user.user.userID == ''
+              ? 'Guest user'
+              : '${user.user.firstName} ${user.user.lastName}',
+          onSelected: onSelected,
+          itemBuilder: (context) => [
+                if (user.user.userID == '')
+                  const PopupMenuItem(value: 1, child: Text('Log In'))
+                else
+                  const PopupMenuItem(value: 2, child: Text('Log Out'))
+              ]);
+    });
   }
 }

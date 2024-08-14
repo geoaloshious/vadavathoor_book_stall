@@ -22,7 +22,7 @@ class ItemType {
   static const int attachment = 7;
   static const int misc = 8;
   static const int users = 9;
-  static const int loginHistory = 9;
+  static const int loginHistory = 10;
 }
 
 class DBNames {

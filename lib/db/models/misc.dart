@@ -10,5 +10,9 @@ class MiscModel {
   @HiveField(1)
   String itemValue;
 
+  Map<String, dynamic> toJson() {
+    return {'itemKey': itemKey, 'itemValue': itemValue};
+  }
+
   MiscModel({required this.itemKey, required this.itemValue});
 }

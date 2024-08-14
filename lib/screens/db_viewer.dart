@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 
 import '../db/functions/book.dart';
 import '../db/functions/book_purchase.dart';
@@ -52,6 +53,20 @@ class _DbViewerState extends State<DbViewer> {
       'label': 'Users',
       'value': getPrettyJSONString(
           json.encode(usersDB.map((p) => p.toJson()).toList()))
+    });
+
+    final miscDB = (await getMiscBox()).values.toList();
+    tempArr.add({
+      'label': 'Misc',
+      'value': getPrettyJSONString(
+          json.encode(miscDB.map((p) => p.toJson()).toList()))
+    });
+
+    final loginHistoryDB = (await getLoginHistoryBox()).values.toList();
+    tempArr.add({
+      'label': 'Login history',
+      'value': getPrettyJSONString(
+          json.encode(loginHistoryDB.map((p) => p.toJson()).toList()))
     });
 
     setState(() {

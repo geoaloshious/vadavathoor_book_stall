@@ -8,7 +8,7 @@ part of 'login_history.dart';
 
 class LoginHistoryModelAdapter extends TypeAdapter<LoginHistoryModel> {
   @override
-  final int typeId = 9;
+  final int typeId = 10;
 
   @override
   LoginHistoryModel read(BinaryReader reader) {

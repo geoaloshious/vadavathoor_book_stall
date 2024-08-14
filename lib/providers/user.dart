@@ -18,7 +18,7 @@ class UserProvider with ChangeNotifier {
 
   UserModel get user => _user;
 
-  void login(UserModel data) {
+  void setData(UserModel data) {
     _user = data;
     notifyListeners();
   }

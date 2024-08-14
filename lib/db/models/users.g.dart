@@ -26,9 +26,9 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       status: fields[6] as int,
       lastLoginDate: fields[7] as int,
       createdDate: fields[8] as int,
-      createdBy: fields[9] as int,
+      createdBy: fields[9] as String,
       modifiedDate: fields[10] as int,
-      modifiedBy: fields[11] as int,
+      modifiedBy: fields[11] as String,
     );
   }
 

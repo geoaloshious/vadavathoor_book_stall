@@ -31,7 +31,7 @@ class _LoginDialogState extends State<LoginDialogWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      final res = await login(username, password);
+      final res = await login(context, username, password);
 
       if (res['error'] != null) {
         setState(() {
@@ -55,6 +55,7 @@ class _LoginDialogState extends State<LoginDialogWidget> {
             child: Column(children: [
               TextField(
                   controller: _usernameController,
+                  autofocus: true,
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(RegExp(r'\s'))
                   ],
@@ -77,6 +78,9 @@ class _LoginDialogState extends State<LoginDialogWidget> {
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(RegExp(r'\s'))
                   ],
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
                   decoration: InputDecoration(
                       labelText: 'Password',
                       border: const OutlineInputBorder(),

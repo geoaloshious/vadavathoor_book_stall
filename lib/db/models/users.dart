@@ -2,6 +2,20 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 part 'users.g.dart';
 
+UserModel emptyUserModel() => UserModel(
+    userID: '',
+    firstName: '',
+    lastName: '',
+    username: '',
+    password: '',
+    role: 0,
+    status: 0,
+    lastLoginDate: 0,
+    createdDate: 0,
+    createdBy: '',
+    modifiedDate: 0,
+    modifiedBy: '');
+
 class UserRole {
   static const int admin = 1;
   static const int normal = 2;
