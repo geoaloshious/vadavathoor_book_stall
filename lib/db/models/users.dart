@@ -42,13 +42,13 @@ class UserModel {
   final int createdDate;
 
   @HiveField(9)
-  final int createdBy;
+  final String createdBy;
 
   @HiveField(10)
   final int modifiedDate;
 
   @HiveField(11)
-  final int modifiedBy;
+  final String modifiedBy;
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/login.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
-import 'package:vadavathoor_book_stall/screens/book_purchase/edit_book_purchase.dart';
 
 class UserProfileWidget extends StatefulWidget {
   const UserProfileWidget({super.key});
