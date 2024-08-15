@@ -81,14 +81,8 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      await addBookPurchase(
-          _publisherID,
-          publisherName,
-          _selectedDate.millisecondsSinceEpoch,
-          _bookID,
-          bookName,
-          price,
-          quantity);
+      await addBookPurchase(_publisherID, publisherName, purchaseDate, _bookID,
+          bookName, price, quantity);
 
       widget.updateUI();
 

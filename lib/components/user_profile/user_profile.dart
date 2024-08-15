@@ -76,7 +76,7 @@ class _UserProfileState extends State<UserProfileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(builder: (context, user, child) {
+    return Consumer<UserProvider>(builder: (cntx, user, child) {
       return PopupMenuButton<int>(
           padding: const EdgeInsets.all(5),
           icon: user.user.userID == ''
