@@ -1,3 +1,9 @@
+class ErrorMessages {
+  static const String usernameTaken = 'That username is taken. Try another.';
+  static const String userNotEnabled = 'User is not enabled';
+  static const String incorrectCredentials = 'Incorrect Username / Password';
+}
+
 class MiscDBKeys {
   static const String currentlyLoggedInUserID = 'currentlyLoggedInUserID';
   static const String lastLogInTime = 'lastLogInTime';

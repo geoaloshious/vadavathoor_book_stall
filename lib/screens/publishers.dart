@@ -20,8 +20,8 @@ class _PublishersState extends State<Publishers> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     updatePublishersList();
   }
 

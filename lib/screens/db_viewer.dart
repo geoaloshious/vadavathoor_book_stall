@@ -75,9 +75,8 @@ class _DbViewerState extends State<DbViewer> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setData();
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/components/ModalCloseConfirmation.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 
 import '../../components/drop_down.dart';
@@ -11,10 +12,10 @@ enum UserModalMode { add, edit }
 class UsermodalWidget extends StatefulWidget {
   final UserModel? data;
   final UserModalMode mode;
-  final void Function(UserModel data) submit;
+  final void Function() updateUI;
 
   const UsermodalWidget(
-      {super.key, this.data, required this.mode, required this.submit});
+      {super.key, this.data, required this.mode, required this.updateUI});
 
   @override
   State<UsermodalWidget> createState() => _UserModalState();
@@ -29,6 +30,7 @@ class _UserModalState extends State<UsermodalWidget> {
   String _role = UserRole.normal.toString();
   String _status = UserStatus.enabled.toString();
   Map<String, bool> inputErrors = {};
+  String submitErrorMessage = '';
 
   var _roles = [
     {'id': UserRole.admin.toString(), 'name': 'Admin'},
@@ -64,7 +66,9 @@ class _UserModalState extends State<UsermodalWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      widget.submit(UserModel(
+      final fn = widget.mode == UserModalMode.add ? addUser : editUser;
+
+      final res = await fn(UserModel(
           userID: widget.data?.userID ?? '',
           firstName: firstName,
           lastName: lastName,
@@ -76,6 +80,14 @@ class _UserModalState extends State<UsermodalWidget> {
           createdBy: '',
           modifiedDate: 0,
           modifiedBy: ''));
+
+      if (res['error'] != null) {
+        setState(() {
+          submitErrorMessage = res['error']!;
+        });
+      } else {
+        widget.updateUI();
+      }
     } else {
       setState(() {
         inputErrors = tempInputErrors;
@@ -248,6 +260,10 @@ class _UserModalState extends State<UsermodalWidget> {
           ],
         ),
         const SizedBox(height: 20.0),
+        submitErrorMessage != ''
+            ? Text('$submitErrorMessage\n',
+                style: const TextStyle(color: Colors.red))
+            : const SizedBox.shrink(),
         ElevatedButton(onPressed: _saveData, child: const Text('Submit')),
       ],
     );

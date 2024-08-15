@@ -112,8 +112,8 @@ class _NewSaleState extends State<NewSaleWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setBooks();
   }
 

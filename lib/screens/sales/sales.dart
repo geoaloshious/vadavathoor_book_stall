@@ -13,8 +13,8 @@ class SalesWidget extends StatefulWidget {
 
 class _SalesState extends State<SalesWidget> {
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     updateBookSaleList();
   }
 

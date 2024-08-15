@@ -23,8 +23,8 @@ class _UsersState extends State<UsersWidget> {
       context: context,
       builder: (BuildContext context) {
         Size screenSize = MediaQuery.of(context).size;
-        double dialogWidth = screenSize.width * 0.7;
-        double dialogHeight = screenSize.height * 0.5;
+        double dialogWidth = screenSize.width * 0.6;
+        double dialogHeight = screenSize.height * 0.4;
 
         return Dialog(
           child: Container(
@@ -38,8 +38,7 @@ class _UsersState extends State<UsersWidget> {
                 //#pending - while scrolling, header and submit should be sticky
                 child: UsermodalWidget(
                     mode: UserModalMode.add,
-                    submit: (userData) async {
-                      await addUser(userData);
+                    updateUI: () {
                       setData();
                       Navigator.of(context).pop();
                     }),
@@ -73,8 +72,7 @@ class _UsersState extends State<UsersWidget> {
                 child: UsermodalWidget(
                     mode: UserModalMode.edit,
                     data: selectedUser,
-                    submit: (userData) async {
-                      await editUser(userData);
+                    updateUI: () {
                       setData();
                       Navigator.of(context).pop();
                     }),

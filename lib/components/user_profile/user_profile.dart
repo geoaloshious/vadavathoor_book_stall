@@ -36,7 +36,6 @@ class _UserProfileState extends State<UserProfileWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          // title: const Text('Confirm'),
           content: const Text('Are you sure you want to logout?'),
           actions: [
             TextButton(
@@ -70,8 +69,8 @@ class _UserProfileState extends State<UserProfileWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     loadUserProviderValue(context);
   }
 

@@ -25,45 +25,64 @@ Future<List<UserModel>> getUsers() async {
   return usersDB.values.where((i) => i.status != UserStatus.deleted).toList();
 }
 
-Future<void> addUser(UserModel userData) async {
+Future<Map<String, String>> addUser(UserModel userData) async {
   final box = await getUsersBox();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  box.add(UserModel(
-      userID: generateID(),
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      username: userData.username,
-      password: userData.password,
-      role: userData.role,
-      status: userData.status,
-      createdDate: currentTS,
-      createdBy: loggedInUser,
-      modifiedDate: currentTS,
-      modifiedBy: loggedInUser));
+  bool usernameNotTaken =
+      box.values.where((i) => i.username == userData.username).isEmpty;
+
+  if (usernameNotTaken) {
+    box.add(UserModel(
+        userID: generateID(),
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        username: userData.username,
+        password: userData.password,
+        role: userData.role,
+        status: userData.status,
+        createdDate: currentTS,
+        createdBy: loggedInUser,
+        modifiedDate: currentTS,
+        modifiedBy: loggedInUser));
+  } else {
+    return {'error': ErrorMessages.usernameTaken};
+  }
+
+  return {};
 }
 
-Future<void> editUser(UserModel userData) async {
+Future<Map<String, String>> editUser(UserModel userData) async {
   final box = await getUsersBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  bool usernameNotTaken = box.values
+      .where(
+          (i) => i.username == userData.username && i.userID != userData.userID)
+      .isEmpty;
 
-  for (int key in box.keys) {
-    UserModel? existingData = box.get(key);
-    if (existingData != null && existingData.userID == userData.userID) {
-      existingData.firstName = userData.firstName;
-      existingData.lastName = userData.lastName;
-      existingData.username = userData.username;
-      existingData.password = userData.password;
-      existingData.role = userData.role;
-      existingData.status = userData.status;
-      existingData.modifiedDate = getCurrentTimestamp();
-      existingData.modifiedBy = loggedInUser;
+  if (usernameNotTaken) {
+    for (int key in box.keys) {
+      UserModel? existingData = box.get(key);
+      if (existingData != null && existingData.userID == userData.userID) {
+        existingData.firstName = userData.firstName;
+        existingData.lastName = userData.lastName;
+        existingData.username = userData.username;
+        existingData.password = userData.password;
+        existingData.role = userData.role;
+        existingData.status = userData.status;
+        existingData.modifiedDate = getCurrentTimestamp();
+        existingData.modifiedBy = loggedInUser;
 
-      await box.put(key, existingData);
-      break;
+        await box.put(key, existingData);
+        break;
+      }
     }
+  } else {
+    return {'error': ErrorMessages.usernameTaken};
   }
+
+  return {};
 }
 
 Future<void> deleteUser(String userID) async {
@@ -110,18 +129,23 @@ Future<Map<String, String>> login(
       box.values.where((u) => u.username == username && u.password == password);
 
   if (users.isNotEmpty) {
-    String userID = users.first.userID;
+    if (users.first.status == UserStatus.enabled) {
+      String userID = users.first.userID;
 
-    await updateMiscValue(MiscDBKeys.currentlyLoggedInUserID, userID);
-    await updateMiscValue(MiscDBKeys.lastLogInTime,
-        DateTime.now().millisecondsSinceEpoch.toString());
-    await addLoginHistory(userID);
+      await updateMiscValue(MiscDBKeys.currentlyLoggedInUserID, userID);
+      await updateMiscValue(MiscDBKeys.lastLogInTime,
+          DateTime.now().millisecondsSinceEpoch.toString());
+      await addLoginHistory(userID);
 
-    context.read<UserProvider>().setData(users.first);
-    return {};
+      context.read<UserProvider>().setData(users.first);
+    } else {
+      return {'error': ErrorMessages.userNotEnabled};
+    }
   } else {
-    return {'error': 'Incorrect Username / Password'};
+    return {'error': ErrorMessages.incorrectCredentials};
   }
+
+  return {};
 }
 
 Future<void> logout(BuildContext context) async {

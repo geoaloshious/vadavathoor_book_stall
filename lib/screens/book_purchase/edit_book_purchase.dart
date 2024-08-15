@@ -126,8 +126,8 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setData();
     updatePublishersList();
     updateBooksList();

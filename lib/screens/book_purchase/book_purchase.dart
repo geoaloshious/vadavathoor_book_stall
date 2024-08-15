@@ -53,8 +53,8 @@ class _BookPurchaseState extends State<BookPurchase> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setData();
   }
 

@@ -101,8 +101,8 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     updatePublishersList();
     updateBooksList();
   }
