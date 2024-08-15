@@ -10,21 +10,10 @@ UserModel emptyUserModel() => UserModel(
     password: '',
     role: 0,
     status: 0,
-    lastLoginDate: 0,
     createdDate: 0,
     createdBy: '',
     modifiedDate: 0,
     modifiedBy: '');
-
-class UserRole {
-  static const int admin = 1;
-  static const int normal = 2;
-}
-
-class UserStatus {
-  static const int enabled = 1;
-  static const int disabled = 2;
-}
 
 @HiveType(typeId: ItemType.users)
 class UserModel {
@@ -32,37 +21,34 @@ class UserModel {
   final String userID;
 
   @HiveField(1)
-  final String firstName;
+  String firstName;
 
   @HiveField(2)
-  final String lastName;
+  String lastName;
 
   @HiveField(3)
-  final String username;
+  String username;
 
   @HiveField(4)
-  final String password;
+  String password;
 
   @HiveField(5)
-  final int role;
+  int role;
 
   @HiveField(6)
-  final int status;
+  int status;
 
   @HiveField(7)
-  final int lastLoginDate;
-
-  @HiveField(8)
   final int createdDate;
 
-  @HiveField(9)
+  @HiveField(8)
   final String createdBy;
 
-  @HiveField(10)
-  final int modifiedDate;
+  @HiveField(9)
+  int modifiedDate;
 
-  @HiveField(11)
-  final String modifiedBy;
+  @HiveField(10)
+  String modifiedBy;
 
   Map<String, dynamic> toJson() {
     return {
@@ -73,7 +59,6 @@ class UserModel {
       'password': password,
       'role': role,
       'status': status,
-      'lastLoginDate': lastLoginDate,
       'createdDate': createdDate,
       'createdBy': createdBy,
       'modifiedDate': modifiedDate,
@@ -93,7 +78,6 @@ class UserModel {
       required this.password,
       required this.role,
       required this.status,
-      required this.lastLoginDate,
       required this.createdDate,
       required this.createdBy,
       required this.modifiedDate,

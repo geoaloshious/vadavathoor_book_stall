@@ -1,8 +1,65 @@
+import 'dart:io';
+
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/models/publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
+import 'package:vadavathoor_book_stall/db/models/users.dart';
 
 import '../../utils.dart';
+import '../constants.dart';
 import '../models/login_history.dart';
 import '../models/misc.dart';
+
+Future<void> initializeHiveDB() async {
+  // Get the current executable path
+  final executablePath = Directory.current.path;
+  final dbPath = Directory('$executablePath/database');
+
+  // Create the database directory if it doesn't exist
+  if (!await dbPath.exists()) {
+    await dbPath.create(recursive: true);
+  }
+
+  await Hive.initFlutter(dbPath.path);
+  if (!Hive.isAdapterRegistered(BookModelAdapter().typeId)) {
+    Hive.registerAdapter(BookModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(BookPurchaseModelAdapter().typeId)) {
+    Hive.registerAdapter(BookPurchaseModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(SaleModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(SaleItemBookModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemBookModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(
+      SaleItemBookPurchaseVariantModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemBookPurchaseVariantModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
+    Hive.registerAdapter(PurchaseAttachmentModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
+    Hive.registerAdapter(PublisherModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
+    Hive.registerAdapter(UserModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(LoginHistoryModelAdapter().typeId)) {
+    Hive.registerAdapter(LoginHistoryModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(MiscModelAdapter().typeId)) {
+    Hive.registerAdapter(MiscModelAdapter());
+  }
+
+  //#pending - might need to add user to table in TGDB.
+  await addDeveloperUserIfEmpty();
+}
 
 Future<Box<MiscModel>> getMiscBox() async {
   Box<MiscModel> box;

@@ -19,20 +19,17 @@ class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
     return PublisherModel(
       publisherID: fields[0] as String,
       publisherName: fields[1] as String,
-      publisherAddress: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, PublisherModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.publisherID)
       ..writeByte(1)
-      ..write(obj.publisherName)
-      ..writeByte(2)
-      ..write(obj.publisherAddress);
+      ..write(obj.publisherName);
   }
 
   @override

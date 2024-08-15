@@ -20,19 +20,81 @@ Future<Box<UserModel>> getUsersBox() async {
   return box;
 }
 
-Future<void> addAdminUserIfEmpty() async {
+Future<List<UserModel>> getUsers() async {
+  final usersDB = await getUsersBox();
+  return usersDB.values.where((i) => i.status != UserStatus.deleted).toList();
+}
+
+Future<void> addUser(UserModel userData) async {
+  final box = await getUsersBox();
+  final currentTS = getCurrentTimestamp();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  box.add(UserModel(
+      userID: generateID(),
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      username: userData.username,
+      password: userData.password,
+      role: userData.role,
+      status: userData.status,
+      createdDate: currentTS,
+      createdBy: loggedInUser,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser));
+}
+
+Future<void> editUser(UserModel userData) async {
+  final box = await getUsersBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  for (int key in box.keys) {
+    UserModel? existingData = box.get(key);
+    if (existingData != null && existingData.userID == userData.userID) {
+      existingData.firstName = userData.firstName;
+      existingData.lastName = userData.lastName;
+      existingData.username = userData.username;
+      existingData.password = userData.password;
+      existingData.role = userData.role;
+      existingData.status = userData.status;
+      existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
+      await box.put(key, existingData);
+      break;
+    }
+  }
+}
+
+Future<void> deleteUser(String userID) async {
+  final box = await getUsersBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  for (int key in box.keys) {
+    UserModel? existingData = box.get(key);
+    if (existingData != null && existingData.userID == userID) {
+      existingData.status = UserStatus.deleted;
+      existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
+      await box.put(key, existingData);
+      break;
+    }
+  }
+}
+
+Future<void> addDeveloperUserIfEmpty() async {
   final box = await getUsersBox();
   if (box.values.isEmpty) {
     final currentTS = getCurrentTimestamp();
     box.add(UserModel(
         userID: generateID(),
-        firstName: 'Admin',
-        lastName: '1',
-        username: 'admin',
-        password: 'admin',
-        role: UserRole.admin,
+        firstName: 'Developer',
+        lastName: '0',
+        username: 'dev0',
+        password: 'dev0',
+        role: UserRole.developer,
         status: UserStatus.enabled,
-        lastLoginDate: 0,
         createdDate: currentTS,
         createdBy: '',
         modifiedDate: currentTS,

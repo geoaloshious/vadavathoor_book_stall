@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
-import 'package:vadavathoor_book_stall/db/models/users.dart';
+import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
+import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
 // import 'package:vadavathoor_book_stall/screens/publishers.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales.dart';
 // import 'package:vadavathoor_book_stall/screens/stationary.dart';
 import 'package:vadavathoor_book_stall/screens/under_development.dart';
+import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
 
 import '../providers/user.dart';
 
@@ -38,13 +40,15 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const SalesWidget();
       case 2:
-        // return const Publishers();
-        return const UnderDevelopment();
-      case 3:
         // return const Stationary();
         return const UnderDevelopment();
+      case 3:
+        // return const Publishers();
+        return const UnderDevelopment();
+      case 4:
+        return const UsersWidget();
       default:
-        return;
+        return const EmptyScreenWidget();
     }
   }
 
@@ -86,13 +90,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }),
             actions: [
-              showDBViewer
-                  ? IconButton(
+              Consumer<UserProvider>(builder: (cntx, user, _) {
+                if (user.user.role == UserRole.developer) {
+                  return IconButton(
                       icon: const Icon(Icons.table_view),
-                      onPressed: openDBViewer)
-                  : const SizedBox.shrink(),
-              const UserProfileWidget(),
-              SizedBox(width: 100)
+                      onPressed: openDBViewer);
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
+              UserProfileWidget(resetPage: () {
+                setState(() {
+                  currentPage = 0;
+                });
+              }),
+              const SizedBox(width: 100)
             ]),
         body: Row(
           children: [
@@ -110,7 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: leftItems.length,
                       itemBuilder: (context, index) {
                         if (leftItems[index]['label'] == 'Users' &&
-                            user.user.role != UserRole.admin) {
+                            user.user.role != UserRole.admin &&
+                            user.user.role != UserRole.developer) {
                           return null;
                         }
 

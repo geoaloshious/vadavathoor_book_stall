@@ -10,23 +10,13 @@ class PublisherModel {
   @HiveField(1)
   final String publisherName;
 
-  @HiveField(2)
-  final String publisherAddress;
-
   Map<String, dynamic> toJson() {
-    return {
-      'publisherID': publisherID,
-      'publisherName': publisherName,
-      'publisherAddress': publisherAddress
-    };
+    return {'publisherID': publisherID, 'publisherName': publisherName};
   }
 
   Map<String, String> toDropdownData() {
     return {'id': publisherID, 'name': publisherName};
   }
 
-  PublisherModel(
-      {required this.publisherID,
-      required this.publisherName,
-      required this.publisherAddress});
+  PublisherModel({required this.publisherID, required this.publisherName});
 }

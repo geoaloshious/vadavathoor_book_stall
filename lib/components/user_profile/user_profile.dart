@@ -6,7 +6,9 @@ import '../../providers/user.dart';
 import 'login.dart';
 
 class UserProfileWidget extends StatefulWidget {
-  const UserProfileWidget({super.key});
+  final void Function() resetPage;
+
+  const UserProfileWidget({super.key, required this.resetPage});
 
   @override
   State<UserProfileWidget> createState() => _UserProfileState();
@@ -44,8 +46,10 @@ class _UserProfileState extends State<UserProfileWidget> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
+              autofocus: true,
               onPressed: () async {
                 await logout(context);
+                widget.resetPage();
                 Navigator.of(context).pop();
               },
               child: const Text('Confirm'),

@@ -3,6 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
+import '../constants.dart';
+
 final publishersNotifier = ValueNotifier<List<PublisherModel>>([]);
 
 Future<Box<PublisherModel>> getPublishersBox() async {
@@ -17,14 +19,11 @@ Future<Box<PublisherModel>> getPublishersBox() async {
   return box;
 }
 
-Future<String> addPublisher(String name, String address) async {
+Future<String> addPublisher(String name) async {
   String publisherID = generateID();
   final db = await getPublishersBox();
 
-  await db.add(PublisherModel(
-      publisherID: publisherID,
-      publisherName: name,
-      publisherAddress: address));
+  await db.add(PublisherModel(publisherID: publisherID, publisherName: name));
   await updatePublishersList();
 
   return publisherID;

@@ -10,7 +10,6 @@ class UserProvider with ChangeNotifier {
       password: '',
       role: 0,
       status: 0,
-      lastLoginDate: 0,
       createdDate: 0,
       createdBy: '',
       modifiedDate: 0,

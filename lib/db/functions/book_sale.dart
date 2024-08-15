@@ -7,8 +7,10 @@ import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
+import '../constants.dart';
 import 'book.dart';
 import 'book_purchase.dart';
+import 'utils.dart';
 
 ValueNotifier<List<SaleListItemModel>> salesNotifier = ValueNotifier([]);
 
@@ -28,6 +30,7 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
     double grandTotal, String customerName, String customerBatch) async {
   final saleBox = await getSalesBox();
   final currentTS = getCurrentTimestamp();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   saleBox.add(SaleModel(
       saleID: generateID(),
@@ -36,7 +39,9 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
       customerName: customerName,
       customerBatch: customerBatch,
       createdDate: currentTS,
+      createdBy: loggedInUser,
       modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       deleted: false));
 
   final purchaseBox = await getBookPurchaseBox();
