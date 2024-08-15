@@ -3,23 +3,34 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
+import '../constants.dart';
+
 final publishersNotifier = ValueNotifier<List<PublisherModel>>([]);
 
-Future<String> addPublisher(String name, String address) async {
-  String publisherID = generateID(ItemType.publisher);
-  final db = await Hive.openBox<PublisherModel>(DBNames.publisher);
+Future<Box<PublisherModel>> getPublishersBox() async {
+  Box<PublisherModel> box;
 
-  await db.add(PublisherModel(
-      publisherID: publisherID,
-      publisherName: name,
-      publisherAddress: address));
+  if (Hive.isBoxOpen(DBNames.publisher)) {
+    box = Hive.box<PublisherModel>(DBNames.publisher);
+  } else {
+    box = await Hive.openBox<PublisherModel>(DBNames.publisher);
+  }
+
+  return box;
+}
+
+Future<String> addPublisher(String name) async {
+  String publisherID = generateID();
+  final db = await getPublishersBox();
+
+  await db.add(PublisherModel(publisherID: publisherID, publisherName: name));
   await updatePublishersList();
 
   return publisherID;
 }
 
 Future<void> updatePublishersList() async {
-  final db = await Hive.openBox<PublisherModel>(DBNames.publisher);
+  final db = await getPublishersBox();
   publishersNotifier.value = db.values.toList();
   publishersNotifier.notifyListeners();
 }

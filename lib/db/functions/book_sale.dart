@@ -7,25 +7,44 @@ import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
+import '../constants.dart';
+import 'book.dart';
+import 'book_purchase.dart';
+import 'utils.dart';
+
 ValueNotifier<List<SaleListItemModel>> salesNotifier = ValueNotifier([]);
+
+Future<Box<SaleModel>> getSalesBox() async {
+  Box<SaleModel> box;
+
+  if (Hive.isBoxOpen(DBNames.sale)) {
+    box = Hive.box<SaleModel>(DBNames.sale);
+  } else {
+    box = await Hive.openBox<SaleModel>(DBNames.sale);
+  }
+
+  return box;
+}
 
 Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
     double grandTotal, String customerName, String customerBatch) async {
-  final saleBox = await Hive.openBox<SaleModel>(DBNames.sale);
+  final saleBox = await getSalesBox();
   final currentTS = getCurrentTimestamp();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   saleBox.add(SaleModel(
-      saleID: generateID(ItemType.sale),
+      saleID: generateID(),
       books: booksToCheckout,
       grandTotal: grandTotal,
       customerName: customerName,
       customerBatch: customerBatch,
       createdDate: currentTS,
+      createdBy: loggedInUser,
       modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       deleted: false));
 
-  final purchaseBox =
-      await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+  final purchaseBox = await getBookPurchaseBox();
   Map<String, int> purchaseKeys = {};
   for (int key in purchaseBox.keys) {
     String? pID = purchaseBox.get(key)?.purchaseID;
@@ -50,8 +69,8 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
 }
 
 void updateBookSaleList() async {
-  final sales = (await Hive.openBox<SaleModel>(DBNames.sale)).values.toList();
-  final books = (await Hive.openBox<BookModel>(DBNames.book)).values.toList();
+  final sales = (await getSalesBox()).values.toList();
+  final books = (await getBooksBox()).values.toList();
 
   List<SaleListItemModel> joinedData = [];
 
@@ -83,11 +102,8 @@ void updateBookSaleList() async {
 }
 
 Future<List<ForNewSaleBookItem>> getBooksWithPurchaseVariants() async {
-  final books = (await Hive.openBox<BookModel>(DBNames.book)).values.toList();
-  final purchases =
-      (await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase))
-          .values
-          .toList();
+  final books = (await getBooksBox()).values.toList();
+  final purchases = (await getBookPurchaseBox()).values.toList();
 
   List<ForNewSaleBookItem> returnData = [];
 

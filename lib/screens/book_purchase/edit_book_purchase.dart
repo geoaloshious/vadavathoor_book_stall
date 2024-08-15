@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
 
 import '../../classes.dart';
 import '../../components/drop_down.dart';
@@ -127,8 +126,8 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setData();
     updatePublishersList();
     updateBooksList();
@@ -243,7 +242,6 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                                 ? const BorderSide(color: Colors.red, width: 1)
                                 : const BorderSide(
                                     color: Colors.grey, width: 1)),
-                        // Add auto-suggestion functionality here
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -284,7 +282,6 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                                 ? const BorderSide(color: Colors.red, width: 1)
                                 : const BorderSide(
                                     color: Colors.grey, width: 1)),
-                        // Add auto-suggestion functionality here
                       ),
                       onChanged: (value) {
                         setState(() {

@@ -104,8 +104,10 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       customerName: fields[3] as String,
       customerBatch: fields[4] as String,
       createdDate: fields[5] as int,
-      modifiedDate: fields[6] as int,
-      deleted: fields[7] as bool,
+      createdBy: fields[6] as String,
+      modifiedDate: fields[7] as int,
+      modifiedBy: fields[8] as String,
+      deleted: fields[9] as bool,
       saleID: fields[0] as String,
     );
   }
@@ -113,7 +115,7 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
   @override
   void write(BinaryWriter writer, SaleModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.saleID)
       ..writeByte(1)
@@ -127,8 +129,12 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       ..writeByte(5)
       ..write(obj.createdDate)
       ..writeByte(6)
-      ..write(obj.modifiedDate)
+      ..write(obj.createdBy)
       ..writeByte(7)
+      ..write(obj.modifiedDate)
+      ..writeByte(8)
+      ..write(obj.modifiedBy)
+      ..writeByte(9)
       ..write(obj.deleted);
   }
 

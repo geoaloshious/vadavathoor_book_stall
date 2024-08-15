@@ -8,7 +8,11 @@ class MiscModel {
   final String itemKey;
 
   @HiveField(1)
-  final String itemValue;
+  String itemValue;
+
+  Map<String, dynamic> toJson() {
+    return {'itemKey': itemKey, 'itemValue': itemValue};
+  }
 
   MiscModel({required this.itemKey, required this.itemValue});
 }

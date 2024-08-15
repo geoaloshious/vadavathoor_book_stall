@@ -112,8 +112,8 @@ class _NewSaleState extends State<NewSaleWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setBooks();
   }
 
@@ -121,45 +121,38 @@ class _NewSaleState extends State<NewSaleWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'New Sale',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-            ),
-            IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: 'Close',
-                onPressed: () {
-                  showDialog(
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Text(
+            'New Sale',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          ),
+          IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Close',
+              onPressed: () {
+                showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('Confirmation'),
-                        content: const Text(
-                            'Are you sure you want to discard this sale?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Discard'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }),
-          ],
-        ),
+                          title: const Text('Confirmation'),
+                          content: const Text(
+                              'Are you sure you want to discard this sale?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel')),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Discard'))
+                          ]);
+                    });
+              })
+        ]),
         Row(
           children: [
             Expanded(

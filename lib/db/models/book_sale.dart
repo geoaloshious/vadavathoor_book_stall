@@ -78,9 +78,15 @@ class SaleModel {
   final int createdDate;
 
   @HiveField(6)
-  int modifiedDate;
+  final String createdBy;
 
   @HiveField(7)
+  int modifiedDate;
+
+  @HiveField(8)
+  String modifiedBy;
+
+  @HiveField(9)
   final bool deleted;
 
   Map<String, dynamic> toJson() {
@@ -90,7 +96,9 @@ class SaleModel {
       'customerName': customerName,
       'customerBatch': customerBatch,
       'createdDate': createdDate,
+      'createdBy': createdBy,
       'modifiedDate': modifiedDate,
+      'modifiedBy': modifiedBy,
       'deleted': deleted,
       'books': books.map((b) => b.toJson()).toString()
     };
@@ -102,7 +110,9 @@ class SaleModel {
       required this.customerName,
       required this.customerBatch,
       required this.createdDate,
+      required this.createdBy,
       required this.modifiedDate,
+      required this.modifiedBy,
       required this.deleted,
       required this.saleID});
 }

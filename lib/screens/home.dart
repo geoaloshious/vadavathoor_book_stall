@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
+import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
+import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
 // import 'package:vadavathoor_book_stall/screens/publishers.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales.dart';
 // import 'package:vadavathoor_book_stall/screens/stationary.dart';
 import 'package:vadavathoor_book_stall/screens/under_development.dart';
+import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
+
+import '../providers/user.dart';
 
 final leftItems = [
   {'label': 'Book Purchases', 'icon': Icons.book},
   {'label': 'Sales', 'icon': Icons.monetization_on},
   {'label': 'Stationary purchases', 'icon': Icons.image},
-  {'label': 'Publishers', 'icon': Icons.house}
+  {'label': 'Publishers', 'icon': Icons.house},
+  {'label': 'Users', 'icon': Icons.account_box}
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -32,19 +40,20 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const SalesWidget();
       case 2:
-        // return const Publishers();
-        return const UnderDevelopment();
-      case 3:
         // return const Stationary();
         return const UnderDevelopment();
+      case 3:
+        // return const Publishers();
+        return const UnderDevelopment();
+      case 4:
+        return const UsersWidget();
       default:
-        return;
+        return const EmptyScreenWidget();
     }
   }
 
   void openDBViewer() {
     showDialog(
-      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         Size screenSize = MediaQuery.of(context).size;
@@ -81,33 +90,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }),
             actions: [
-              showDBViewer
-                  ? IconButton(
+              Consumer<UserProvider>(builder: (cntx, user, _) {
+                if (user.user.role == UserRole.developer) {
+                  return IconButton(
                       icon: const Icon(Icons.table_view),
-                      onPressed: openDBViewer)
-                  : const SizedBox.shrink(),
-              PopupMenuButton<int>(
-                  icon: const Icon(Icons.account_circle),
-                  onSelected: (value) {
-                    if (value == 1) {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                                title: const Text('Login'),
-                                content: const Text('Login button clicked!'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('Close'))
-                                ]);
-                          });
-                    }
-                  },
-                  itemBuilder: (context) =>
-                      [const PopupMenuItem(value: 1, child: Text('Log In'))])
+                      onPressed: openDBViewer);
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
+              UserProfileWidget(resetPage: () {
+                setState(() {
+                  currentPage = 0;
+                });
+              }),
+              const SizedBox(width: 100)
             ]),
         body: Row(
           children: [
@@ -120,40 +117,48 @@ class _HomeScreenState extends State<HomeScreen> {
                       spreadRadius: 1,
                       blurRadius: 2)
                 ]),
-                child: ListView.builder(
-                    itemCount: leftItems.length,
-                    itemBuilder: (context, index) {
-                      Color backgroundColor, textColor;
-                      if (currentPage == index) {
-                        backgroundColor = Colors.white;
-                        textColor = Colors.blueGrey;
-                      } else {
-                        backgroundColor = Colors.blueGrey;
-                        textColor = Colors.white;
-                      }
+                child: Consumer<UserProvider>(builder: (context, user, child) {
+                  return ListView.builder(
+                      itemCount: leftItems.length,
+                      itemBuilder: (context, index) {
+                        if (leftItems[index]['label'] == 'Users' &&
+                            user.user.role != UserRole.admin &&
+                            user.user.role != UserRole.developer) {
+                          return null;
+                        }
 
-                      return TextButton(
-                          style: TextButton.styleFrom(
-                              alignment: Alignment.centerLeft,
-                              padding: const EdgeInsets.all(20),
-                              backgroundColor: backgroundColor,
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero)),
-                          onPressed: () {
-                            setState(() {
-                              currentPage = index;
-                            });
-                          },
-                          child: Row(children: [
-                            Icon(leftItems[index]['icon'] as IconData,
-                                color: textColor),
-                            if (_isDrawerOpen) ...[
-                              const SizedBox(width: 10),
-                              Text(leftItems[index]['label'] as String,
-                                  style: TextStyle(color: textColor))
-                            ]
-                          ]));
-                    })),
+                        Color backgroundColor, textColor;
+                        if (currentPage == index) {
+                          backgroundColor = Colors.white;
+                          textColor = Colors.blueGrey;
+                        } else {
+                          backgroundColor = Colors.blueGrey;
+                          textColor = Colors.white;
+                        }
+
+                        return TextButton(
+                            style: TextButton.styleFrom(
+                                alignment: Alignment.centerLeft,
+                                padding: const EdgeInsets.all(20),
+                                backgroundColor: backgroundColor,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero)),
+                            onPressed: () {
+                              setState(() {
+                                currentPage = index;
+                              });
+                            },
+                            child: Row(children: [
+                              Icon(leftItems[index]['icon'] as IconData,
+                                  color: textColor),
+                              if (_isDrawerOpen) ...[
+                                const SizedBox(width: 10),
+                                Text(leftItems[index]['label'] as String,
+                                    style: TextStyle(color: textColor))
+                              ]
+                            ]));
+                      });
+                })),
             Expanded(child: Container(child: renderRightSide()))
           ],
         ));

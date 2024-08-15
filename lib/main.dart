@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/screens/home.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:provider/provider.dart';
+
+import 'db/functions/utils.dart';
+import 'providers/user.dart';
+import 'screens/home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeHiveDB();
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

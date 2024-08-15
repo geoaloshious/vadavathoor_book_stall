@@ -1,55 +1,54 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'book_purchase.dart';
+part of 'users.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
+class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
-  final int typeId = 2;
+  final int typeId = 9;
 
   @override
-  BookPurchaseModel read(BinaryReader reader) {
+  UserModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return BookPurchaseModel(
-      purchaseID: fields[0] as String,
-      publisherID: fields[1] as String,
-      purchaseDate: fields[2] as int,
-      bookID: fields[3] as String,
-      quantityPurchased: fields[5] as int,
-      quantityLeft: fields[6] as int,
-      bookPrice: fields[4] as double,
+    return UserModel(
+      userID: fields[0] as String,
+      firstName: fields[1] as String,
+      lastName: fields[2] as String,
+      username: fields[3] as String,
+      password: fields[4] as String,
+      role: fields[5] as int,
+      status: fields[6] as int,
       createdDate: fields[7] as int,
       createdBy: fields[8] as String,
       modifiedDate: fields[9] as int,
       modifiedBy: fields[10] as String,
-      deleted: fields[11] as bool,
     );
   }
 
   @override
-  void write(BinaryWriter writer, BookPurchaseModel obj) {
+  void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(11)
       ..writeByte(0)
-      ..write(obj.purchaseID)
+      ..write(obj.userID)
       ..writeByte(1)
-      ..write(obj.publisherID)
+      ..write(obj.firstName)
       ..writeByte(2)
-      ..write(obj.purchaseDate)
+      ..write(obj.lastName)
       ..writeByte(3)
-      ..write(obj.bookID)
+      ..write(obj.username)
       ..writeByte(4)
-      ..write(obj.bookPrice)
+      ..write(obj.password)
       ..writeByte(5)
-      ..write(obj.quantityPurchased)
+      ..write(obj.role)
       ..writeByte(6)
-      ..write(obj.quantityLeft)
+      ..write(obj.status)
       ..writeByte(7)
       ..write(obj.createdDate)
       ..writeByte(8)
@@ -57,9 +56,7 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       ..writeByte(9)
       ..write(obj.modifiedDate)
       ..writeByte(10)
-      ..write(obj.modifiedBy)
-      ..writeByte(11)
-      ..write(obj.deleted);
+      ..write(obj.modifiedBy);
   }
 
   @override
@@ -68,7 +65,7 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BookPurchaseModelAdapter &&
+      other is UserModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

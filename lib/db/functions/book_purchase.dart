@@ -1,11 +1,23 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
-import 'package:vadavathoor_book_stall/db/models/publisher.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
+
+Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
+  Box<BookPurchaseModel> box;
+
+  if (Hive.isBoxOpen(DBNames.bookPurchase)) {
+    box = Hive.box<BookPurchaseModel>(DBNames.bookPurchase);
+  } else {
+    box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+  }
+
+  return box;
+}
 
 Future<void> addBookPurchase(
     String publisherID,
@@ -15,18 +27,19 @@ Future<void> addBookPurchase(
     String bookName,
     double bookPrice,
     int quantity) async {
-  String purchaseID = generateID(ItemType.bookPurchase);
+  String purchaseID = generateID();
   final currentTS = getCurrentTimestamp();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   if (publisherID == '') {
-    publisherID = await addPublisher(publisherName, '');
+    publisherID = await addPublisher(publisherName);
   }
 
   if (bookID == '') {
     bookID = await addBook(bookName);
   }
 
-  final db = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+  final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
       purchaseID: purchaseID,
       publisherID: publisherID,
@@ -36,7 +49,9 @@ Future<void> addBookPurchase(
       quantityLeft: quantity,
       bookPrice: bookPrice,
       createdDate: currentTS,
+      createdBy: loggedInUser,
       modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       deleted: false));
 }
 
@@ -49,13 +64,14 @@ Future<void> editBookPurchase(
     int quantity,
     double bookPrice,
     int purchaseDate) async {
-  final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+  final box = await getBookPurchaseBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   for (int key in box.keys) {
     BookPurchaseModel? existingData = box.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
       if (publisherID == '') {
-        publisherID = await addPublisher(publisherName, '');
+        publisherID = await addPublisher(publisherName);
       }
 
       if (bookID == '') {
@@ -70,6 +86,8 @@ Future<void> editBookPurchase(
       existingData.bookPrice = bookPrice;
       existingData.purchaseDate = purchaseDate;
       existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
       await box.put(key, existingData);
       break;
     }
@@ -77,12 +95,16 @@ Future<void> editBookPurchase(
 }
 
 Future<void> deleteBookPurchase(String purchaseID) async {
-  final box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+  final box = await getBookPurchaseBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   for (int key in box.keys) {
     BookPurchaseModel? existingData = box.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
       existingData.deleted = true;
+      existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
       await box.put(key, existingData);
       break;
     }
@@ -90,13 +112,9 @@ Future<void> deleteBookPurchase(String purchaseID) async {
 }
 
 Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
-  final purchases =
-      (await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase))
-          .values
-          .toList();
-  final books = (await Hive.openBox<BookModel>(DBNames.book)).values.toList();
-  final publishers =
-      (await Hive.openBox<PublisherModel>(DBNames.publisher)).values.toList();
+  final purchases = (await getBookPurchaseBox()).values.toList();
+  final books = (await getBooksBox()).values.toList();
+  final publishers = (await getPublishersBox()).values.toList();
 
   List<BookPurchaseListItemModel> joinedData = [];
 

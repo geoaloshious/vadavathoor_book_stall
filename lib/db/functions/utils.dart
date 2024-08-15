@@ -1,0 +1,134 @@
+import 'dart:io';
+
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/models/publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
+import 'package:vadavathoor_book_stall/db/models/users.dart';
+
+import '../../utils.dart';
+import '../constants.dart';
+import '../models/login_history.dart';
+import '../models/misc.dart';
+
+Future<void> initializeHiveDB() async {
+  // Get the current executable path
+  final executablePath = Directory.current.path;
+  final dbPath = Directory('$executablePath/database');
+
+  // Create the database directory if it doesn't exist
+  if (!await dbPath.exists()) {
+    await dbPath.create(recursive: true);
+  }
+
+  await Hive.initFlutter(dbPath.path);
+  if (!Hive.isAdapterRegistered(BookModelAdapter().typeId)) {
+    Hive.registerAdapter(BookModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(BookPurchaseModelAdapter().typeId)) {
+    Hive.registerAdapter(BookPurchaseModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(SaleModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(SaleItemBookModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemBookModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(
+      SaleItemBookPurchaseVariantModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemBookPurchaseVariantModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
+    Hive.registerAdapter(PurchaseAttachmentModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
+    Hive.registerAdapter(PublisherModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
+    Hive.registerAdapter(UserModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(LoginHistoryModelAdapter().typeId)) {
+    Hive.registerAdapter(LoginHistoryModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(MiscModelAdapter().typeId)) {
+    Hive.registerAdapter(MiscModelAdapter());
+  }
+
+  //#pending - might need to add user to table in TGDB.
+  await addDeveloperUserIfEmpty();
+}
+
+Future<Box<MiscModel>> getMiscBox() async {
+  Box<MiscModel> box;
+
+  if (Hive.isBoxOpen(DBNames.misc)) {
+    box = Hive.box<MiscModel>(DBNames.misc);
+  } else {
+    box = await Hive.openBox<MiscModel>(DBNames.misc);
+  }
+
+  return box;
+}
+
+Future<Box<LoginHistoryModel>> getLoginHistoryBox() async {
+  Box<LoginHistoryModel> box;
+
+  if (Hive.isBoxOpen(DBNames.loginHistory)) {
+    box = Hive.box<LoginHistoryModel>(DBNames.loginHistory);
+  } else {
+    box = await Hive.openBox<LoginHistoryModel>(DBNames.loginHistory);
+  }
+
+  return box;
+}
+
+Future<String> readMiscValue(String itemKey) async {
+  final miscBox = await getMiscBox();
+  final items = miscBox.values.where((i) => i.itemKey == itemKey);
+  if (items.isNotEmpty) {
+    return items.first.itemValue;
+  } else {
+    return '';
+  }
+}
+
+Future<void> updateMiscValue(String itemKey, String itemValue) async {
+  final miscBox = await getMiscBox();
+
+  final items = miscBox.values.where((i) => i.itemKey == itemKey);
+
+  if (items.isEmpty) {
+    miscBox.add(MiscModel(itemKey: itemKey, itemValue: itemValue));
+  } else {
+    for (int key in miscBox.keys) {
+      MiscModel? existingData = miscBox.get(key);
+      if (existingData != null && existingData.itemKey == itemKey) {
+        existingData.itemValue = itemValue;
+        await miscBox.put(key, existingData);
+        break;
+      }
+    }
+  }
+}
+
+Future<void> addLoginHistory(String userID) async {
+  final box = await getLoginHistoryBox();
+  int currentTS = DateTime.now().millisecondsSinceEpoch;
+
+  box.add(LoginHistoryModel(
+      id: generateID(), userID: userID, logInTime: currentTS, logOutTime: 0));
+}
+
+Future<void> updateLogoutHistory() async {
+  final box = await getLoginHistoryBox();
+
+  for (int key in box.keys) {
+    LoginHistoryModel? existingData = box.get(key);
+    if (existingData != null && existingData.logOutTime == 0) {
+      existingData.logOutTime = DateTime.now().millisecondsSinceEpoch;
+    }
+  }
+}

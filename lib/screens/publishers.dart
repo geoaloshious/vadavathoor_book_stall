@@ -10,20 +10,18 @@ class Publishers extends StatefulWidget {
 
 class _PublishersState extends State<Publishers> {
   final _nameController = TextEditingController();
-  final _addressController = TextEditingController();
 
   void add() {
     if (_nameController.text != '') {
-      addPublisher(_nameController.text, _addressController.text);
+      addPublisher(_nameController.text);
 
       _nameController.clear();
-      _addressController.clear();
     }
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     updatePublishersList();
   }
 
@@ -42,14 +40,6 @@ class _PublishersState extends State<Publishers> {
                           border: OutlineInputBorder(), hintText: 'Name'),
                       controller: _nameController,
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: 'Address'),
-                      controller: _addressController,
-                    ),
                   )
                 ],
               ),
@@ -64,7 +54,7 @@ class _PublishersState extends State<Publishers> {
                             return Row(
                               children: [
                                 Text(
-                                    'Name: ${publishers[index].publisherName}, Address: ${publishers[index].publisherAddress}'),
+                                    'Name: ${publishers[index].publisherName}'),
                               ],
                             );
                           },
