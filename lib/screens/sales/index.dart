@@ -1,54 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
+import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/book_purchase/purchased_book.dart';
+import 'package:vadavathoor_book_stall/screens/sales/new_sale.dart';
+import 'package:vadavathoor_book_stall/screens/sales/sale.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 
-import '../../classes.dart';
-import 'new_purchase.dart';
-
-class BookPurchase extends StatefulWidget {
-  const BookPurchase({super.key});
+class SalesWidget extends StatefulWidget {
+  const SalesWidget({super.key});
 
   @override
-  State<BookPurchase> createState() => _BookPurchaseState();
+  State<SalesWidget> createState() => _SalesState();
 }
 
-class _BookPurchaseState extends State<BookPurchase> {
-  List<BookPurchaseListItemModel> purchases = [];
-
-  void newPurchase() {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        Size screenSize = MediaQuery.of(context).size;
-        double dialogWidth = screenSize.width * 0.7;
-        double dialogHeight = screenSize.height * 0.5;
-
-        return Dialog(
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: dialogHeight,
-              maxWidth: dialogWidth,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                //#pending - while scrolling, header and submit should be sticky
-                child: NewPurchaseWidget(updateUI: setData),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+class _SalesState extends State<SalesWidget> {
+  List<SaleListItemModel> sales = [];
 
   void setData() async {
-    var tempData = await getBookPurchaseList();
+    final temp = await getBookSaleList();
     setState(() {
-      purchases = tempData;
+      sales = temp;
     });
   }
 
@@ -58,25 +30,53 @@ class _BookPurchaseState extends State<BookPurchase> {
     setData();
   }
 
+  void newSale() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        Size screenSize = MediaQuery.of(context).size;
+        double dialogWidth = screenSize.width * 0.8;
+        double dialogHeight = screenSize.height * 0.7;
+
+        return Dialog(
+          child: Container(
+            constraints: BoxConstraints(
+              minHeight: dialogHeight,
+              maxWidth: dialogWidth, // Set the desired maximum width
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                //#pending - while scrolling, header, grand total and submit should be sticky
+                child: NewSaleWidget(updateUI: setData),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
       final loggedIn = user.user.userID != '';
 
       return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               const Text(
-                'Purchases',
+                'Sales',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               if (loggedIn)
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueGrey),
-                    onPressed: newPurchase,
-                    child: const Text('New purchase',
+                    onPressed: newSale,
+                    child: const Text('New sale',
                         style: TextStyle(color: Colors.white)))
             ]),
             const SizedBox(height: 20),
@@ -86,23 +86,19 @@ class _BookPurchaseState extends State<BookPurchase> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Publisher',
+                  child: Text('Qty',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Category',
+                  child: Text('Paid via',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Quantity',
+                  child: Text('Total',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Price',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  child: Text('Purchase date',
+                  child: Text('Date',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               if (loggedIn) const SizedBox(width: 80)
@@ -114,13 +110,16 @@ class _BookPurchaseState extends State<BookPurchase> {
                         border:
                             Border.all(width: 0.2, color: Colors.blueGrey)))),
             Expanded(
-                child: purchases.isNotEmpty
+                child: sales.isNotEmpty
                     ? ListView.builder(
-                        itemCount: purchases.length,
-                        itemBuilder: (context, index) => PurchasedBookWidget(
-                            data: purchases[index],
-                            loggedIn: loggedIn,
-                            updateUI: setData))
+                        itemBuilder: (ctx2, index) {
+                          return SaleWidget(
+                              key: Key('$index'),
+                              data: sales[index],
+                              loggedIn: loggedIn,
+                              updateUI: setData);
+                        },
+                        itemCount: sales.length)
                     : const Text("No records found"))
           ]));
     });

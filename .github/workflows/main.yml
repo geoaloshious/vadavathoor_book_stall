@@ -2,10 +2,10 @@ name: Manually Triggered Workflow
 on:
   workflow_dispatch:
     inputs:
-        version:
-          description: 'Version number'
-          required: false
-          default: '0.0.0'
+      version:
+        description: 'Version number'
+        required: false
+        default: '0.0.0'
         
 jobs:
   windows:

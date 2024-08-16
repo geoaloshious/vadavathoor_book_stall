@@ -91,7 +91,7 @@ class SaleModel {
   String modifiedBy;
 
   @HiveField(10)
-  final bool deleted;
+  int status;
 
   Map<String, dynamic> toJson() {
     return {
@@ -104,7 +104,7 @@ class SaleModel {
       'createdBy': createdBy,
       'modifiedDate': modifiedDate,
       'modifiedBy': modifiedBy,
-      'deleted': deleted,
+      'status': status,
       'books': books.map((b) => b.toJson()).toString()
     };
   }
@@ -119,6 +119,6 @@ class SaleModel {
       required this.createdBy,
       required this.modifiedDate,
       required this.modifiedBy,
-      required this.deleted,
+      required this.status,
       required this.saleID});
 }

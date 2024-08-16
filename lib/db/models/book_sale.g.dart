@@ -108,7 +108,7 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       createdBy: fields[7] as String,
       modifiedDate: fields[8] as int,
       modifiedBy: fields[9] as String,
-      deleted: fields[10] as bool,
+      status: fields[10] as int,
       saleID: fields[0] as String,
     );
   }
@@ -138,7 +138,7 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       ..writeByte(9)
       ..write(obj.modifiedBy)
       ..writeByte(10)
-      ..write(obj.deleted);
+      ..write(obj.status);
   }
 
   @override

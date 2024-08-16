@@ -12,8 +12,6 @@ import 'book.dart';
 import 'book_purchase.dart';
 import 'utils.dart';
 
-ValueNotifier<List<SaleListItemModel>> salesNotifier = ValueNotifier([]);
-
 Future<Box<SaleModel>> getSalesBox() async {
   Box<SaleModel> box;
 
@@ -47,7 +45,7 @@ Future<void> addBookSale(
       createdBy: loggedInUser,
       modifiedDate: 0,
       modifiedBy: '',
-      deleted: false));
+      status: DBRowStatus.active));
 
   final purchaseBox = await getBookPurchaseBox();
   Map<String, int> purchaseKeys = {};
@@ -69,18 +67,59 @@ Future<void> addBookSale(
       }
     }
   }
-
-  updateBookSaleList();
 }
 
-void updateBookSaleList() async {
+Future<void> editBookSale(
+    String saleID,
+    String publisherID,
+    String publisherName,
+    String bookID,
+    String bookName,
+    String bookCategoryID,
+    String bookCategoryName,
+    int quantity,
+    double bookPrice,
+    int purchaseDate) async {
+  final box = await getSalesBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  for (int key in box.keys) {
+    SaleModel? existingData = box.get(key);
+    if (existingData != null && existingData.saleID == saleID) {
+      existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
+      await box.put(key, existingData);
+      break;
+    }
+  }
+}
+
+Future<void> deleteBookSale(String saleID) async {
+  final box = await getSalesBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  for (int key in box.keys) {
+    SaleModel? existingData = box.get(key);
+    if (existingData != null && existingData.saleID == saleID) {
+      existingData.status = DBRowStatus.deleted;
+      existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
+      await box.put(key, existingData);
+      break;
+    }
+  }
+}
+
+Future<List<SaleListItemModel>> getBookSaleList() async {
   final sales = (await getSalesBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
 
   List<SaleListItemModel> joinedData = [];
 
   for (SaleModel sale in sales) {
-    if (!sale.deleted) {
+    if (sale.status == DBRowStatus.active) {
       for (SaleItemBookModel saleItem in sale.books) {
         final book =
             books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
@@ -93,6 +132,7 @@ void updateBookSaleList() async {
 
         if (book != null) {
           joinedData.add(SaleListItemModel(
+              saleID: sale.saleID,
               bookName: book.bookName,
               quantity: totalQty,
               grandTotal: sale.grandTotal,
@@ -103,8 +143,7 @@ void updateBookSaleList() async {
     }
   }
 
-  salesNotifier.value = joinedData;
-  salesNotifier.notifyListeners();
+  return joinedData;
 }
 
 Future<List<ForNewSaleBookItem>> getBooksWithPurchaseVariants() async {

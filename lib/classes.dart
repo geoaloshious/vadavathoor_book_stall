@@ -27,6 +27,7 @@ class BookPurchaseListItemModel {
 }
 
 class SaleListItemModel {
+  final String saleID;
   final String bookName;
   final int quantity;
   final String date;
@@ -34,7 +35,8 @@ class SaleListItemModel {
   final String paymentMode;
 
   SaleListItemModel(
-      {required this.bookName,
+      {required this.saleID,
+      required this.bookName,
       required this.quantity,
       required this.date,
       required this.grandTotal,

@@ -6,7 +6,9 @@ import 'package:vadavathoor_book_stall/screens/sales/new_sale_item_book.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
 class NewSaleWidget extends StatefulWidget {
-  const NewSaleWidget({super.key});
+  final void Function() updateUI;
+
+  const NewSaleWidget({super.key, required this.updateUI});
 
   @override
   State<NewSaleWidget> createState() => _NewSaleState();
@@ -51,6 +53,7 @@ class _NewSaleState extends State<NewSaleWidget> {
             _customerBatchController.text.trim(),
             _paymentMode);
 
+        widget.updateUI();
         Navigator.of(context).pop();
       } else {
         showDialog(
