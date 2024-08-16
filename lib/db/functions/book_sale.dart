@@ -96,6 +96,7 @@ void updateBookSaleList() async {
               bookName: book.bookName,
               quantity: totalQty,
               grandTotal: sale.grandTotal,
+              paymentMode: sale.paymentMode,
               date: formatTimestamp(timestamp: sale.createdDate)));
         }
       }

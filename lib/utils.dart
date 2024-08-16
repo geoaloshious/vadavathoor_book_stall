@@ -8,6 +8,19 @@ class PaymentModes {
   static const String card = '3';
 }
 
+String getPaymentModeName(String mode) {
+  switch (mode) {
+    case PaymentModes.cash:
+      return 'Cash';
+    case PaymentModes.upi:
+      return 'UPI';
+    case PaymentModes.card:
+      return 'Card';
+    default:
+      return 'Unknown';
+  }
+}
+
 String getRoleName(int role) {
   switch (role) {
     case UserRole.admin:
@@ -17,7 +30,7 @@ String getRoleName(int role) {
     case UserRole.normal:
       return 'Normal User';
     default:
-      return 'Invalid user';
+      return 'Unknown';
   }
 }
 

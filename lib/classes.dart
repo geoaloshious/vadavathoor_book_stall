@@ -31,20 +31,12 @@ class SaleListItemModel {
   final int quantity;
   final String date;
   final double grandTotal;
+  final String paymentMode;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'bookName': bookName,
-      'quantity': quantity,
-      'date': date,
-      'grandTotal': grandTotal
-    };
-  }
-
-  SaleListItemModel({
-    required this.bookName,
-    required this.quantity,
-    required this.date,
-    required this.grandTotal,
-  });
+  SaleListItemModel(
+      {required this.bookName,
+      required this.quantity,
+      required this.date,
+      required this.grandTotal,
+      required this.paymentMode});
 }

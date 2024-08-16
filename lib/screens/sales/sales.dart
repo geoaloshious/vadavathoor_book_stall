@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/screens/sales/new_sale.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 
 class SalesWidget extends StatefulWidget {
   const SalesWidget({super.key});
@@ -78,6 +79,10 @@ class _SalesState extends State<SalesWidget> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               Expanded(
+                  child: Text('Paid via',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              Expanded(
                   child: Text('Total',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
@@ -104,6 +109,9 @@ class _SalesState extends State<SalesWidget> {
                                 Expanded(
                                     child:
                                         Text(sales[index].quantity.toString())),
+                                Expanded(
+                                    child: Text(getPaymentModeName(
+                                        sales[index].paymentMode))),
                                 Expanded(
                                     child: Text(
                                         sales[index].grandTotal.toString())),
