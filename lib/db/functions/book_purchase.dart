@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
@@ -25,6 +26,8 @@ Future<void> addBookPurchase(
     int purchaseDate,
     String bookID,
     String bookName,
+    String bookCategoryID,
+    String bookCategoryName,
     double bookPrice,
     int quantity) async {
   String purchaseID = generateID();
@@ -39,10 +42,15 @@ Future<void> addBookPurchase(
     bookID = await addBook(bookName);
   }
 
+  if (bookCategoryID == '') {
+    bookCategoryID = await addBookCategory(bookCategoryName);
+  }
+
   final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
       purchaseID: purchaseID,
       publisherID: publisherID,
+      bookCategoryID: bookCategoryID,
       purchaseDate: purchaseDate,
       bookID: bookID,
       quantityPurchased: quantity,
@@ -61,6 +69,8 @@ Future<void> editBookPurchase(
     String publisherName,
     String bookID,
     String bookName,
+    String bookCategoryID,
+    String bookCategoryName,
     int quantity,
     double bookPrice,
     int purchaseDate) async {
@@ -78,8 +88,13 @@ Future<void> editBookPurchase(
         bookID = await addBook(bookName);
       }
 
+      if (bookCategoryID == '') {
+        bookCategoryID = await addBookCategory(bookCategoryName);
+      }
+
       existingData.publisherID = publisherID;
       existingData.bookID = bookID;
+      existingData.bookCategoryID = bookCategoryID;
       existingData.quantityPurchased = quantity;
       existingData.quantityLeft =
           quantity; //#pending - If editing after a sale is done, then data will conflict
@@ -115,6 +130,7 @@ Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
   final purchases = (await getBookPurchaseBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
   final publishers = (await getPublishersBox()).values.toList();
+  final bookCategories = (await getBookCategoriesBox()).values.toList();
 
   List<BookPurchaseListItemModel> joinedData = [];
 
@@ -123,12 +139,20 @@ Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
     final publisher = publishers
         .where((u) => u.publisherID == purchase.publisherID)
         .firstOrNull;
+    final bookCategory = bookCategories
+        .where((u) => u.categoryID == purchase.bookCategoryID)
+        .firstOrNull;
 
-    if (book != null && publisher != null && !purchase.deleted) {
+    if (book != null &&
+        publisher != null &&
+        bookCategory != null &&
+        !purchase.deleted) {
       joinedData.add(BookPurchaseListItemModel(
           purchaseID: purchase.purchaseID,
           publisherID: purchase.publisherID,
           publisherName: publisher.publisherName,
+          categoryID: bookCategory.categoryID,
+          categoryName: bookCategory.categoryName,
           purchaseDate: purchase.purchaseDate,
           formattedPurchaseDate: formatTimestamp(
               timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),

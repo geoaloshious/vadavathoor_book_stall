@@ -6,6 +6,7 @@ part 'book_purchase.g.dart';
 BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
     purchaseID: '',
     publisherID: '',
+    bookCategoryID: '',
     purchaseDate: 0,
     bookID: '',
     quantityPurchased: 0,
@@ -55,10 +56,14 @@ class BookPurchaseModel {
   @HiveField(11)
   bool deleted;
 
+  @HiveField(12)
+  String bookCategoryID;
+
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
       'publisherID': publisherID,
+      'bookCategoryID': bookCategoryID,
       'purchaseDate': purchaseDate,
       'bookID': bookID,
       'quantityPurchased': quantityPurchased,
@@ -75,6 +80,7 @@ class BookPurchaseModel {
   BookPurchaseModel(
       {required this.purchaseID,
       required this.publisherID,
+      required this.bookCategoryID,
       required this.purchaseDate,
       required this.bookID,
       required this.quantityPurchased,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/screens/book_categories/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
@@ -57,9 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 5:
         return const UnderDevelopment();
       case 6:
-        return const Publishers();
+        return const PublishersWidget();
       case 7:
-        return const UnderDevelopment();
+        return const BookCategoriesWidget();
       default:
         return const EmptyScreenWidget();
     }

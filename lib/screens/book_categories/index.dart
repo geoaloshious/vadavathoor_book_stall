@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
-import 'package:vadavathoor_book_stall/screens/publishers/edit_publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
+import 'package:vadavathoor_book_stall/screens/book_categories/edit_category.dart';
 
-class PublishersWidget extends StatefulWidget {
-  const PublishersWidget({super.key});
+class BookCategoriesWidget extends StatefulWidget {
+  const BookCategoriesWidget({super.key});
 
   @override
-  State<PublishersWidget> createState() => _PublishersState();
+  State<BookCategoriesWidget> createState() => _BookCategoriesState();
 }
 
-class _PublishersState extends State<PublishersWidget> {
+class _BookCategoriesState extends State<BookCategoriesWidget> {
   final _nameController = TextEditingController();
-  List<PublisherModel> publishers = [];
+  List<BookCategoryModel> categories = [];
 
   void add() async {
     final name = _nameController.text.trim();
     if (name != '') {
-      await addPublisher(name);
+      await addBookCategory(name);
       _nameController.clear();
       setData();
     }
   }
 
-  onPressEdit(PublisherModel selectedItem) {
+  onPressEdit(BookCategoryModel selectedItem) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -39,7 +40,7 @@ class _PublishersState extends State<PublishersWidget> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
-                child: EditPublisherWidget(
+                child: EditBookCategoryWidget(
                     data: selectedItem,
                     updateUI: () {
                       setData();
@@ -69,8 +70,8 @@ class _PublishersState extends State<PublishersWidget> {
             ),
             ElevatedButton(
               onPressed: () async {
-                await editPublisher(
-                    publisherID: selectedID, status: DBRowStatus.deleted);
+                await editBookCategory(
+                    categoryID: selectedID, status: DBRowStatus.deleted);
                 setData();
                 Navigator.of(context).pop();
               },
@@ -83,9 +84,9 @@ class _PublishersState extends State<PublishersWidget> {
   }
 
   void setData() async {
-    final temp = await getPublishers();
+    final temp = await getBookCategories();
     setState(() {
-      publishers = temp;
+      categories = temp;
     });
   }
 
@@ -105,7 +106,7 @@ class _PublishersState extends State<PublishersWidget> {
                 child: TextField(
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: 'Publisher Name'),
+                        hintText: 'Category Name'),
                     controller: _nameController)),
             const SizedBox(width: 20),
             ElevatedButton(
@@ -115,7 +116,7 @@ class _PublishersState extends State<PublishersWidget> {
                 child: const Text('Add', style: TextStyle(color: Colors.white)))
           ]),
           const SizedBox(height: 20),
-          const Text('Publishers',
+          const Text('Book Categories',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           const Row(
@@ -131,23 +132,23 @@ class _PublishersState extends State<PublishersWidget> {
                   decoration: BoxDecoration(
                       border: Border.all(width: 0.2, color: Colors.blueGrey)))),
           Expanded(
-              child: publishers.isNotEmpty
+              child: categories.isNotEmpty
                   ? ListView.builder(
-                      itemCount: publishers.length,
+                      itemCount: categories.length,
                       itemBuilder: (context, index) => Row(children: [
                             Expanded(
-                                child: Text(publishers[index].publisherName)),
+                                child: Text(categories[index].categoryName)),
                             IconButton(
                                 icon: const Icon(Icons.edit),
                                 tooltip: 'Edit',
                                 onPressed: () {
-                                  onPressEdit(publishers[index]);
+                                  onPressEdit(categories[index]);
                                 }),
                             IconButton(
                                 icon: const Icon(Icons.delete),
                                 tooltip: 'Delete',
                                 onPressed: () {
-                                  onPressDelete(publishers[index].publisherID);
+                                  onPressDelete(categories[index].categoryID);
                                 })
                           ]))
                   : const Text("No records found"))

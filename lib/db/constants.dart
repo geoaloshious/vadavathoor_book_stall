@@ -26,6 +26,7 @@ class DBItemHiveType {
 class DBNames {
   static const String book = 'book_db';
   static const String bookPurchase = 'book_purchase_db';
+  static const String bookCategories = 'book_categories_db';
   static const String sale = 'sale_db';
   static const String saleItemBook = 'sale_item_book_db';
   static const String saleItemBookPurchaseVariant =

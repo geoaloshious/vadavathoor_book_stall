@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
@@ -42,6 +43,9 @@ Future<void> initializeHiveDB() async {
   }
   if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
     Hive.registerAdapter(PublisherModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(BookCategoryModelAdapter().typeId)) {
+    Hive.registerAdapter(BookCategoryModelAdapter());
   }
   if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
     Hive.registerAdapter(UserModelAdapter());

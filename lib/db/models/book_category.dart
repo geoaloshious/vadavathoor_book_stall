@@ -9,7 +9,7 @@ class BookCategoryModel {
   final String categoryID;
 
   @HiveField(1)
-  final String categoryName;
+  String categoryName;
 
   @HiveField(2)
   final int createdDate;

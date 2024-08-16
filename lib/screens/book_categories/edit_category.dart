@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 
 enum UserModalMode { add, edit }
 
-class EditPublisherWidget extends StatefulWidget {
-  final PublisherModel data;
+class EditBookCategoryWidget extends StatefulWidget {
+  final BookCategoryModel data;
   final void Function() updateUI;
 
-  const EditPublisherWidget(
+  const EditBookCategoryWidget(
       {super.key, required this.data, required this.updateUI});
 
   @override
-  State<EditPublisherWidget> createState() => _EditPublisherState();
+  State<EditBookCategoryWidget> createState() => _EditBookCategoryState();
 }
 
-class _EditPublisherState extends State<EditPublisherWidget> {
+class _EditBookCategoryState extends State<EditBookCategoryWidget> {
   TextEditingController _nameController = TextEditingController();
 
   Map<String, bool> inputErrors = {};
@@ -30,8 +31,8 @@ class _EditPublisherState extends State<EditPublisherWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      await editPublisher(
-          publisherID: widget.data.publisherID, publisherName: name);
+      await editBookCategory(
+          categoryID: widget.data.categoryID, categoryName: name);
       widget.updateUI();
     } else {
       setState(() {
@@ -41,7 +42,7 @@ class _EditPublisherState extends State<EditPublisherWidget> {
   }
 
   void setData() {
-    _nameController = TextEditingController(text: widget.data.publisherName);
+    _nameController = TextEditingController(text: widget.data.categoryName);
   }
 
   @override
@@ -58,7 +59,7 @@ class _EditPublisherState extends State<EditPublisherWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Edit Publisher',
+              'Edit Category',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             IconButton(
@@ -76,7 +77,7 @@ class _EditPublisherState extends State<EditPublisherWidget> {
               child: TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Publisher Name',
+                  labelText: 'Category Name',
                   border: const OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
                       borderSide: inputErrors['name'] == true
