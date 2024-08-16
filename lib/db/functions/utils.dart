@@ -57,7 +57,7 @@ Future<void> initializeHiveDB() async {
     Hive.registerAdapter(MiscModelAdapter());
   }
 
-  //#pending - might need to add user to table in TGDB.
+  //#pending - might need to add user to table from TGDB.
   await addDeveloperUserIfEmpty();
 }
 

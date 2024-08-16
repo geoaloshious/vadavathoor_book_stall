@@ -18,7 +18,7 @@ import '../providers/user.dart';
 final group1 = [
   {'id': 4, 'label': 'Sales', 'icon': Icons.monetization_on},
   {'id': 3, 'label': 'Book Purchases', 'icon': Icons.book},
-  {'id': 5, 'label': 'Stationary purchases', 'icon': Icons.attach_file},
+  {'id': 5, 'label': 'Stationary Purchases', 'icon': Icons.attach_file},
 ];
 
 final group2 = [
@@ -28,7 +28,7 @@ final group2 = [
 
 final group3 = [
   {'id': 1, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
-  {'id': 2, 'label': 'Book stall details', 'icon': Icons.add_business}
+  {'id': 2, 'label': 'Book Stall Details', 'icon': Icons.add_business}
 ];
 
 final int defaultPage = 4;
@@ -117,8 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   currentPage = defaultPage;
                 });
-              }),
-              const SizedBox(width: 100)
+              })
             ]),
         body: Row(children: [
           AnimatedContainer(

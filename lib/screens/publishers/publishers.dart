@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
+import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/screens/publishers/edit_publisher.dart';
 
 class PublishersWidget extends StatefulWidget {
@@ -97,60 +99,72 @@ class _PublishersState extends State<PublishersWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(children: [
-          Row(children: [
+    return Consumer<UserProvider>(builder: (cntx, user, _) {
+      final loggedIn = user.user.userID != '';
+
+      return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (loggedIn)
+              Row(children: [
+                Expanded(
+                    child: TextField(
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Publisher Name'),
+                        controller: _nameController)),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey),
+                    onPressed: add,
+                    child: const Text('Add',
+                        style: TextStyle(color: Colors.white)))
+              ]),
+            if (loggedIn) const SizedBox(height: 20),
+            const Text('Publishers',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Text('Name',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                if (loggedIn) const SizedBox(width: 80)
+              ],
+            ),
+            Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Container(
+                    decoration: BoxDecoration(
+                        border:
+                            Border.all(width: 0.2, color: Colors.blueGrey)))),
             Expanded(
-                child: TextField(
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Publisher Name'),
-                    controller: _nameController)),
-            const SizedBox(width: 20),
-            ElevatedButton(
-                style:
-                    ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
-                onPressed: add,
-                child: const Text('Add', style: TextStyle(color: Colors.white)))
-          ]),
-          const SizedBox(height: 20),
-          const Text('Publishers',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          const Row(
-            children: [
-              Text('Name',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              SizedBox(width: 80)
-            ],
-          ),
-          Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 10),
-              child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 0.2, color: Colors.blueGrey)))),
-          Expanded(
-              child: publishers.isNotEmpty
-                  ? ListView.builder(
-                      itemCount: publishers.length,
-                      itemBuilder: (context, index) => Row(children: [
-                            Expanded(
-                                child: Text(publishers[index].publisherName)),
-                            IconButton(
-                                icon: const Icon(Icons.edit),
-                                tooltip: 'Edit',
-                                onPressed: () {
-                                  onPressEdit(publishers[index]);
-                                }),
-                            IconButton(
-                                icon: const Icon(Icons.delete),
-                                tooltip: 'Delete',
-                                onPressed: () {
-                                  onPressDelete(publishers[index].publisherID);
-                                })
-                          ]))
-                  : const Text("No records found"))
-        ]));
+                child: publishers.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: publishers.length,
+                        itemBuilder: (context, index) => Row(children: [
+                              Expanded(
+                                  child: Text(publishers[index].publisherName)),
+                              if (loggedIn)
+                                IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    tooltip: 'Edit',
+                                    onPressed: () {
+                                      onPressEdit(publishers[index]);
+                                    }),
+                              if (loggedIn)
+                                IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    tooltip: 'Delete',
+                                    onPressed: () {
+                                      onPressDelete(
+                                          publishers[index].publisherID);
+                                    })
+                            ]))
+                    : const Text("No records found"))
+          ]));
+    });
   }
 }

@@ -138,42 +138,38 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'New Purchase',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-            ),
-            IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: 'Close',
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                            title: const Text('Confirmation'),
-                            content: const Text(
-                                'Are you sure you want to discard this purchase?'),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Cancel')),
-                              ElevatedButton(
-                                  autofocus: true,
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Discard'))
-                            ]);
-                      });
-                })
-          ],
-        ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Text('New Purchase',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+          IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Close',
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                          title: const Text('Confirmation'),
+                          content: const Text(
+                              'Are you sure you want to discard this purchase?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel')),
+                            ElevatedButton(
+                                autofocus: true,
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Discard'))
+                          ]);
+                    });
+              })
+        ]),
+        const SizedBox(height: 20.0),
         Row(children: [
           Expanded(
               child: CheckboxListTile(
@@ -308,66 +304,61 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
         Row(
           children: [
             Expanded(
-              child: TextField(
-                controller: _quantityController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                decoration: InputDecoration(
-                  labelText: 'Quantity',
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: inputErrors['quantity'] == true
-                          ? const BorderSide(color: Colors.red, width: 1)
-                          : const BorderSide(color: Colors.grey, width: 1)),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    inputErrors = {...inputErrors, 'quantity': false};
-                  });
-                },
-              ),
-            ),
+                child: TextField(
+                    controller: _quantityController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'Quantity',
+                      border: const OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: inputErrors['quantity'] == true
+                              ? const BorderSide(color: Colors.red, width: 1)
+                              : const BorderSide(color: Colors.grey, width: 1)),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        inputErrors = {...inputErrors, 'quantity': false};
+                      });
+                    })),
             const SizedBox(width: 10.0),
             Expanded(
-              child: TextField(
-                controller: _priceController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                ],
-                decoration: InputDecoration(
-                  labelText: 'Book price',
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: inputErrors['bookPrice'] == true
-                          ? const BorderSide(color: Colors.red, width: 1)
-                          : const BorderSide(color: Colors.grey, width: 1)),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    inputErrors = {...inputErrors, 'bookPrice': false};
-                  });
-                },
-              ),
-            ),
+                child: TextField(
+                    controller: _priceController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'Book price',
+                      border: const OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: inputErrors['bookPrice'] == true
+                              ? const BorderSide(color: Colors.red, width: 1)
+                              : const BorderSide(color: Colors.grey, width: 1)),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        inputErrors = {...inputErrors, 'bookPrice': false};
+                      });
+                    })),
             const SizedBox(width: 10.0),
             Expanded(
-              child: GestureDetector(
-                onTap: _selectDate,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Purchase Date',
-                    suffixIcon: Icon(Icons.calendar_today),
-                    border: OutlineInputBorder(),
-                  ),
-                  child: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-                ),
-              ),
-            ),
+                child: GestureDetector(
+                    onTap: _selectDate,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Purchase Date',
+                        suffixIcon: Icon(Icons.calendar_today),
+                        border: OutlineInputBorder(),
+                      ),
+                      child:
+                          Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+                    ))),
             // const SizedBox(width: 16.0),
             // IconButton(
             //   icon: const Icon(Icons.add),
@@ -376,7 +367,10 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
           ],
         ),
         const SizedBox(height: 20.0),
-        ElevatedButton(onPressed: _addBook, child: const Text('Submit')),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+            onPressed: _addBook,
+            child: const Text('Submit', style: TextStyle(color: Colors.white)))
       ],
     );
   }

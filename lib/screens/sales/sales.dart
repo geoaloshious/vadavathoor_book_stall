@@ -48,74 +48,74 @@ class _SalesState extends State<SalesWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text(
-              'Sales',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            Consumer<UserProvider>(builder: (cntx, user, _) {
-              if (user.user.userID != '') {
-                return ElevatedButton(
+    return Consumer<UserProvider>(builder: (cntx, user, _) {
+      final loggedIn = user.user.userID != '';
+
+      return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text(
+                'Sales',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              if (loggedIn)
+                ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueGrey),
                     onPressed: newSale,
                     child: const Text('New sale',
-                        style: TextStyle(color: Colors.white)));
-              } else {
-                return const SizedBox.shrink();
-              }
-            })
-          ]),
-          const SizedBox(height: 20),
-          const Row(children: [
+                        style: TextStyle(color: Colors.white)))
+            ]),
+            const SizedBox(height: 20),
+            const Row(children: [
+              Expanded(
+                  child: Text('Book',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              Expanded(
+                  child: Text('Qty',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              Expanded(
+                  child: Text('Total',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              Expanded(
+                  child: Text('Date',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)))
+            ]),
+            Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Container(
+                    decoration: BoxDecoration(
+                        border:
+                            Border.all(width: 0.2, color: Colors.blueGrey)))),
             Expanded(
-                child: Text('Book',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-            Expanded(
-                child: Text('Qty',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-            Expanded(
-                child: Text('Total',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-            Expanded(
-                child: Text('Date',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)))
-          ]),
-          Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 10),
-              child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 0.2, color: Colors.blueGrey)))),
-          Expanded(
-              child: ValueListenableBuilder(
-                  valueListenable: salesNotifier,
-                  builder: (ctx, sales, child) {
-                    if (sales.isNotEmpty) {
-                      return ListView.builder(
-                          itemBuilder: (ctx2, index) {
-                            return Row(children: [
-                              Expanded(child: Text(sales[index].bookName)),
-                              Expanded(
-                                  child:
-                                      Text(sales[index].quantity.toString())),
-                              Expanded(
-                                  child:
-                                      Text(sales[index].grandTotal.toString())),
-                              Expanded(child: Text(sales[index].date))
-                            ]);
-                          },
-                          itemCount: sales.length);
-                    } else {
-                      return const Text("No records found");
-                    }
-                  }))
-        ]));
+                child: ValueListenableBuilder(
+                    valueListenable: salesNotifier,
+                    builder: (ctx, sales, child) {
+                      if (sales.isNotEmpty) {
+                        return ListView.builder(
+                            itemBuilder: (ctx2, index) {
+                              return Row(children: [
+                                Expanded(child: Text(sales[index].bookName)),
+                                Expanded(
+                                    child:
+                                        Text(sales[index].quantity.toString())),
+                                Expanded(
+                                    child: Text(
+                                        sales[index].grandTotal.toString())),
+                                Expanded(child: Text(sales[index].date))
+                              ]);
+                            },
+                            itemCount: sales.length);
+                      } else {
+                        return const Text("No records found");
+                      }
+                    }))
+          ]));
+    });
   }
 }

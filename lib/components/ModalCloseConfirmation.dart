@@ -15,6 +15,7 @@ showModalCloseConfirmation(BuildContext context) {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
+            autofocus: true,
             onPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pop();

@@ -194,6 +194,7 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                             child: const Text('Cancel'),
                           ),
                           ElevatedButton(
+                            autofocus: true,
                             onPressed: () {
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
@@ -361,7 +362,7 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
             ),
           ],
         ),
-        const SizedBox(height: 10.0),
+        const SizedBox(height: 20.0),
         Row(children: [
           Expanded(
             child: TextField(
@@ -424,7 +425,10 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                   )))
         ]),
         const SizedBox(height: 20.0),
-        ElevatedButton(onPressed: _saveData, child: const Text('Submit')),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+            onPressed: _saveData,
+            child: const Text('Submit', style: TextStyle(color: Colors.white))),
       ],
     );
   }
