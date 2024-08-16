@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/screens/book_categories/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/book_purchase.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
+import 'package:vadavathoor_book_stall/screens/publishers/publishers.dart';
 // import 'package:vadavathoor_book_stall/screens/publishers.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales.dart';
 // import 'package:vadavathoor_book_stall/screens/stationary.dart';
@@ -13,13 +15,23 @@ import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
 
 import '../providers/user.dart';
 
-final leftItems = [
-  {'label': 'Book Purchases', 'icon': Icons.book},
-  {'label': 'Sales', 'icon': Icons.monetization_on},
-  {'label': 'Stationary purchases', 'icon': Icons.image},
-  {'label': 'Publishers', 'icon': Icons.house},
-  {'label': 'Users', 'icon': Icons.account_box}
+final group1 = [
+  {'id': 4, 'label': 'Sales', 'icon': Icons.monetization_on},
+  {'id': 3, 'label': 'Book Purchases', 'icon': Icons.book},
+  {'id': 5, 'label': 'Stationary Purchases', 'icon': Icons.attach_file},
 ];
+
+final group2 = [
+  {'id': 6, 'label': 'Publishers', 'icon': Icons.house, 'showDivider': true},
+  {'id': 7, 'label': 'Book Categories', 'icon': Icons.shelves},
+];
+
+final group3 = [
+  {'id': 1, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
+  {'id': 2, 'label': 'Book Stall Details', 'icon': Icons.add_business}
+];
+
+final int defaultPage = 4;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,24 +41,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int currentPage = 0;
+  int currentPage = defaultPage;
   bool showDBViewer = true;
   bool _isDrawerOpen = true;
 
   renderRightSide() {
     switch (currentPage) {
-      case 0:
-        return const BookPurchase();
       case 1:
-        return const SalesWidget();
+        return const UsersWidget();
       case 2:
-        // return const Stationary();
         return const UnderDevelopment();
       case 3:
-        // return const Publishers();
-        return const UnderDevelopment();
+        return const BookPurchase();
       case 4:
-        return const UsersWidget();
+        return const SalesWidget();
+      case 5:
+        return const UnderDevelopment();
+      case 6:
+        return const PublishersWidget();
+      case 7:
+        return const BookCategoriesWidget();
       default:
         return const EmptyScreenWidget();
     }
@@ -101,66 +115,75 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
               UserProfileWidget(resetPage: () {
                 setState(() {
-                  currentPage = 0;
+                  currentPage = defaultPage;
                 });
-              }),
-              const SizedBox(width: 100)
+              })
             ]),
-        body: Row(
-          children: [
-            AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: _isDrawerOpen ? 250.0 : 60.0,
-                decoration: BoxDecoration(color: Colors.blueGrey, boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      spreadRadius: 1,
-                      blurRadius: 2)
-                ]),
-                child: Consumer<UserProvider>(builder: (context, user, child) {
-                  return ListView.builder(
-                      itemCount: leftItems.length,
-                      itemBuilder: (context, index) {
-                        if (leftItems[index]['label'] == 'Users' &&
-                            user.user.role != UserRole.admin &&
-                            user.user.role != UserRole.developer) {
-                          return null;
-                        }
+        body: Row(children: [
+          AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: _isDrawerOpen ? 250.0 : 60.0,
+              decoration: BoxDecoration(color: Colors.blueGrey, boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: 1,
+                    blurRadius: 2)
+              ]),
+              child: Consumer<UserProvider>(builder: (context, user, child) {
+                final items = [
+                  ...group1,
+                  ...group2,
+                  if (user.user.role == UserRole.admin ||
+                      user.user.role == UserRole.developer)
+                    ...group3
+                ];
 
-                        Color backgroundColor, textColor;
-                        if (currentPage == index) {
-                          backgroundColor = Colors.white;
-                          textColor = Colors.blueGrey;
-                        } else {
-                          backgroundColor = Colors.blueGrey;
-                          textColor = Colors.white;
-                        }
+                return ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      Color backgroundColor, textColor;
+                      if (currentPage == items[index]['id']) {
+                        backgroundColor = Colors.white;
+                        textColor = Colors.blueGrey;
+                      } else {
+                        backgroundColor = Colors.blueGrey;
+                        textColor = Colors.white;
+                      }
 
-                        return TextButton(
-                            style: TextButton.styleFrom(
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(20),
-                                backgroundColor: backgroundColor,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero)),
-                            onPressed: () {
-                              setState(() {
-                                currentPage = index;
-                              });
-                            },
-                            child: Row(children: [
-                              Icon(leftItems[index]['icon'] as IconData,
-                                  color: textColor),
-                              if (_isDrawerOpen) ...[
-                                const SizedBox(width: 10),
-                                Text(leftItems[index]['label'] as String,
-                                    style: TextStyle(color: textColor))
-                              ]
-                            ]));
-                      });
-                })),
-            Expanded(child: Container(child: renderRightSide()))
-          ],
-        ));
+                      return Column(
+                        children: [
+                          if (items[index]['showDivider'] == true)
+                            Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child:
+                                    Container(height: 1, color: Colors.grey)),
+                          TextButton(
+                              style: TextButton.styleFrom(
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.all(20),
+                                  backgroundColor: backgroundColor,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero)),
+                              onPressed: () {
+                                setState(() {
+                                  currentPage = items[index]['id']! as int;
+                                });
+                              },
+                              child: Row(children: [
+                                Icon(items[index]['icon'] as IconData,
+                                    color: textColor),
+                                if (_isDrawerOpen) ...[
+                                  const SizedBox(width: 10),
+                                  Text(items[index]['label'] as String,
+                                      style: TextStyle(color: textColor))
+                                ]
+                              ])),
+                        ],
+                      );
+                    });
+              })),
+          Expanded(child: Container(child: renderRightSide()))
+        ]));
   }
 }

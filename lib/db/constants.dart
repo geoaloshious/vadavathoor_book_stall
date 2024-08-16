@@ -9,9 +9,24 @@ class MiscDBKeys {
   static const String lastLogInTime = 'lastLogInTime';
 }
 
+class DBItemHiveType {
+  static const int book = 1;
+  static const int bookPublisher = 2;
+  static const int bookCategory = 3;
+  static const int bookPurchase = 4;
+  static const int sale = 5;
+  static const int saleItemBook = 6;
+  static const int saleItemBookPurchaseVariant = 7;
+  static const int attachment = 8;
+  static const int misc = 9;
+  static const int users = 10;
+  static const int loginHistory = 11;
+}
+
 class DBNames {
   static const String book = 'book_db';
   static const String bookPurchase = 'book_purchase_db';
+  static const String bookCategories = 'book_categories_db';
   static const String sale = 'sale_db';
   static const String saleItemBook = 'sale_item_book_db';
   static const String saleItemBookPurchaseVariant =
@@ -33,4 +48,9 @@ class UserStatus {
   static const int enabled = 1;
   static const int disabled = 2;
   static const int deleted = 3;
+}
+
+class DBRowStatus {
+  static const int active = 1;
+  static const int deleted = 2;
 }

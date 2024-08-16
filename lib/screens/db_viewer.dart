@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
+import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 
 import '../db/functions/book.dart';
@@ -46,6 +48,20 @@ class _DbViewerState extends State<DbViewer> {
       'label': 'Books',
       'value': getPrettyJSONString(
           json.encode(booksDB.map((p) => p.toJson()).toList()))
+    });
+
+    final publishersDB = (await getPublishersBox()).values.toList();
+    tempArr.add({
+      'label': 'Publishers',
+      'value': getPrettyJSONString(
+          json.encode(publishersDB.map((p) => p.toJson()).toList()))
+    });
+
+    final bookCatgsDB = (await getBookCategoriesBox()).values.toList();
+    tempArr.add({
+      'label': 'Book Categories',
+      'value': getPrettyJSONString(
+          json.encode(bookCatgsDB.map((p) => p.toJson()).toList()))
     });
 
     final usersDB = (await getUsersBox()).values.toList();

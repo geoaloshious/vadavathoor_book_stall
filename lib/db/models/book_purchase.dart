@@ -1,10 +1,12 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+
+import '../constants.dart';
 part 'book_purchase.g.dart';
 
 BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
     purchaseID: '',
     publisherID: '',
+    bookCategoryID: '',
     purchaseDate: 0,
     bookID: '',
     quantityPurchased: 0,
@@ -16,7 +18,7 @@ BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
     modifiedBy: '',
     deleted: false);
 
-@HiveType(typeId: ItemType.bookPurchase)
+@HiveType(typeId: DBItemHiveType.bookPurchase)
 class BookPurchaseModel {
   @HiveField(0)
   final String purchaseID;
@@ -54,10 +56,14 @@ class BookPurchaseModel {
   @HiveField(11)
   bool deleted;
 
+  @HiveField(12)
+  String bookCategoryID;
+
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
       'publisherID': publisherID,
+      'bookCategoryID': bookCategoryID,
       'purchaseDate': purchaseDate,
       'bookID': bookID,
       'quantityPurchased': quantityPurchased,
@@ -74,6 +80,7 @@ class BookPurchaseModel {
   BookPurchaseModel(
       {required this.purchaseID,
       required this.publisherID,
+      required this.bookCategoryID,
       required this.purchaseDate,
       required this.bookID,
       required this.quantityPurchased,

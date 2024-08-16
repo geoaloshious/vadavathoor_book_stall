@@ -2,17 +2,10 @@ import 'package:intl/intl.dart';
 
 import 'db/constants.dart';
 
-class ItemType {
-  static const int book = 1;
-  static const int bookPurchase = 2;
-  static const int sale = 3;
-  static const int saleItemBook = 4;
-  static const int saleItemBookPurchaseVariant = 5;
-  static const int publisher = 6;
-  static const int attachment = 7;
-  static const int misc = 8;
-  static const int users = 9;
-  static const int loginHistory = 10;
+class PaymentModes {
+  static const String cash = '1';
+  static const String upi = '2';
+  static const String card = '3';
 }
 
 String getRoleName(int role) {

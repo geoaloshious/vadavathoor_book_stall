@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
+import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 
 import '../../classes.dart';
 import '../../components/drop_down.dart';
@@ -10,7 +14,6 @@ import '../../db/functions/publisher.dart';
 
 class EditBookPurchaseWidget extends StatefulWidget {
   final BookPurchaseListItemModel data;
-  // final void Function(BookPurchaseListItemModel data) updateUI;
   final void Function() updateUI;
 
   const EditBookPurchaseWidget(
@@ -23,15 +26,22 @@ class EditBookPurchaseWidget extends StatefulWidget {
 class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
   var _publisherController = TextEditingController();
   var _bookNameController = TextEditingController();
+  var _categoryNameController = TextEditingController();
   var _quantityController = TextEditingController();
   var _priceController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
   String _publisherID = '';
   String _bookID = '';
-  bool _isPublisherChecked = true;
-  bool _isBookChecked = true;
+  String _categoryID = '';
+  bool _isExistingCategory = true;
+  bool _isExistingPublisher = true;
+  bool _isExistingBook = true;
   Map<String, bool> inputErrors = {};
+
+  List<PublisherModel> publishers = [];
+  List<BookModel> books = [];
+  List<BookCategoryModel> bookCategories = [];
 
   void _selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -46,6 +56,7 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
       });
     }
 
+    //#pending - do we need an option to pick time
     // final TimeOfDay? timePicked = await showTimePicker(
     //     context: context, initialTime: TimeOfDay.fromDateTime(_selectedDate));
   }
@@ -53,13 +64,14 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
   void _saveData() async {
     final publisherName = _publisherController.text.trim();
     final bookName = _bookNameController.text.trim();
+    final categoryName = _categoryNameController.text.trim();
     final quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
     final price = double.tryParse(_priceController.text.trim()) ?? 0;
     final purchaseDate = _selectedDate.millisecondsSinceEpoch;
 
     Map<String, bool> tempInputErrors = {};
 
-    if (_isPublisherChecked) {
+    if (_isExistingPublisher) {
       if (_publisherID == '') {
         tempInputErrors['publisherName'] = true;
       }
@@ -69,13 +81,23 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
       }
     }
 
-    if (_isBookChecked) {
+    if (_isExistingBook) {
       if (_bookID == '') {
         tempInputErrors['bookName'] = true;
       }
     } else {
       if (bookName == '') {
         tempInputErrors['bookName'] = true;
+      }
+    }
+
+    if (_isExistingCategory) {
+      if (_categoryID == '') {
+        tempInputErrors['categoryName'] = true;
+      }
+    } else {
+      if (categoryName == '') {
+        tempInputErrors['categoryName'] = true;
       }
     }
 
@@ -88,20 +110,18 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      await editBookPurchase(widget.data.purchaseID, _publisherID,
-          publisherName, _bookID, bookName, quantity, price, purchaseDate);
+      await editBookPurchase(
+          widget.data.purchaseID,
+          _publisherID,
+          publisherName,
+          _bookID,
+          bookName,
+          _categoryID,
+          categoryName,
+          quantity,
+          price,
+          purchaseDate);
 
-      // widget.updateUI(BookPurchaseListItemModel(
-      //     purchaseID: widget.data.purchaseID,
-      //     publisherID: _publisherID,
-      //     publisherName: publisherName,
-      //     purchaseDate: purchaseDate,
-      //     formattedPurchaseDate: formatTimestamp(
-      //         timestamp: purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-      //     bookID: _bookID,
-      //     bookName: bookName,
-      //     quantityPurchased: quantity,
-      //     bookPrice: price));
       widget.updateUI();
       Navigator.of(context).pop();
     } else {
@@ -111,26 +131,37 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
     }
   }
 
-  void setData() {
+  void setData() async {
     _bookID = widget.data.bookID;
     _publisherID = widget.data.publisherID;
+    _categoryID = widget.data.categoryID;
     _selectedDate =
         DateTime.fromMillisecondsSinceEpoch(widget.data.purchaseDate);
     _publisherController =
         TextEditingController(text: widget.data.publisherName);
     _bookNameController = TextEditingController(text: widget.data.bookName);
+    _categoryNameController =
+        TextEditingController(text: widget.data.categoryName);
     _quantityController =
         TextEditingController(text: widget.data.quantityPurchased.toString());
     _priceController =
         TextEditingController(text: widget.data.bookPrice.toString());
+
+    final tempPubs = await getPublishers();
+    final tempBooks = await getBooks();
+    final tempCatgs = await getBookCategories();
+
+    setState(() {
+      publishers = tempPubs;
+      books = tempBooks;
+      bookCategories = tempCatgs;
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     setData();
-    updatePublishersList();
-    updateBooksList();
   }
 
   @override
@@ -163,6 +194,7 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                             child: const Text('Cancel'),
                           ),
                           ElevatedButton(
+                            autofocus: true,
                             onPressed: () {
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
@@ -181,11 +213,11 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
             Expanded(
               child: CheckboxListTile(
                 title: const Text('Existing Publisher'),
-                value: _isPublisherChecked,
+                value: _isExistingPublisher,
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool? value) {
                   setState(() {
-                    _isPublisherChecked = value ?? false;
+                    _isExistingPublisher = value ?? false;
                     _publisherID = '';
                   });
                 },
@@ -194,12 +226,25 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
             Expanded(
               child: CheckboxListTile(
                 title: const Text('Existing Book'),
-                value: _isBookChecked,
+                value: _isExistingBook,
                 controlAffinity: ListTileControlAffinity.leading,
                 onChanged: (bool? value) {
                   setState(() {
-                    _isBookChecked = value ?? false;
+                    _isExistingBook = value ?? false;
                     _bookID = '';
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Existing Category'),
+                value: _isExistingCategory,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isExistingCategory = value ?? false;
+                    _categoryID = '';
                   });
                 },
               ),
@@ -210,28 +255,22 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
         Row(
           children: [
             Expanded(
-              child: _isPublisherChecked
-                  ? ValueListenableBuilder(
-                      valueListenable: publishersNotifier,
-                      builder: (ctx, publishers, child) {
-                        return CustomDropdown(
-                          items: publishers
-                              .map((i) => i.toDropdownData())
-                              .toList(),
-                          selectedValue: _publisherID,
-                          label: 'Select Publisher',
-                          hasError: inputErrors['publisherName'] == true,
-                          onValueChanged: (value) {
-                            setState(() {
-                              _publisherID = value;
-                              inputErrors = {
-                                ...inputErrors,
-                                'publisherName': false
-                              };
-                            });
-                          },
-                        );
-                      })
+              child: _isExistingPublisher
+                  ? CustomDropdown(
+                      items: publishers.map((i) => i.toDropdownData()).toList(),
+                      selectedValue: _publisherID,
+                      label: 'Select Publisher',
+                      hasError: inputErrors['publisherName'] == true,
+                      onValueChanged: (value) {
+                        setState(() {
+                          _publisherID = value;
+                          inputErrors = {
+                            ...inputErrors,
+                            'publisherName': false
+                          };
+                        });
+                      },
+                    )
                   : TextField(
                       controller: _publisherController,
                       decoration: InputDecoration(
@@ -255,23 +294,19 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
             ),
             const SizedBox(width: 16.0),
             Expanded(
-              child: _isBookChecked
-                  ? ValueListenableBuilder(
-                      valueListenable: booksNotifier,
-                      builder: (ctx, books, child) {
-                        return CustomDropdown(
-                          items: books.map((i) => i.toDropdownData()).toList(),
-                          selectedValue: _bookID,
-                          label: 'Select Book',
-                          hasError: inputErrors['bookName'] == true,
-                          onValueChanged: (value) {
-                            setState(() {
-                              _bookID = value;
-                              inputErrors = {...inputErrors, 'bookName': false};
-                            });
-                          },
-                        );
-                      })
+              child: _isExistingBook
+                  ? CustomDropdown(
+                      items: books.map((i) => i.toDropdownData()).toList(),
+                      selectedValue: _bookID,
+                      label: 'Select Book',
+                      hasError: inputErrors['bookName'] == true,
+                      onValueChanged: (value) {
+                        setState(() {
+                          _bookID = value;
+                          inputErrors = {...inputErrors, 'bookName': false};
+                        });
+                      },
+                    )
                   : TextField(
                       controller: _bookNameController,
                       decoration: InputDecoration(
@@ -290,9 +325,44 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                       },
                     ),
             ),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: _isExistingCategory
+                  ? CustomDropdown(
+                      items: bookCategories
+                          .map((i) => i.toDropdownData())
+                          .toList(),
+                      selectedValue: _categoryID,
+                      label: 'Select Category',
+                      hasError: inputErrors['categoryName'] == true,
+                      onValueChanged: (value) {
+                        setState(() {
+                          _categoryID = value;
+                          inputErrors = {...inputErrors, 'categoryName': false};
+                        });
+                      },
+                    )
+                  : TextField(
+                      controller: _categoryNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Category name',
+                        border: const OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: inputErrors['categoryName'] == true
+                                ? const BorderSide(color: Colors.red, width: 1)
+                                : const BorderSide(
+                                    color: Colors.grey, width: 1)),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          inputErrors = {...inputErrors, 'categoryName': false};
+                        });
+                      },
+                    ),
+            ),
           ],
         ),
-        const SizedBox(height: 10.0),
+        const SizedBox(height: 20.0),
         Row(children: [
           Expanded(
             child: TextField(
@@ -355,7 +425,10 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                   )))
         ]),
         const SizedBox(height: 20.0),
-        ElevatedButton(onPressed: _saveData, child: const Text('Submit')),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+            onPressed: _saveData,
+            child: const Text('Submit', style: TextStyle(color: Colors.white))),
       ],
     );
   }

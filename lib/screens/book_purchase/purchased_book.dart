@@ -5,10 +5,14 @@ import 'package:vadavathoor_book_stall/screens/book_purchase/edit_book_purchase.
 
 class PurchasedBookWidget extends StatefulWidget {
   final BookPurchaseListItemModel data;
+  final bool loggedIn;
   final void Function() updateUI;
 
   const PurchasedBookWidget(
-      {super.key, required this.data, required this.updateUI});
+      {super.key,
+      required this.data,
+      required this.loggedIn,
+      required this.updateUI});
 
   @override
   State<PurchasedBookWidget> createState() => _PurchasedBookState();
@@ -80,19 +84,22 @@ class _PurchasedBookState extends State<PurchasedBookWidget> {
       children: [
         Expanded(child: Text(widget.data.bookName)),
         Expanded(child: Text(widget.data.publisherName)),
+        Expanded(child: Text(widget.data.categoryName)),
         Expanded(child: Text(widget.data.quantityPurchased.toString())),
         Expanded(child: Text(widget.data.bookPrice.toString())),
         Expanded(child: Text(widget.data.formattedPurchaseDate)),
-        IconButton(
-          icon: const Icon(Icons.edit),
-          tooltip: 'Edit',
-          onPressed: onPressEdit,
-        ),
-        IconButton(
-          icon: const Icon(Icons.delete),
-          tooltip: 'Delete',
-          onPressed: _deletePurchase,
-        )
+        if (widget.loggedIn)
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit',
+            onPressed: onPressEdit,
+          ),
+        if (widget.loggedIn)
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: 'Delete',
+            onPressed: _deletePurchase,
+          )
       ],
     );
   }

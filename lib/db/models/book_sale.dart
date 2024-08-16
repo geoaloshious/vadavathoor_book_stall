@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+
+import '../constants.dart';
 part 'book_sale.g.dart';
 
 SaleItemBookModel emptyBookSaleItem() =>
@@ -9,7 +10,7 @@ SaleItemBookPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
     SaleItemBookPurchaseVariantModel(
         purchaseID: '', originalPrice: 0, soldPrice: 0, quantity: 0);
 
-@HiveType(typeId: ItemType.saleItemBookPurchaseVariant)
+@HiveType(typeId: DBItemHiveType.saleItemBookPurchaseVariant)
 class SaleItemBookPurchaseVariantModel {
   @HiveField(0)
   String purchaseID;
@@ -39,7 +40,7 @@ class SaleItemBookPurchaseVariantModel {
       required this.quantity});
 }
 
-@HiveType(typeId: ItemType.saleItemBook)
+@HiveType(typeId: DBItemHiveType.saleItemBook)
 class SaleItemBookModel {
   @HiveField(0)
   String bookID;
@@ -57,7 +58,7 @@ class SaleItemBookModel {
   SaleItemBookModel({required this.bookID, required this.purchaseVariants});
 }
 
-@HiveType(typeId: ItemType.sale)
+@HiveType(typeId: DBItemHiveType.sale)
 class SaleModel {
   @HiveField(0)
   final String saleID;
@@ -75,18 +76,21 @@ class SaleModel {
   final String customerBatch;
 
   @HiveField(5)
-  final int createdDate;
+  String paymentMode;
 
   @HiveField(6)
-  final String createdBy;
+  final int createdDate;
 
   @HiveField(7)
-  int modifiedDate;
+  final String createdBy;
 
   @HiveField(8)
-  String modifiedBy;
+  int modifiedDate;
 
   @HiveField(9)
+  String modifiedBy;
+
+  @HiveField(10)
   final bool deleted;
 
   Map<String, dynamic> toJson() {
@@ -95,6 +99,7 @@ class SaleModel {
       'grandTotal': grandTotal,
       'customerName': customerName,
       'customerBatch': customerBatch,
+      'paymentMode': paymentMode,
       'createdDate': createdDate,
       'createdBy': createdBy,
       'modifiedDate': modifiedDate,
@@ -109,6 +114,7 @@ class SaleModel {
       required this.grandTotal,
       required this.customerName,
       required this.customerBatch,
+      required this.paymentMode,
       required this.createdDate,
       required this.createdBy,
       required this.modifiedDate,

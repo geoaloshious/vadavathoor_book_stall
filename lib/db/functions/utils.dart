@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
-import 'package:vadavathoor_book_stall/db/models/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
+import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 
 import '../../utils.dart';
@@ -41,11 +41,11 @@ Future<void> initializeHiveDB() async {
       SaleItemBookPurchaseVariantModelAdapter().typeId)) {
     Hive.registerAdapter(SaleItemBookPurchaseVariantModelAdapter());
   }
-  if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
-    Hive.registerAdapter(PurchaseAttachmentModelAdapter());
-  }
   if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
     Hive.registerAdapter(PublisherModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(BookCategoryModelAdapter().typeId)) {
+    Hive.registerAdapter(BookCategoryModelAdapter());
   }
   if (!Hive.isAdapterRegistered(UserModelAdapter().typeId)) {
     Hive.registerAdapter(UserModelAdapter());
@@ -57,7 +57,7 @@ Future<void> initializeHiveDB() async {
     Hive.registerAdapter(MiscModelAdapter());
   }
 
-  //#pending - might need to add user to table in TGDB.
+  //#pending - might need to add user to table from TGDB.
   await addDeveloperUserIfEmpty();
 }
 

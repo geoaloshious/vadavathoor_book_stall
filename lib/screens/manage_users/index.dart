@@ -145,7 +145,11 @@ class _UsersState extends State<UsersWidget> {
             Consumer<UserProvider>(builder: (cntx, user, _) {
               if (user.user.userID != '') {
                 return ElevatedButton(
-                    onPressed: onPressNewUser, child: const Text('New User'));
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey),
+                    onPressed: onPressNewUser,
+                    child: const Text('New User',
+                        style: TextStyle(color: Colors.white)));
               } else {
                 return const SizedBox.shrink();
               }
