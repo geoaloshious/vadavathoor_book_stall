@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vadavathoor_book_stall/db/models/publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
 import '../constants.dart';
@@ -23,7 +23,7 @@ Future<String> addPublisher(String name) async {
   String publisherID = generateID();
   final db = await getPublishersBox();
 
-  await db.add(PublisherModel(publisherID: publisherID, publisherName: name));
+  // await db.add(PublisherModel(publisherID: publisherID, publisherName: name));
   await updatePublishersList();
 
   return publisherID;

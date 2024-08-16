@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'publisher.dart';
+part of 'book_publisher.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -8,7 +8,7 @@ part of 'publisher.dart';
 
 class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
   @override
-  final int typeId = 6;
+  final int typeId = 2;
 
   @override
   PublisherModel read(BinaryReader reader) {
@@ -19,17 +19,32 @@ class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
     return PublisherModel(
       publisherID: fields[0] as String,
       publisherName: fields[1] as String,
+      createdDate: fields[2] as int,
+      createdBy: fields[3] as String,
+      modifiedDate: fields[4] as int,
+      modifiedBy: fields[5] as String,
+      status: fields[6] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, PublisherModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.publisherID)
       ..writeByte(1)
-      ..write(obj.publisherName);
+      ..write(obj.publisherName)
+      ..writeByte(2)
+      ..write(obj.createdDate)
+      ..writeByte(3)
+      ..write(obj.createdBy)
+      ..writeByte(4)
+      ..write(obj.modifiedDate)
+      ..writeByte(5)
+      ..write(obj.modifiedBy)
+      ..writeByte(6)
+      ..write(obj.status);
   }
 
   @override

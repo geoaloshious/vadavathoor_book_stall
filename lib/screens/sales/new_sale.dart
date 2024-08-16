@@ -3,6 +3,7 @@ import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
 import 'package:vadavathoor_book_stall/screens/sales/new_sale_item_book.dart';
+import 'package:vadavathoor_book_stall/utils.dart';
 
 class NewSaleWidget extends StatefulWidget {
   const NewSaleWidget({super.key});
@@ -20,6 +21,7 @@ class _NewSaleState extends State<NewSaleWidget> {
   List<SaleItemBookModel> booksToCheckout = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
+  String _paymentMode = PaymentModes.cash;
 
   List<ForNewSaleBookItem> books = [];
 
@@ -46,7 +48,8 @@ class _NewSaleState extends State<NewSaleWidget> {
             booksToCheckout,
             grandTotal,
             _customerNameController.text.trim(),
-            _customerBatchController.text.trim());
+            _customerBatchController.text.trim(),
+            _paymentMode);
 
         Navigator.of(context).pop();
       } else {
@@ -144,6 +147,7 @@ class _NewSaleState extends State<NewSaleWidget> {
                                 },
                                 child: const Text('Cancel')),
                             ElevatedButton(
+                                autofocus: true,
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   Navigator.of(context).pop();
@@ -190,14 +194,11 @@ class _NewSaleState extends State<NewSaleWidget> {
         ),
         const SizedBox(height: 10.0),
         Visibility(
-          visible: _isBookChecked,
-          child: Column(
-            children: [
+            visible: _isBookChecked,
+            child: Column(children: [
               Column(
-                  children: List.generate(
-                booksToCheckout.length,
-                (index) {
-                  return NewBookSaleItemWidget(
+                  children: List.generate(booksToCheckout.length, (index) {
+                return NewBookSaleItemWidget(
                     key: Key(index.toString()),
                     books: books,
                     selectedBookIDs: selectedBookIDs,
@@ -251,10 +252,8 @@ class _NewSaleState extends State<NewSaleWidget> {
 
                       _updateGrandTotal();
                       _updateSelectedBookIDs();
-                    },
-                  );
-                },
-              )),
+                    });
+              })),
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () {
@@ -262,38 +261,74 @@ class _NewSaleState extends State<NewSaleWidget> {
                       booksToCheckout.add(emptyBookSaleItem());
                     });
                   },
-                  child: const Text('Add item')),
-            ],
-          ),
-        ),
+                  child: const Text('Add item'))
+            ])),
         const SizedBox(height: 30),
-        Row(
-          children: [
-            Expanded(
+        Row(children: [
+          Expanded(
               child: TextField(
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Customer name'),
-                controller: _customerNameController,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Customer name'),
+                  controller: _customerNameController)),
+          const SizedBox(width: 10),
+          Expanded(
               child: TextField(
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Customer batch'),
-                controller: _customerBatchController,
-              ),
-            )
-          ],
-        ),
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Customer batch'),
+                  controller: _customerBatchController))
+        ]),
         const SizedBox(height: 20),
         Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              'Grand Total : $grandTotal',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-            )),
+            child: Text('Grand Total : $grandTotal',
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.w600))),
         const SizedBox(height: 20),
+        Row(children: [
+          const Expanded(
+              child: Text('Payment Mode',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))),
+          Expanded(
+            child: RadioListTile<String>(
+                title: const Text('Cash'),
+                value: PaymentModes.cash,
+                groupValue: _paymentMode,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    setState(() {
+                      _paymentMode = value;
+                    });
+                  }
+                }),
+          ),
+          Expanded(
+            child: RadioListTile<String>(
+                title: const Text('UPI'),
+                value: PaymentModes.upi,
+                groupValue: _paymentMode,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    setState(() {
+                      _paymentMode = value;
+                    });
+                  }
+                }),
+          ),
+          Expanded(
+            child: RadioListTile<String>(
+                title: const Text('Card'),
+                value: PaymentModes.card,
+                groupValue: _paymentMode,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    setState(() {
+                      _paymentMode = value;
+                    });
+                  }
+                }),
+          )
+        ]),
+        const SizedBox(height: 30),
         ElevatedButton(
             onPressed: _handleSubmit,
             child: const Text(

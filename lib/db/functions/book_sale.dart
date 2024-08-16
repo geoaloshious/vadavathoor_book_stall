@@ -26,8 +26,12 @@ Future<Box<SaleModel>> getSalesBox() async {
   return box;
 }
 
-Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
-    double grandTotal, String customerName, String customerBatch) async {
+Future<void> addBookSale(
+    List<SaleItemBookModel> booksToCheckout,
+    double grandTotal,
+    String customerName,
+    String customerBatch,
+    String paymentMode) async {
   final saleBox = await getSalesBox();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
@@ -38,6 +42,7 @@ Future<void> addBookSale(List<SaleItemBookModel> booksToCheckout,
       grandTotal: grandTotal,
       customerName: customerName,
       customerBatch: customerBatch,
+      paymentMode: paymentMode,
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: currentTS,

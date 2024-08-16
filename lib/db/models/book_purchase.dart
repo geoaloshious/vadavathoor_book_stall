@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+
+import '../constants.dart';
 part 'book_purchase.g.dart';
 
 BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
@@ -16,7 +17,7 @@ BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
     modifiedBy: '',
     deleted: false);
 
-@HiveType(typeId: ItemType.bookPurchase)
+@HiveType(typeId: DBItemHiveType.bookPurchase)
 class BookPurchaseModel {
   @HiveField(0)
   final String purchaseID;

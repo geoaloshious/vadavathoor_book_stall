@@ -117,63 +117,54 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
                 tooltip: 'Close',
                 onPressed: () {
                   showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Confirmation'),
-                        content: const Text(
-                            'Are you sure you want to discard this purchase?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Discard'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }),
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                            title: const Text('Confirmation'),
+                            content: const Text(
+                                'Are you sure you want to discard this purchase?'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cancel')),
+                              ElevatedButton(
+                                  autofocus: true,
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Discard'))
+                            ]);
+                      });
+                })
           ],
         ),
-        Row(
-          children: [
-            Expanded(
+        Row(children: [
+          Expanded(
               child: CheckboxListTile(
-                title: const Text('Existing Publisher'),
-                value: _isPublisherChecked,
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isPublisherChecked = value ?? false;
-                    _publisherID = '';
-                  });
-                },
-              ),
-            ),
-            Expanded(
+                  title: const Text('Existing Publisher'),
+                  value: _isPublisherChecked,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _isPublisherChecked = value ?? false;
+                      _publisherID = '';
+                    });
+                  })),
+          Expanded(
               child: CheckboxListTile(
-                title: const Text('Existing Book'),
-                value: _isBookChecked,
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isBookChecked = value ?? false;
-                    _bookID = '';
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
+                  title: const Text('Existing Book'),
+                  value: _isBookChecked,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _isBookChecked = value ?? false;
+                      _bookID = '';
+                    });
+                  }))
+        ]),
         const SizedBox(height: 10.0),
         Row(
           children: [
@@ -183,34 +174,33 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
                       valueListenable: publishersNotifier,
                       builder: (ctx, publishers, child) {
                         return CustomDropdown(
-                          items: publishers
-                              .map((i) => i.toDropdownData())
-                              .toList(),
-                          selectedValue: _publisherID,
-                          label: 'Select Publisher',
-                          hasError: inputErrors['publisherName'] == true,
-                          onValueChanged: (value) {
-                            setState(() {
-                              _publisherID = value;
-                              inputErrors = {
-                                ...inputErrors,
-                                'publisherName': false
-                              };
+                            items: publishers
+                                .map((i) => i.toDropdownData())
+                                .toList(),
+                            selectedValue: _publisherID,
+                            label: 'Select Publisher',
+                            hasError: inputErrors['publisherName'] == true,
+                            onValueChanged: (value) {
+                              setState(() {
+                                _publisherID = value;
+                                inputErrors = {
+                                  ...inputErrors,
+                                  'publisherName': false
+                                };
+                              });
                             });
-                          },
-                        );
                       })
                   : TextField(
                       controller: _publisherController,
                       decoration: InputDecoration(
-                        labelText: 'Publisher name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['publisherName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1)),
-                      ),
+                          labelText: 'Publisher name',
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: inputErrors['publisherName'] == true
+                                  ? const BorderSide(
+                                      color: Colors.red, width: 1)
+                                  : const BorderSide(
+                                      color: Colors.grey, width: 1))),
                       onChanged: (value) {
                         setState(() {
                           inputErrors = {
@@ -218,8 +208,7 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
                             'publisherName': false
                           };
                         });
-                      },
-                    ),
+                      }),
             ),
             const SizedBox(width: 16.0),
             Expanded(

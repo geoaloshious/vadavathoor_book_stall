@@ -5,8 +5,7 @@ import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/book_sale.dart';
-import 'package:vadavathoor_book_stall/db/models/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/purchase_attachment.dart';
+import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 
 import '../../utils.dart';
@@ -40,9 +39,6 @@ Future<void> initializeHiveDB() async {
   if (!Hive.isAdapterRegistered(
       SaleItemBookPurchaseVariantModelAdapter().typeId)) {
     Hive.registerAdapter(SaleItemBookPurchaseVariantModelAdapter());
-  }
-  if (!Hive.isAdapterRegistered(PurchaseAttachmentModelAdapter().typeId)) {
-    Hive.registerAdapter(PurchaseAttachmentModelAdapter());
   }
   if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
     Hive.registerAdapter(PublisherModelAdapter());

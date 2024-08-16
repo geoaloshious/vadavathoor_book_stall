@@ -1,8 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+
+import '../constants.dart';
 part 'misc.g.dart';
 
-@HiveType(typeId: ItemType.misc)
+@HiveType(typeId: DBItemHiveType.misc)
 class MiscModel {
   @HiveField(0)
   final String itemKey;
