@@ -50,8 +50,8 @@ Future<void> addBookPurchase(
       bookPrice: bookPrice,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: currentTS,
-      modifiedBy: loggedInUser,
+      modifiedDate: 0,
+      modifiedBy: '',
       deleted: false));
 }
 

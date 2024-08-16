@@ -59,7 +59,11 @@ class _SalesState extends State<SalesWidget> {
             Consumer<UserProvider>(builder: (cntx, user, _) {
               if (user.user.userID != '') {
                 return ElevatedButton(
-                    onPressed: newSale, child: const Text('New sale'));
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey),
+                    onPressed: newSale,
+                    child: const Text('New sale',
+                        style: TextStyle(color: Colors.white)));
               } else {
                 return const SizedBox.shrink();
               }

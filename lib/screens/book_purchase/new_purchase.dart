@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 
 import '../../components/drop_down.dart';
 import '../../db/functions/book.dart';
 import '../../db/functions/book_purchase.dart';
-import '../../db/functions/publisher.dart';
 
 class NewPurchaseWidget extends StatefulWidget {
   final void Function() updateUI;
@@ -28,6 +30,8 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
   bool _isPublisherChecked = false;
   bool _isBookChecked = false;
   Map<String, bool> inputErrors = {};
+  List<PublisherModel> publishers = [];
+  List<BookModel> books = [];
 
   void _selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -94,11 +98,20 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
     }
   }
 
+  void setData() async {
+    final tempPubs = await getPublishers();
+    final tempBooks = await getBooks();
+
+    setState(() {
+      publishers = tempPubs;
+      books = tempBooks;
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    updatePublishersList();
-    updateBooksList();
+    setData();
   }
 
   @override
@@ -170,25 +183,19 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
           children: [
             Expanded(
               child: _isPublisherChecked
-                  ? ValueListenableBuilder(
-                      valueListenable: publishersNotifier,
-                      builder: (ctx, publishers, child) {
-                        return CustomDropdown(
-                            items: publishers
-                                .map((i) => i.toDropdownData())
-                                .toList(),
-                            selectedValue: _publisherID,
-                            label: 'Select Publisher',
-                            hasError: inputErrors['publisherName'] == true,
-                            onValueChanged: (value) {
-                              setState(() {
-                                _publisherID = value;
-                                inputErrors = {
-                                  ...inputErrors,
-                                  'publisherName': false
-                                };
-                              });
-                            });
+                  ? CustomDropdown(
+                      items: publishers.map((i) => i.toDropdownData()).toList(),
+                      selectedValue: _publisherID,
+                      label: 'Select Publisher',
+                      hasError: inputErrors['publisherName'] == true,
+                      onValueChanged: (value) {
+                        setState(() {
+                          _publisherID = value;
+                          inputErrors = {
+                            ...inputErrors,
+                            'publisherName': false
+                          };
+                        });
                       })
                   : TextField(
                       controller: _publisherController,
@@ -213,22 +220,18 @@ class _NewPurchaseState extends State<NewPurchaseWidget> {
             const SizedBox(width: 16.0),
             Expanded(
               child: _isBookChecked
-                  ? ValueListenableBuilder(
-                      valueListenable: booksNotifier,
-                      builder: (ctx, books, child) {
-                        return CustomDropdown(
-                          items: books.map((i) => i.toDropdownData()).toList(),
-                          selectedValue: _bookID,
-                          label: 'Select Book',
-                          hasError: inputErrors['bookName'] == true,
-                          onValueChanged: (value) {
-                            setState(() {
-                              _bookID = value;
-                              inputErrors = {...inputErrors, 'bookName': false};
-                            });
-                          },
-                        );
-                      })
+                  ? CustomDropdown(
+                      items: books.map((i) => i.toDropdownData()).toList(),
+                      selectedValue: _bookID,
+                      label: 'Select Book',
+                      hasError: inputErrors['bookName'] == true,
+                      onValueChanged: (value) {
+                        setState(() {
+                          _bookID = value;
+                          inputErrors = {...inputErrors, 'bookName': false};
+                        });
+                      },
+                    )
                   : TextField(
                       controller: _bookNameController,
                       decoration: InputDecoration(

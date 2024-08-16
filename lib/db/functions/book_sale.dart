@@ -45,8 +45,8 @@ Future<void> addBookSale(
       paymentMode: paymentMode,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: currentTS,
-      modifiedBy: loggedInUser,
+      modifiedDate: 0,
+      modifiedBy: '',
       deleted: false));
 
   final purchaseBox = await getBookPurchaseBox();

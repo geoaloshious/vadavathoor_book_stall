@@ -44,8 +44,8 @@ Future<Map<String, String>> addUser(UserModel userData) async {
         status: userData.status,
         createdDate: currentTS,
         createdBy: loggedInUser,
-        modifiedDate: currentTS,
-        modifiedBy: loggedInUser));
+        modifiedDate: 0,
+        modifiedBy: ''));
   } else {
     return {'error': ErrorMessages.usernameTaken};
   }
@@ -116,7 +116,7 @@ Future<void> addDeveloperUserIfEmpty() async {
         status: UserStatus.enabled,
         createdDate: currentTS,
         createdBy: '',
-        modifiedDate: currentTS,
+        modifiedDate: 0,
         modifiedBy: ''));
   }
 }

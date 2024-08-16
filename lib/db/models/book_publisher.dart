@@ -9,7 +9,7 @@ class PublisherModel {
   final String publisherID;
 
   @HiveField(1)
-  final String publisherName;
+  String publisherName;
 
   @HiveField(2)
   final int createdDate;

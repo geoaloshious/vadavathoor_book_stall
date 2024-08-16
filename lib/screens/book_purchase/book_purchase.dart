@@ -71,7 +71,11 @@ class _BookPurchaseState extends State<BookPurchase> {
             Consumer<UserProvider>(builder: (cntx, user, _) {
               if (user.user.userID != '') {
                 return ElevatedButton(
-                    onPressed: newPurchase, child: const Text('New purchase'));
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey),
+                    onPressed: newPurchase,
+                    child: const Text('New purchase',
+                        style: TextStyle(color: Colors.white)));
               } else {
                 return const SizedBox.shrink();
               }
