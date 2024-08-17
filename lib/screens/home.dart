@@ -4,6 +4,7 @@ import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/screens/book_categories/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/index.dart';
+import 'package:vadavathoor_book_stall/screens/book_stall_details.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
 import 'package:vadavathoor_book_stall/screens/publishers/publishers.dart';
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const UsersWidget();
       case 2:
-        return const UnderDevelopment();
+        return const BookStallDetailsWidget();
       case 3:
         return const BookPurchase();
       case 4:

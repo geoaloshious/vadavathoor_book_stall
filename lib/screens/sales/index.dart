@@ -5,7 +5,6 @@ import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/screens/sales/new_sale.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sale.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
 
 class SalesWidget extends StatefulWidget {
   const SalesWidget({super.key});

@@ -7,6 +7,9 @@ class ErrorMessages {
 class MiscDBKeys {
   static const String currentlyLoggedInUserID = 'currentlyLoggedInUserID';
   static const String lastLogInTime = 'lastLogInTime';
+  static const String bookStallName = 'bookStallName';
+  static const String bookStallAdress = 'bookStallAdress';
+  static const String bookStallPhoneNumber = 'bookStallPhoneNumber';
 }
 
 class DBItemHiveType {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
-import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 
 enum UserModalMode { add, edit }
