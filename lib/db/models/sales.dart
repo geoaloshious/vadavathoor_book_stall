@@ -1,22 +1,18 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../constants.dart';
-part 'book_sale.g.dart';
+part 'sales.g.dart';
 
 SaleItemBookModel emptyBookSaleItem() =>
     SaleItemBookModel(bookID: '', purchaseVariants: []);
 
 SaleItemBookPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
-    SaleItemBookPurchaseVariantModel(
-        purchaseID: '', originalPrice: 0, soldPrice: 0, quantity: 0);
+    SaleItemBookPurchaseVariantModel(purchaseID: '', soldPrice: 0, quantity: 0);
 
 @HiveType(typeId: DBItemHiveType.saleItemBookPurchaseVariant)
 class SaleItemBookPurchaseVariantModel {
   @HiveField(0)
   String purchaseID;
-
-  @HiveField(1)
-  double originalPrice;
 
   @HiveField(2)
   double soldPrice;
@@ -27,15 +23,18 @@ class SaleItemBookPurchaseVariantModel {
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
-      'originalPrice': originalPrice,
       'soldPrice': soldPrice,
       'quantity': quantity
     };
   }
 
+  SaleItemBookPurchaseVariantModel clone() {
+    return SaleItemBookPurchaseVariantModel(
+        purchaseID: purchaseID, soldPrice: soldPrice, quantity: quantity);
+  }
+
   SaleItemBookPurchaseVariantModel(
       {required this.purchaseID,
-      required this.originalPrice,
       required this.soldPrice,
       required this.quantity});
 }
@@ -55,6 +54,12 @@ class SaleItemBookModel {
     };
   }
 
+  SaleItemBookModel clone() {
+    return SaleItemBookModel(
+        bookID: bookID,
+        purchaseVariants: purchaseVariants.map((i) => i.clone()).toList());
+  }
+
   SaleItemBookModel({required this.bookID, required this.purchaseVariants});
 }
 
@@ -67,13 +72,13 @@ class SaleModel {
   final List<SaleItemBookModel> books;
 
   @HiveField(2)
-  final double grandTotal;
+  double grandTotal;
 
   @HiveField(3)
-  final String customerName;
+  String customerName;
 
   @HiveField(4)
-  final String customerBatch;
+  String customerBatch;
 
   @HiveField(5)
   String paymentMode;
@@ -107,6 +112,21 @@ class SaleModel {
       'status': status,
       'books': books.map((b) => b.toJson()).toString()
     };
+  }
+
+  SaleModel clone() {
+    return SaleModel(
+        books: books.map((b) => b.clone()).toList(),
+        grandTotal: grandTotal,
+        customerName: customerName,
+        customerBatch: customerBatch,
+        paymentMode: paymentMode,
+        createdDate: createdDate,
+        createdBy: createdBy,
+        modifiedDate: modifiedDate,
+        modifiedBy: modifiedBy,
+        status: status,
+        saleID: saleID);
   }
 
   SaleModel(

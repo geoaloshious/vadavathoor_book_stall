@@ -19,12 +19,13 @@ Future<Box<BookModel>> getBooksBox() async {
 Future<String> addBook(String name) async {
   String bookID = generateID();
   final bookDB = await getBooksBox();
-  await bookDB.add(BookModel(bookID: bookID, bookName: name));
+  await bookDB.add(
+      BookModel(bookID: bookID, bookName: name, status: DBRowStatus.active));
 
   return bookID;
 }
 
 Future<List<BookModel>> getBooks() async {
   final db = await getBooksBox();
-  return db.values.toList();
+  return db.values.where((i) => i.status == DBRowStatus.active).toList();
 }

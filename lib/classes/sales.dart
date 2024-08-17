@@ -1,16 +1,20 @@
 class ForNewSaleBookPurchaseVariant {
   final String purchaseID;
   final String purchaseDate;
-  final int inStockCount;
+  final int balanceStock;
   final double originalPrice;
+  final double soldPrice;
+  final int quantitySold;
   bool selected;
 
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
       'purchaseDate': purchaseDate,
-      'inStockCount': inStockCount,
+      'balanceStock': balanceStock,
       'originalPrice': originalPrice,
+      'soldPrice': soldPrice,
+      'quantitySold': quantitySold,
       'selected': selected
     };
   }
@@ -19,16 +23,20 @@ class ForNewSaleBookPurchaseVariant {
     return ForNewSaleBookPurchaseVariant(
         purchaseID: purchaseID,
         purchaseDate: purchaseDate,
-        inStockCount: inStockCount,
+        balanceStock: balanceStock,
         originalPrice: originalPrice,
+        soldPrice: soldPrice,
+        quantitySold: quantitySold,
         selected: selected);
   }
 
   ForNewSaleBookPurchaseVariant(
       {required this.purchaseID,
       required this.purchaseDate,
-      required this.inStockCount,
+      required this.balanceStock,
       required this.originalPrice,
+      required this.soldPrice,
+      required this.quantitySold,
       required this.selected});
 }
 
@@ -36,20 +44,12 @@ ForNewSaleBookItem emptyForNewSaleBookItem() =>
     ForNewSaleBookItem(bookID: '', bookName: '', purchases: []);
 
 class ForNewSaleBookItem {
-  final String bookID;
+  String bookID;
   final String bookName;
-  final List<ForNewSaleBookPurchaseVariant> purchases;
+  List<ForNewSaleBookPurchaseVariant> purchases;
 
   Map<String, String> toDropdownData() {
     return {'id': bookID, 'name': bookName};
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'bookID': bookID,
-      'bookName': bookName,
-      'purchases': purchases.map((p) => p.toJson()),
-    };
   }
 
   ForNewSaleBookItem clone() {

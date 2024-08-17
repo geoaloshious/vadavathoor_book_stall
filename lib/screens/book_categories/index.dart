@@ -104,7 +104,8 @@ class _BookCategoriesState extends State<BookCategoriesWidget> {
 
       return Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             if (loggedIn)
               Row(children: [
                 Expanded(

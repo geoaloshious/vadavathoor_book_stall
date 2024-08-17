@@ -14,18 +14,15 @@ class PurchaseVariantWidget extends StatefulWidget {
 }
 
 class _PurchaseVariantState extends State<PurchaseVariantWidget> {
-  final TextEditingController _discountPriceController =
-      TextEditingController();
-  final TextEditingController _quantityController =
-      TextEditingController(text: '0');
-  ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
-  String discountPrice = '';
+  TextEditingController _discountPriceController = TextEditingController();
+  TextEditingController _quantityController = TextEditingController(text: '0');
+  bool didSetData = false;
 
   void incrementQuantity() {
     if (widget.data.selected) {
       int quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
 
-      if (quantity < widget.data.inStockCount) {
+      if (quantity < widget.data.balanceStock) {
         quantity++;
         _quantityController.text = quantity.toString();
         widget.updateData(qty: quantity);
@@ -42,6 +39,22 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
         _quantityController.text = quantity.toString();
         widget.updateData(qty: quantity);
       }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!didSetData) {
+      _discountPriceController =
+          TextEditingController(text: widget.data.soldPrice.toString());
+      _quantityController =
+          TextEditingController(text: widget.data.quantitySold.toString());
+
+      setState(() {
+        didSetData = true;
+      });
     }
   }
 
@@ -132,15 +145,15 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                                     ],
                                     onChanged: (value) {
                                       int numVal = int.tryParse(value) ?? 0;
-                                      if (numVal > widget.data.inStockCount) {
-                                        numVal = widget.data.inStockCount;
+                                      if (numVal > widget.data.balanceStock) {
+                                        numVal = widget.data.balanceStock;
                                         _quantityController.text =
                                             numVal.toString();
                                       }
                                       widget.updateData(qty: numVal);
                                     })),
                             Expanded(
-                                child: Text('/ ${widget.data.inStockCount}')),
+                                child: Text('/ ${widget.data.balanceStock}')),
                           ]))),
                           IconButton(
                               icon: const Icon(Icons.add),

@@ -7,7 +7,7 @@ import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 
 import '../db/functions/book.dart';
 import '../db/functions/book_purchase.dart';
-import '../db/functions/book_sale.dart';
+import '../db/functions/sales.dart';
 import '../db/functions/users.dart';
 
 class DbViewer extends StatefulWidget {

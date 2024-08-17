@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'book_sale.dart';
+part of 'sales.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -19,7 +19,6 @@ class SaleItemBookPurchaseVariantModelAdapter
     };
     return SaleItemBookPurchaseVariantModel(
       purchaseID: fields[0] as String,
-      originalPrice: fields[1] as double,
       soldPrice: fields[2] as double,
       quantity: fields[3] as int,
     );
@@ -28,11 +27,9 @@ class SaleItemBookPurchaseVariantModelAdapter
   @override
   void write(BinaryWriter writer, SaleItemBookPurchaseVariantModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.purchaseID)
-      ..writeByte(1)
-      ..write(obj.originalPrice)
       ..writeByte(2)
       ..write(obj.soldPrice)
       ..writeByte(3)

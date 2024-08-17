@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_category.dart';
@@ -179,32 +180,7 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                 icon: const Icon(Icons.close),
                 tooltip: 'Close',
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Confirmation'),
-                        content:
-                            const Text('Are you sure you want to discard?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            autofocus: true,
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Discard'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  showModalCloseConfirmation(context);
                 }),
           ],
         ),

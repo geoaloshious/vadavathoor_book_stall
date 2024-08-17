@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/purchase_variant.dart';
 
-class NewBookSaleItemWidget extends StatefulWidget {
-  final List<ForNewSaleBookItem> books;
+class SaleItemBookWidget extends StatefulWidget {
+  final Map<String, Map<String, Map<String, Object>>> allBooksWithPurchases;
+  final List<BookModel> allBooks;
+  final SaleItemBookModel savedData;
   final List<String> selectedBookIDs;
   final VoidCallback onClickDelete;
   final void Function(
@@ -15,19 +19,84 @@ class NewBookSaleItemWidget extends StatefulWidget {
       double? dsPr,
       int? qty}) updateData;
 
-  const NewBookSaleItemWidget(
+  const SaleItemBookWidget(
       {super.key,
-      required this.books,
+      required this.allBooksWithPurchases,
+      required this.allBooks,
+      required this.savedData,
       required this.selectedBookIDs,
       required this.onClickDelete,
       required this.updateData});
 
   @override
-  State<NewBookSaleItemWidget> createState() => _NewBookSaleItemState();
+  State<SaleItemBookWidget> createState() => _SaleItemBookState();
 }
 
-class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
+class _SaleItemBookState extends State<SaleItemBookWidget> {
   ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
+  List<Map<String, String>> allBooks = [];
+  bool didSetData = false;
+
+  void onChangeBook(String bookID) {
+    final tempPurchases =
+        widget.allBooksWithPurchases[bookID]?.keys.map((purchaseID) {
+      final p = widget.allBooksWithPurchases[bookID]?[purchaseID];
+
+      return ForNewSaleBookPurchaseVariant(
+          purchaseID: purchaseID,
+          purchaseDate: p?['date'] as String,
+          balanceStock: p?['balanceStock'] as int,
+          originalPrice: p?['price'] as double,
+          soldPrice: 0,
+          quantitySold: 0,
+          selected: false);
+    }).toList();
+
+    setState(() {
+      selectedBook.bookID = bookID;
+      if (tempPurchases != null) {
+        selectedBook.purchases = tempPurchases;
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!didSetData) {
+      final List<ForNewSaleBookPurchaseVariant> tempPurchases = [];
+
+      final bookPurchases =
+          widget.allBooksWithPurchases[widget.savedData.bookID];
+      if (bookPurchases != null) {
+        for (String purchaseID in bookPurchases.keys) {
+          final p = bookPurchases[purchaseID];
+          if (p != null) {
+            final savedPV = widget.savedData.purchaseVariants
+                .where((i) => i.purchaseID == purchaseID)
+                .firstOrNull;
+
+            tempPurchases.add(ForNewSaleBookPurchaseVariant(
+                purchaseID: purchaseID,
+                purchaseDate: p['date'] as String,
+                balanceStock: p['balanceStock'] as int,
+                originalPrice: p['price'] as double,
+                soldPrice: savedPV?.soldPrice ?? 0,
+                quantitySold: savedPV?.quantity ?? 0,
+                selected: savedPV != null));
+          }
+        }
+      }
+
+      setState(() {
+        selectedBook.bookID = widget.savedData.bookID;
+        selectedBook.purchases = tempPurchases;
+
+        didSetData = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +110,9 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                 Expanded(
                     flex: 5,
                     child: CustomDropdown(
-                      items:
-                          widget.books.map((i) => i.toDropdownData()).toList(),
+                      items: widget.allBooks
+                          .map((i) => i.toDropdownData())
+                          .toList(),
                       selectedValue: selectedBook.bookID,
                       label: 'Select Book',
                       hasError: false,
@@ -50,11 +120,7 @@ class _NewBookSaleItemState extends State<NewBookSaleItemWidget> {
                       onValueChanged: (value) {
                         setState(() {
                           if (value != selectedBook.bookID) {
-                            selectedBook = widget.books
-                                .firstWhere((i) => i.bookID == value,
-                                    orElse: emptyForNewSaleBookItem)
-                                .clone();
-
+                            onChangeBook(value);
                             widget.updateData(bkId: selectedBook.bookID);
                           }
                         });
