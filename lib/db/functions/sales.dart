@@ -1,6 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
-import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
@@ -23,6 +22,20 @@ Future<Box<SaleModel>> getSalesBox() async {
   return box;
 }
 
+Future<Map<String, int>> getPurchaseKeysAndIDs(
+    Box<BookPurchaseModel> purchaseBox) async {
+  Map<String, int> purchaseKeys = {};
+
+  for (int key in purchaseBox.keys) {
+    String? pID = purchaseBox.get(key)?.purchaseID;
+    if (pID != null) {
+      purchaseKeys[pID] = key;
+    }
+  }
+
+  return purchaseKeys;
+}
+
 Future<void> addSale(List<SaleItemBookModel> booksToCheckout, double grandTotal,
     String customerName, String customerBatch, String paymentMode) async {
   final saleBox = await getSalesBox();
@@ -43,13 +56,7 @@ Future<void> addSale(List<SaleItemBookModel> booksToCheckout, double grandTotal,
       status: DBRowStatus.active));
 
   final purchaseBox = await getBookPurchaseBox();
-  Map<String, int> purchaseKeys = {};
-  for (int key in purchaseBox.keys) {
-    String? pID = purchaseBox.get(key)?.purchaseID;
-    if (pID != null) {
-      purchaseKeys[pID] = key;
-    }
-  }
+  final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
   for (var book in booksToCheckout) {
     for (var pv in book.purchaseVariants) {
@@ -76,55 +83,92 @@ Future<void> editSale(
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  Map<String, int> purchaseKeys = {};
-  for (int key in purchaseBox.keys) {
-    String? pID = purchaseBox.get(key)?.purchaseID;
-    if (pID != null) {
-      purchaseKeys[pID] = key;
+  final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
+
+  for (int saleKey in salesBox.keys) {
+    SaleModel? existingSale = salesBox.get(saleKey);
+    if (existingSale != null && existingSale.saleID == saleID) {
+      //Prepare the object which contains the exisintg sold quantities
+      for (var esb in existingSale.books) {
+        for (var espv in esb.purchaseVariants) {
+          final existingPurchase =
+              purchaseBox.get(purchaseKeys[espv.purchaseID]);
+          if (existingPurchase != null) {
+            //Undo the balance stock reduction that have done when the sale is created.
+            int newBalance = existingPurchase.quantityLeft + espv.quantity;
+
+            existingPurchase.quantityLeft = newBalance;
+            existingPurchase.modifiedDate = currentTS;
+            await purchaseBox.put(
+                purchaseKeys[espv.purchaseID], existingPurchase);
+          }
+        }
+      }
+
+      existingSale.books = booksToCheckout;
+      existingSale.grandTotal = grandTotal;
+      existingSale.customerName = customerName;
+      existingSale.customerBatch = customerBatch;
+      existingSale.paymentMode = paymentMode;
+
+      existingSale.modifiedDate = currentTS;
+      existingSale.modifiedBy = loggedInUser;
+
+      await salesBox.put(saleKey, existingSale);
+      break;
     }
   }
 
+  //Update balance stock in purchase table
   for (var book in booksToCheckout) {
     for (var pv in book.purchaseVariants) {
-      BookPurchaseModel? existingData =
+      BookPurchaseModel? existingPurchase =
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
-      if (existingData != null) {
-        existingData.quantityLeft = existingData.quantityLeft - pv.quantity;
-        existingData.modifiedDate = currentTS;
-        await purchaseBox.put(purchaseKeys[pv.purchaseID], existingData);
+      if (existingPurchase != null) {
+        //Reduce the new quantity from balance stock.
+        int newBalance = existingPurchase.quantityLeft - pv.quantity;
+
+        existingPurchase.quantityLeft = newBalance;
+        existingPurchase.modifiedDate = currentTS;
+        await purchaseBox.put(purchaseKeys[pv.purchaseID], existingPurchase);
       }
-    }
-  }
-
-  for (int key in salesBox.keys) {
-    SaleModel? existingData = salesBox.get(key);
-    if (existingData != null && existingData.saleID == saleID) {
-      existingData.grandTotal = grandTotal;
-      existingData.customerName = customerName;
-      existingData.customerBatch = customerBatch;
-      existingData.paymentMode = paymentMode;
-
-      existingData.modifiedDate = currentTS;
-      existingData.modifiedBy = loggedInUser;
-
-      await salesBox.put(key, existingData);
-      break;
     }
   }
 }
 
 Future<void> deleteSale(String saleID) async {
-  final box = await getSalesBox();
+  final salesBox = await getSalesBox();
+  final purchaseBox = await getBookPurchaseBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final currentTS = getCurrentTimestamp();
 
-  for (int key in box.keys) {
-    SaleModel? existingData = box.get(key);
-    if (existingData != null && existingData.saleID == saleID) {
-      existingData.status = DBRowStatus.deleted;
-      existingData.modifiedDate = getCurrentTimestamp();
-      existingData.modifiedBy = loggedInUser;
+  final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
-      await box.put(key, existingData);
+  for (int saleKey in salesBox.keys) {
+    SaleModel? existingSale = salesBox.get(saleKey);
+    if (existingSale != null && existingSale.saleID == saleID) {
+      //Prepare the object which contains the exisintg sold quantities
+      for (var esb in existingSale.books) {
+        for (var espv in esb.purchaseVariants) {
+          BookPurchaseModel? existingPurchase =
+              purchaseBox.get(purchaseKeys[espv.purchaseID]);
+          if (existingPurchase != null) {
+            //Undo the balance stock reduction that have done when the sale is created.
+            int newCount = existingPurchase.quantityLeft + espv.quantity;
+
+            existingPurchase.quantityLeft = newCount;
+            existingPurchase.modifiedDate = currentTS;
+            await purchaseBox.put(
+                purchaseKeys[espv.purchaseID], existingPurchase);
+          }
+        }
+      }
+
+      existingSale.status = DBRowStatus.deleted;
+      existingSale.modifiedDate = getCurrentTimestamp();
+      existingSale.modifiedBy = loggedInUser;
+
+      await salesBox.put(saleKey, existingSale);
       break;
     }
   }
@@ -144,59 +188,34 @@ Future<List<SaleListItemModel>> getSalesList() async {
 
   for (SaleModel sale in sales) {
     if (sale.status == DBRowStatus.active) {
+      List<String> bookNames = [];
+      int totalQty = 0;
+
       for (SaleItemBookModel saleItem in sale.books) {
         final book =
             books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
-
-        int totalQty = 0;
 
         for (var pv in saleItem.purchaseVariants) {
           totalQty = totalQty + pv.quantity;
         }
 
         if (book != null) {
-          joinedData.add(SaleListItemModel(
-              saleID: sale.saleID,
-              bookName: book.bookName,
-              quantity: totalQty,
-              grandTotal: sale.grandTotal,
-              paymentMode: sale.paymentMode,
-              date: formatTimestamp(timestamp: sale.createdDate)));
+          bookNames.add(book.bookName);
         }
       }
+
+      joinedData.add(SaleListItemModel(
+          saleID: sale.saleID,
+          books: bookNames.join(', '),
+          quantity: totalQty,
+          grandTotal: sale.grandTotal,
+          paymentMode: sale.paymentMode,
+          date: formatTimestamp(timestamp: sale.createdDate)));
     }
   }
 
   return joinedData;
 }
-
-// Future<List<ForNewSaleBookItem>> getBooksWithPurchaseVariants() async {
-//   final books = (await getBooksBox()).values.toList();
-//   final purchases = (await getBookPurchaseBox()).values.toList();
-
-//   List<ForNewSaleBookItem> returnData = [];
-
-//   for (BookModel bk in books) {
-//     returnData.add(ForNewSaleBookItem(
-//         bookID: bk.bookID,
-//         bookName: bk.bookName,
-//         purchases: purchases
-//             .where((pr) =>
-//                 pr.bookID == bk.bookID &&
-//                 pr.deleted == false &&
-//                 pr.quantityLeft > 0)
-//             .map((pr) => ForNewSaleBookPurchaseVariant(
-//                 purchaseID: pr.purchaseID,
-//                 purchaseDate: formatTimestamp(
-//                     timestamp: pr.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-//                 balanceStock: pr.quantityLeft,
-//                 originalPrice: pr.bookPrice,
-//                 selected: false))
-//             .toList()));
-//   }
-
-//   return returnData;
-// }
 
 Future<Map<String, Map<String, Map<String, Object>>>> getBookWithPurchases(
   List<String> savedPurchaseIDs,

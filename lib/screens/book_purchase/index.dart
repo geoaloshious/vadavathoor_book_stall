@@ -94,7 +94,7 @@ class _BookPurchaseState extends State<BookPurchase> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Quantity',
+                  child: Text('Balance Stock/Purchased Quantity',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(

@@ -85,7 +85,9 @@ class _PurchasedBookState extends State<PurchasedBookWidget> {
         Expanded(child: Text(widget.data.bookName)),
         Expanded(child: Text(widget.data.publisherName)),
         Expanded(child: Text(widget.data.categoryName)),
-        Expanded(child: Text(widget.data.quantityPurchased.toString())),
+        Expanded(
+            child: Text(
+                '${widget.data.balanceStock} / ${widget.data.quantityPurchased}')),
         Expanded(child: Text(widget.data.bookPrice.toString())),
         Expanded(child: Text(widget.data.formattedPurchaseDate)),
         if (widget.loggedIn)

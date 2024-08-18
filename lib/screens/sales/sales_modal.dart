@@ -34,27 +34,38 @@ class _SaleModalState extends State<SaleModalWidget> {
   bool didSetData = false;
 
   Future<void> _handleSubmit() async {
+    // print(booksToCheckout.length);
+    // booksToCheckout.forEach((i) => print(i.toJson()));
+
     /**
        * Below statement following things:
        * Checks whether any purchases selected
        * Checks whether quantity > 0 in purchases
        * Copy original price to sold price if not specified.
        */
-    bool hasBooks = booksToCheckout.where((bk) {
+    final validBooks = booksToCheckout.where((bk) {
+      final List<SaleItemBookPurchaseVariantModel> validPVs = [];
+
       for (var pv in bk.purchaseVariants) {
         if (pv.soldPrice == 0) {
           pv.soldPrice = allBooksWithPurchases[bk.bookID]?[pv.purchaseID]
               ?['price'] as double;
         }
+
+        if (pv.quantity > 0) {
+          validPVs.add(pv);
+        }
       }
 
-      return bk.purchaseVariants.where((p) => p.quantity > 0).isNotEmpty;
-    }).isNotEmpty;
+      bk.purchaseVariants = validPVs;
 
-    if (hasBooks) {
+      return validPVs.isNotEmpty;
+    }).toList();
+
+    if (validBooks.isNotEmpty) {
       if (widget.saleID == '') {
         await addSale(
-            booksToCheckout,
+            validBooks,
             grandTotal,
             _customerNameController.text.trim(),
             _customerBatchController.text.trim(),
@@ -62,7 +73,7 @@ class _SaleModalState extends State<SaleModalWidget> {
       } else {
         await editSale(
             widget.saleID,
-            booksToCheckout,
+            validBooks,
             grandTotal,
             _customerNameController.text.trim(),
             _customerBatchController.text.trim(),
@@ -80,6 +91,7 @@ class _SaleModalState extends State<SaleModalWidget> {
             content: const Text('Please add/complete book details'),
             actions: [
               TextButton(
+                autofocus: true,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -128,8 +140,11 @@ class _SaleModalState extends State<SaleModalWidget> {
     });
   }
 
-  void loadData() async {
+  void setData() async {
     List<String> savedPurchaseIDs = [];
+    List<SaleItemBookModel> tempBooksCheckout = [];
+    String tempPaymentMode = PaymentModes.cash;
+    double tempGrandTotal = 0;
 
     if (widget.saleID != '') {
       final temp = await getSaleData(widget.saleID);
@@ -139,13 +154,9 @@ class _SaleModalState extends State<SaleModalWidget> {
         _customerBatchController =
             TextEditingController(text: temp.customerBatch);
 
-        setState(() {
-          booksToCheckout = temp.books;
-          _paymentMode = temp.paymentMode;
-          grandTotal = temp.grandTotal;
-        });
-
-        _updateSelectedBookIDs();
+        tempBooksCheckout = temp.books;
+        tempPaymentMode = temp.paymentMode;
+        tempGrandTotal = temp.grandTotal;
 
         for (SaleItemBookModel b in temp.books) {
           for (SaleItemBookPurchaseVariantModel p in b.purchaseVariants) {
@@ -161,7 +172,15 @@ class _SaleModalState extends State<SaleModalWidget> {
     setState(() {
       allBooksWithPurchases = tempBookPurchases;
       allBooks = tempBooks;
+
+      booksToCheckout = tempBooksCheckout;
+      _paymentMode = tempPaymentMode;
+      grandTotal = tempGrandTotal;
+
+      didSetData = true;
     });
+
+    _updateSelectedBookIDs();
   }
 
   @override
@@ -169,10 +188,7 @@ class _SaleModalState extends State<SaleModalWidget> {
     super.didChangeDependencies();
 
     if (!didSetData) {
-      loadData();
-      setState(() {
-        didSetData = true;
-      });
+      setData();
     }
   }
 
@@ -284,13 +300,29 @@ class _SaleModalState extends State<SaleModalWidget> {
         Expanded(
             child: TextField(
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Customer name'),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.blueGrey, width: 2)),
+                    filled: true,
+                    fillColor: Colors.white,
+                    hoverColor: Colors.transparent,
+                    hintText: 'Customer name'),
                 controller: _customerNameController)),
         const SizedBox(width: 10),
         Expanded(
             child: TextField(
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Customer batch'),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.blueGrey, width: 2)),
+                    filled: true,
+                    fillColor: Colors.white,
+                    hoverColor: Colors.transparent,
+                    hintText: 'Customer batch'),
                 controller: _customerBatchController))
       ]),
       const SizedBox(height: 20),

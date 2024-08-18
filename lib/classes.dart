@@ -10,25 +10,26 @@ class BookPurchaseListItemModel {
   final String bookName;
   final double bookPrice;
   final int quantityPurchased;
+  final int balanceStock;
 
-  BookPurchaseListItemModel({
-    required this.purchaseID,
-    required this.publisherID,
-    required this.publisherName,
-    required this.categoryID,
-    required this.categoryName,
-    required this.purchaseDate,
-    required this.formattedPurchaseDate,
-    required this.bookID,
-    required this.bookName,
-    required this.quantityPurchased,
-    required this.bookPrice,
-  });
+  BookPurchaseListItemModel(
+      {required this.purchaseID,
+      required this.publisherID,
+      required this.publisherName,
+      required this.categoryID,
+      required this.categoryName,
+      required this.purchaseDate,
+      required this.formattedPurchaseDate,
+      required this.bookID,
+      required this.bookName,
+      required this.quantityPurchased,
+      required this.bookPrice,
+      required this.balanceStock});
 }
 
 class SaleListItemModel {
   final String saleID;
-  final String bookName;
+  final String books;
   final int quantity;
   final String date;
   final double grandTotal;
@@ -36,7 +37,7 @@ class SaleListItemModel {
 
   SaleListItemModel(
       {required this.saleID,
-      required this.bookName,
+      required this.books,
       required this.quantity,
       required this.date,
       required this.grandTotal,

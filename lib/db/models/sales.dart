@@ -69,7 +69,7 @@ class SaleModel {
   final String saleID;
 
   @HiveField(1)
-  final List<SaleItemBookModel> books;
+  List<SaleItemBookModel> books;
 
   @HiveField(2)
   double grandTotal;

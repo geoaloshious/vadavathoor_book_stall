@@ -81,7 +81,7 @@ class _SalesState extends State<SalesWidget> {
             const SizedBox(height: 20),
             Row(children: [
               const Expanded(
-                  child: Text('Book',
+                  child: Text('Books',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(

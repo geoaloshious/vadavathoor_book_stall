@@ -159,6 +159,7 @@ Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
           bookID: book.bookID,
           bookName: book.bookName,
           quantityPurchased: purchase.quantityPurchased,
+          balanceStock: purchase.quantityLeft,
           bookPrice: purchase.bookPrice));
     }
   }
