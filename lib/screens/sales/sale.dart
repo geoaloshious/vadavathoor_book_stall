@@ -70,11 +70,12 @@ class _SaleState extends State<SaleWidget> {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
+      Expanded(child: Text(widget.data.customerName)),
       Expanded(child: Text(widget.data.books)),
-      Expanded(child: Text(widget.data.quantity.toString())),
       Expanded(child: Text(getPaymentModeName(widget.data.paymentMode))),
       Expanded(child: Text(widget.data.grandTotal.toString())),
-      Expanded(child: Text(widget.data.date)),
+      Expanded(child: Text(widget.data.createdDate)),
+      Expanded(child: Text(widget.data.modifiedDate)),
       if (widget.loggedIn)
         IconButton(
             icon: const Icon(Icons.edit),

@@ -189,28 +189,30 @@ Future<List<SaleListItemModel>> getSalesList() async {
   for (SaleModel sale in sales) {
     if (sale.status == DBRowStatus.active) {
       List<String> bookNames = [];
-      int totalQty = 0;
 
       for (SaleItemBookModel saleItem in sale.books) {
         final book =
             books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
+        int bookQty = 0;
 
         for (var pv in saleItem.purchaseVariants) {
-          totalQty = totalQty + pv.quantity;
+          bookQty = bookQty + pv.quantity;
         }
 
         if (book != null) {
-          bookNames.add(book.bookName);
+          bookNames.add(
+              '${book.bookName.length > 10 ? '${book.bookName.substring(0, 10)}...' : book.bookName} ($bookQty)');
         }
       }
 
       joinedData.add(SaleListItemModel(
           saleID: sale.saleID,
-          books: bookNames.join(', '),
-          quantity: totalQty,
+          customerName: sale.customerName,
+          books: bookNames.join('\n'),
           grandTotal: sale.grandTotal,
           paymentMode: sale.paymentMode,
-          date: formatTimestamp(timestamp: sale.createdDate)));
+          createdDate: formatTimestamp(timestamp: sale.createdDate),
+          modifiedDate: formatTimestamp(timestamp: sale.modifiedDate)));
     }
   }
 

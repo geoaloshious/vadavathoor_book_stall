@@ -81,15 +81,15 @@ class _SalesState extends State<SalesWidget> {
             const SizedBox(height: 20),
             Row(children: [
               const Expanded(
-                  child: Text('Books',
+                  child: Text('Customer',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Qty',
+                  child: Text('Book (Qty)',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Paid via',
+                  child: Text('Paid Via',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
@@ -97,7 +97,11 @@ class _SalesState extends State<SalesWidget> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Date',
+                  child: Text('Created Date',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              const Expanded(
+                  child: Text('Modified Date',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               if (loggedIn) const SizedBox(width: 80)

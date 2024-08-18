@@ -55,6 +55,10 @@ int getCurrentTimestamp() {
 }
 
 String formatTimestamp({required int timestamp, String? format}) {
+  if (timestamp == 0) {
+    return '';
+  }
+
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
   DateFormat dateFormat = DateFormat(format ?? 'dd/MM/yyyy hh:mm a');
   return dateFormat.format(dateTime);

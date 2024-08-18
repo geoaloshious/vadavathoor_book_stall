@@ -29,17 +29,19 @@ class BookPurchaseListItemModel {
 
 class SaleListItemModel {
   final String saleID;
+  final String customerName;
   final String books;
-  final int quantity;
-  final String date;
+  final String createdDate;
+  final String modifiedDate;
   final double grandTotal;
   final String paymentMode;
 
   SaleListItemModel(
       {required this.saleID,
+      required this.customerName,
       required this.books,
-      required this.quantity,
-      required this.date,
+      required this.createdDate,
+      required this.modifiedDate,
       required this.grandTotal,
       required this.paymentMode});
 }
