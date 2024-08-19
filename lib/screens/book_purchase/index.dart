@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
+import 'package:vadavathoor_book_stall/screens/book_purchase/purchase_modal.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/purchased_book.dart';
 
 import '../../classes.dart';
-import 'new_purchase.dart';
 
 class BookPurchase extends StatefulWidget {
   const BookPurchase({super.key});
@@ -19,30 +19,23 @@ class _BookPurchaseState extends State<BookPurchase> {
 
   void newPurchase() {
     showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        Size screenSize = MediaQuery.of(context).size;
-        double dialogWidth = screenSize.width * 0.7;
-        double dialogHeight = screenSize.height * 0.5;
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
+          double dialogWidth = screenSize.width * 0.7;
+          double dialogHeight = screenSize.height * 0.5;
 
-        return Dialog(
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: dialogHeight,
-              maxWidth: dialogWidth,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                //#pending - while scrolling, header and submit should be sticky
-                child: NewPurchaseWidget(updateUI: setData),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+          return Dialog(
+              child: Container(
+                  constraints: BoxConstraints(
+                      minHeight: dialogHeight, maxWidth: dialogWidth),
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                          //#pending - while scrolling, header and submit should be sticky
+                          child: BookPurchaseModalWidget(updateUI: setData)))));
+        });
   }
 
   void setData() async {
@@ -67,10 +60,8 @@ class _BookPurchaseState extends State<BookPurchase> {
           padding: const EdgeInsets.all(16.0),
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text(
-                'Purchases',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              const Text('Purchases',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               if (loggedIn)
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(

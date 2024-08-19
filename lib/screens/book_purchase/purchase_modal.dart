@@ -13,18 +13,17 @@ import '../../db/functions/book.dart';
 import '../../db/functions/book_purchase.dart';
 import '../../db/functions/publisher.dart';
 
-class EditBookPurchaseWidget extends StatefulWidget {
-  final BookPurchaseListItemModel data;
+class BookPurchaseModalWidget extends StatefulWidget {
+  final BookPurchaseListItemModel? data;
   final void Function() updateUI;
 
-  const EditBookPurchaseWidget(
-      {super.key, required this.data, required this.updateUI});
+  const BookPurchaseModalWidget({super.key, this.data, required this.updateUI});
 
   @override
-  State<EditBookPurchaseWidget> createState() => _EditBookPurchaseState();
+  State<BookPurchaseModalWidget> createState() => _BookPurchaseModalState();
 }
 
-class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
+class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
   var _publisherController = TextEditingController();
   var _bookNameController = TextEditingController();
   var _categoryNameController = TextEditingController();
@@ -35,9 +34,9 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
   String _publisherID = '';
   String _bookID = '';
   String _categoryID = '';
-  bool _isExistingCategory = true;
-  bool _isExistingPublisher = true;
-  bool _isExistingBook = true;
+  bool _isExistingCategory = false;
+  bool _isExistingPublisher = false;
+  bool _isExistingBook = false;
   Map<String, bool> inputErrors = {};
 
   List<PublisherModel> publishers = [];
@@ -111,17 +110,22 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      await editBookPurchase(
-          widget.data.purchaseID,
-          _publisherID,
-          publisherName,
-          _bookID,
-          bookName,
-          _categoryID,
-          categoryName,
-          quantity,
-          price,
-          purchaseDate);
+      if (widget.data != null) {
+        await editBookPurchase(
+            widget.data!.purchaseID,
+            _publisherID,
+            publisherName,
+            _bookID,
+            bookName,
+            _categoryID,
+            categoryName,
+            quantity,
+            price,
+            purchaseDate);
+      } else {
+        await addBookPurchase(_publisherID, publisherName, purchaseDate,
+            _bookID, bookName, _categoryID, categoryName, price, quantity);
+      }
 
       widget.updateUI();
       Navigator.of(context).pop();
@@ -133,20 +137,28 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
   }
 
   void setData() async {
-    _bookID = widget.data.bookID;
-    _publisherID = widget.data.publisherID;
-    _categoryID = widget.data.categoryID;
-    _selectedDate =
-        DateTime.fromMillisecondsSinceEpoch(widget.data.purchaseDate);
-    _publisherController =
-        TextEditingController(text: widget.data.publisherName);
-    _bookNameController = TextEditingController(text: widget.data.bookName);
-    _categoryNameController =
-        TextEditingController(text: widget.data.categoryName);
-    _quantityController =
-        TextEditingController(text: widget.data.quantityPurchased.toString());
-    _priceController =
-        TextEditingController(text: widget.data.bookPrice.toString());
+    if (widget.data != null) {
+      _isExistingBook = true;
+      _isExistingCategory = true;
+      _isExistingPublisher = true;
+
+      _bookID = widget.data!.bookID;
+      _publisherID = widget.data!.publisherID;
+      _categoryID = widget.data!.categoryID;
+
+      _selectedDate =
+          DateTime.fromMillisecondsSinceEpoch(widget.data!.purchaseDate);
+
+      _publisherController =
+          TextEditingController(text: widget.data!.publisherName);
+      _bookNameController = TextEditingController(text: widget.data!.bookName);
+      _categoryNameController =
+          TextEditingController(text: widget.data!.categoryName);
+      _quantityController = TextEditingController(
+          text: widget.data!.quantityPurchased.toString());
+      _priceController =
+          TextEditingController(text: widget.data!.bookPrice.toString());
+    }
 
     final tempPubs = await getPublishers();
     final tempBooks = await getBooks();
@@ -167,27 +179,20 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Edit Purchase',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-            ),
-            IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: 'Close',
-                onPressed: () {
-                  showModalCloseConfirmation(context);
-                }),
-          ],
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: CheckboxListTile(
+    return Column(children: [
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text('${widget.data == null ? 'Add' : 'Edit'} Purchase',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+        IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: 'Close',
+            onPressed: () {
+              showModalCloseConfirmation(context);
+            }),
+      ]),
+      Row(children: [
+        Expanded(
+            child: CheckboxListTile(
                 title: const Text('Existing Publisher'),
                 value: _isExistingPublisher,
                 controlAffinity: ListTileControlAffinity.leading,
@@ -196,11 +201,9 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                     _isExistingPublisher = value ?? false;
                     _publisherID = '';
                   });
-                },
-              ),
-            ),
-            Expanded(
-              child: CheckboxListTile(
+                })),
+        Expanded(
+            child: CheckboxListTile(
                 title: const Text('Existing Book'),
                 value: _isExistingBook,
                 controlAffinity: ListTileControlAffinity.leading,
@@ -209,11 +212,9 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                     _isExistingBook = value ?? false;
                     _bookID = '';
                   });
-                },
-              ),
-            ),
-            Expanded(
-              child: CheckboxListTile(
+                })),
+        Expanded(
+            child: CheckboxListTile(
                 title: const Text('Existing Category'),
                 value: _isExistingCategory,
                 controlAffinity: ListTileControlAffinity.leading,
@@ -222,15 +223,12 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                     _isExistingCategory = value ?? false;
                     _categoryID = '';
                   });
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10.0),
-        Row(
-          children: [
-            Expanded(
+                }))
+      ]),
+      const SizedBox(height: 10.0),
+      Row(
+        children: [
+          Expanded(
               child: _isExistingPublisher
                   ? CustomDropdown(
                       items: publishers.map((i) => i.toDropdownData()).toList(),
@@ -245,19 +243,18 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                             'publisherName': false
                           };
                         });
-                      },
-                    )
+                      })
                   : TextField(
                       controller: _publisherController,
                       decoration: InputDecoration(
-                        labelText: 'Publisher name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['publisherName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1)),
-                      ),
+                          labelText: 'Publisher name',
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: inputErrors['publisherName'] == true
+                                  ? const BorderSide(
+                                      color: Colors.red, width: 1)
+                                  : const BorderSide(
+                                      color: Colors.grey, width: 1))),
                       onChanged: (value) {
                         setState(() {
                           inputErrors = {
@@ -265,11 +262,9 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                             'publisherName': false
                           };
                         });
-                      },
-                    ),
-            ),
-            const SizedBox(width: 16.0),
-            Expanded(
+                      })),
+          const SizedBox(width: 16.0),
+          Expanded(
               child: _isExistingBook
                   ? CustomDropdown(
                       items: books.map((i) => i.toDropdownData()).toList(),
@@ -281,28 +276,25 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                           _bookID = value;
                           inputErrors = {...inputErrors, 'bookName': false};
                         });
-                      },
-                    )
+                      })
                   : TextField(
                       controller: _bookNameController,
                       decoration: InputDecoration(
-                        labelText: 'Book name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['bookName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1)),
-                      ),
+                          labelText: 'Book name',
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: inputErrors['bookName'] == true
+                                  ? const BorderSide(
+                                      color: Colors.red, width: 1)
+                                  : const BorderSide(
+                                      color: Colors.grey, width: 1))),
                       onChanged: (value) {
                         setState(() {
                           inputErrors = {...inputErrors, 'bookName': false};
                         });
-                      },
-                    ),
-            ),
-            const SizedBox(width: 16.0),
-            Expanded(
+                      })),
+          const SizedBox(width: 16.0),
+          Expanded(
               child: _isExistingCategory
                   ? CustomDropdown(
                       items: bookCategories
@@ -316,96 +308,83 @@ class _EditBookPurchaseState extends State<EditBookPurchaseWidget> {
                           _categoryID = value;
                           inputErrors = {...inputErrors, 'categoryName': false};
                         });
-                      },
-                    )
+                      })
                   : TextField(
                       controller: _categoryNameController,
                       decoration: InputDecoration(
-                        labelText: 'Category name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['categoryName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1)),
-                      ),
+                          labelText: 'Category name',
+                          border: const OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: inputErrors['categoryName'] == true
+                                  ? const BorderSide(
+                                      color: Colors.red, width: 1)
+                                  : const BorderSide(
+                                      color: Colors.grey, width: 1))),
                       onChanged: (value) {
                         setState(() {
                           inputErrors = {...inputErrors, 'categoryName': false};
                         });
-                      },
-                    ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20.0),
-        Row(children: [
-          Expanded(
+                      })),
+        ],
+      ),
+      const SizedBox(height: 20.0),
+      Row(children: [
+        Expanded(
             child: TextField(
-              controller: _quantityController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              decoration: InputDecoration(
-                labelText: 'Quantity',
-                border: const OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                    borderSide: inputErrors['quantity'] == true
-                        ? const BorderSide(color: Colors.red, width: 1)
-                        : const BorderSide(color: Colors.grey, width: 1)),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  inputErrors = {...inputErrors, 'quantity': false};
-                });
-              },
-            ),
-          ),
-          const SizedBox(width: 16.0),
-          Expanded(
+                controller: _quantityController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: InputDecoration(
+                    labelText: 'Quantity',
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: inputErrors['quantity'] == true
+                            ? const BorderSide(color: Colors.red, width: 1)
+                            : const BorderSide(color: Colors.grey, width: 1))),
+                onChanged: (value) {
+                  setState(() {
+                    inputErrors = {...inputErrors, 'quantity': false};
+                  });
+                })),
+        const SizedBox(width: 16.0),
+        Expanded(
             child: TextField(
-              controller: _priceController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-              ],
-              decoration: InputDecoration(
-                labelText: 'Book price',
-                border: const OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                    borderSide: inputErrors['bookPrice'] == true
-                        ? const BorderSide(color: Colors.red, width: 1)
-                        : const BorderSide(color: Colors.grey, width: 1)),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  inputErrors = {...inputErrors, 'bookPrice': false};
-                });
-              },
-            ),
-          ),
-          const SizedBox(width: 16.0),
-          Expanded(
-              child: GestureDetector(
-                  onTap: _selectDate,
-                  child: InputDecorator(
+                controller: _priceController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
+                ],
+                decoration: InputDecoration(
+                    labelText: 'Book price',
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: inputErrors['bookPrice'] == true
+                            ? const BorderSide(color: Colors.red, width: 1)
+                            : const BorderSide(color: Colors.grey, width: 1))),
+                onChanged: (value) {
+                  setState(() {
+                    inputErrors = {...inputErrors, 'bookPrice': false};
+                  });
+                })),
+        const SizedBox(width: 16.0),
+        Expanded(
+            child: GestureDetector(
+                onTap: _selectDate,
+                child: InputDecorator(
                     decoration: const InputDecoration(
-                      labelText: 'Purchase Date',
-                      suffixIcon: Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-                  )))
-        ]),
-        const SizedBox(height: 20.0),
-        ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
-            onPressed: _saveData,
-            child: const Text('Submit', style: TextStyle(color: Colors.white))),
-      ],
-    );
+                        labelText: 'Purchase Date',
+                        suffixIcon: Icon(Icons.calendar_today),
+                        border: OutlineInputBorder()),
+                    child:
+                        Text(DateFormat('yyyy-MM-dd').format(_selectedDate)))))
+      ]),
+      const SizedBox(height: 20.0),
+      ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+          onPressed: _saveData,
+          child: const Text('Submit', style: TextStyle(color: Colors.white)))
+    ]);
   }
 }
