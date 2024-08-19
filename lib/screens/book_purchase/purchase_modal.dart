@@ -123,8 +123,8 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
             price,
             purchaseDate);
       } else {
-        await addBookPurchase(_publisherID, publisherName, purchaseDate,
-            _bookID, bookName, _categoryID, categoryName, price, quantity);
+        await addBookPurchase(_bookID, bookName, _publisherID, publisherName,
+            _categoryID, categoryName, purchaseDate, price, quantity);
       }
 
       widget.updateUI();
@@ -193,17 +193,6 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
       Row(children: [
         Expanded(
             child: CheckboxListTile(
-                title: const Text('Existing Publisher'),
-                value: _isExistingPublisher,
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isExistingPublisher = value ?? false;
-                    _publisherID = '';
-                  });
-                })),
-        Expanded(
-            child: CheckboxListTile(
                 title: const Text('Existing Book'),
                 value: _isExistingBook,
                 controlAffinity: ListTileControlAffinity.leading,
@@ -214,119 +203,146 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
                   });
                 })),
         Expanded(
-            child: CheckboxListTile(
-                title: const Text('Existing Category'),
-                value: _isExistingCategory,
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isExistingCategory = value ?? false;
-                    _categoryID = '';
-                  });
-                }))
+            child: _isExistingBook
+                ? const SizedBox.shrink()
+                : CheckboxListTile(
+                    title: const Text('Existing Publisher'),
+                    value: _isExistingPublisher,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isExistingPublisher = value ?? false;
+                        _publisherID = '';
+                      });
+                    })),
+        Expanded(
+            child: _isExistingBook
+                ? const SizedBox.shrink()
+                : CheckboxListTile(
+                    title: const Text('Existing Category'),
+                    value: _isExistingCategory,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isExistingCategory = value ?? false;
+                        _categoryID = '';
+                      });
+                    }))
       ]),
       const SizedBox(height: 10.0),
-      Row(
-        children: [
-          Expanded(
-              child: _isExistingPublisher
-                  ? CustomDropdown(
-                      items: publishers.map((i) => i.toDropdownData()).toList(),
-                      selectedValue: _publisherID,
-                      label: 'Select Publisher',
-                      hasError: inputErrors['publisherName'] == true,
-                      onValueChanged: (value) {
-                        setState(() {
-                          _publisherID = value;
-                          inputErrors = {
-                            ...inputErrors,
-                            'publisherName': false
-                          };
-                        });
-                      })
-                  : TextField(
-                      controller: _publisherController,
-                      decoration: InputDecoration(
-                          labelText: 'Publisher name',
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: inputErrors['publisherName'] == true
-                                  ? const BorderSide(
-                                      color: Colors.red, width: 1)
-                                  : const BorderSide(
-                                      color: Colors.grey, width: 1))),
-                      onChanged: (value) {
-                        setState(() {
-                          inputErrors = {
-                            ...inputErrors,
-                            'publisherName': false
-                          };
-                        });
-                      })),
-          const SizedBox(width: 16.0),
-          Expanded(
-              child: _isExistingBook
-                  ? CustomDropdown(
-                      items: books.map((i) => i.toDropdownData()).toList(),
-                      selectedValue: _bookID,
-                      label: 'Select Book',
-                      hasError: inputErrors['bookName'] == true,
-                      onValueChanged: (value) {
+      Row(children: [
+        Expanded(
+            child: _isExistingBook
+                ? CustomDropdown(
+                    items: books.map((i) => i.toDropdownData()).toList(),
+                    selectedValue: _bookID,
+                    label: 'Select Book',
+                    hasError: inputErrors['bookName'] == true,
+                    onValueChanged: (value) {
+                      if (_bookID != value) {
                         setState(() {
                           _bookID = value;
                           inputErrors = {...inputErrors, 'bookName': false};
                         });
-                      })
-                  : TextField(
-                      controller: _bookNameController,
-                      decoration: InputDecoration(
-                          labelText: 'Book name',
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: inputErrors['bookName'] == true
-                                  ? const BorderSide(
-                                      color: Colors.red, width: 1)
-                                  : const BorderSide(
-                                      color: Colors.grey, width: 1))),
-                      onChanged: (value) {
-                        setState(() {
-                          inputErrors = {...inputErrors, 'bookName': false};
-                        });
-                      })),
-          const SizedBox(width: 16.0),
-          Expanded(
-              child: _isExistingCategory
-                  ? CustomDropdown(
-                      items: bookCategories
-                          .map((i) => i.toDropdownData())
-                          .toList(),
-                      selectedValue: _categoryID,
-                      label: 'Select Category',
-                      hasError: inputErrors['categoryName'] == true,
-                      onValueChanged: (value) {
-                        setState(() {
-                          _categoryID = value;
-                          inputErrors = {...inputErrors, 'categoryName': false};
-                        });
-                      })
-                  : TextField(
-                      controller: _categoryNameController,
-                      decoration: InputDecoration(
-                          labelText: 'Category name',
-                          border: const OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: inputErrors['categoryName'] == true
-                                  ? const BorderSide(
-                                      color: Colors.red, width: 1)
-                                  : const BorderSide(
-                                      color: Colors.grey, width: 1))),
-                      onChanged: (value) {
-                        setState(() {
-                          inputErrors = {...inputErrors, 'categoryName': false};
-                        });
-                      })),
-        ],
-      ),
+
+                        final bkData =
+                            books.where((bk) => bk.bookID == value).firstOrNull;
+                        if (bkData != null) {
+                          // _publisherController = TextEditingController(
+                          //     text: publishers
+                          //         .where((p) =>
+                          //             p.publisherID == bkData.publisherID)
+                          //         .firstOrNull
+                          //         ?.publisherName);
+
+                                    _publisherController = TextEditingController(
+                              text:'abcd');
+
+                          _categoryNameController = TextEditingController(
+                              text: bookCategories
+                                  .where((p) =>
+                                      p.categoryID == bkData.bookCategoryID)
+                                  .firstOrNull
+                                  ?.categoryName);
+                        }
+                      }
+                    })
+                : TextField(
+                    controller: _bookNameController,
+                    decoration: InputDecoration(
+                        labelText: 'Book name',
+                        border: const OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: inputErrors['bookName'] == true
+                                ? const BorderSide(color: Colors.red, width: 1)
+                                : const BorderSide(
+                                    color: Colors.grey, width: 1))),
+                    onChanged: (value) {
+                      setState(() {
+                        inputErrors = {...inputErrors, 'bookName': false};
+                      });
+                    })),
+        const SizedBox(width: 16.0),
+        Expanded(
+            child: (_isExistingBook || !_isExistingPublisher)
+                ? TextField(
+                    controller: _publisherController,
+                    enabled: !_isExistingBook,
+                    decoration: InputDecoration(
+                        labelText: 'Publisher name',
+                        border: const OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: inputErrors['publisherName'] == true
+                                ? const BorderSide(color: Colors.red, width: 1)
+                                : const BorderSide(
+                                    color: Colors.grey, width: 1))),
+                    onChanged: (value) {
+                      setState(() {
+                        inputErrors = {...inputErrors, 'publisherName': false};
+                      });
+                    })
+                : CustomDropdown(
+                    items: publishers.map((i) => i.toDropdownData()).toList(),
+                    selectedValue: _publisherID,
+                    label: 'Select Publisher',
+                    hasError: inputErrors['publisherName'] == true,
+                    onValueChanged: (value) {
+                      setState(() {
+                        _publisherID = value;
+                        inputErrors = {...inputErrors, 'publisherName': false};
+                      });
+                    })),
+        const SizedBox(width: 16.0),
+        Expanded(
+            child: _isExistingCategory
+                ? CustomDropdown(
+                    items:
+                        bookCategories.map((i) => i.toDropdownData()).toList(),
+                    selectedValue: _categoryID,
+                    label: 'Select Category',
+                    hasError: inputErrors['categoryName'] == true,
+                    onValueChanged: (value) {
+                      setState(() {
+                        _categoryID = value;
+                        inputErrors = {...inputErrors, 'categoryName': false};
+                      });
+                    })
+                : TextField(
+                    controller: _categoryNameController,
+                    decoration: InputDecoration(
+                        labelText: 'Category name',
+                        border: const OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: inputErrors['categoryName'] == true
+                                ? const BorderSide(color: Colors.red, width: 1)
+                                : const BorderSide(
+                                    color: Colors.grey, width: 1))),
+                    onChanged: (value) {
+                      setState(() {
+                        inputErrors = {...inputErrors, 'categoryName': false};
+                      });
+                    }))
+      ]),
       const SizedBox(height: 20.0),
       Row(children: [
         Expanded(

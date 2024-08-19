@@ -18,9 +18,9 @@ Future<Box<BookModel>> getBooksBox() async {
 
 Future<String> addBook(String name) async {
   String bookID = generateID();
-  final bookDB = await getBooksBox();
-  await bookDB.add(
-      BookModel(bookID: bookID, bookName: name, status: DBRowStatus.active));
+  // final bookDB = await getBooksBox();
+  // await bookDB.add(
+  //     BookModel(bookID: bookID, bookName: name, status: DBRowStatus.active));
 
   return bookID;
 }

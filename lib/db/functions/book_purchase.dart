@@ -21,13 +21,13 @@ Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
 }
 
 Future<void> addBookPurchase(
-    String publisherID,
-    String publisherName,
-    int purchaseDate,
     String bookID,
     String bookName,
+    String publisherID,
+    String publisherName,
     String bookCategoryID,
     String bookCategoryName,
+    int purchaseDate,
     double bookPrice,
     int quantity) async {
   String purchaseID = generateID();
@@ -49,8 +49,6 @@ Future<void> addBookPurchase(
   final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
       purchaseID: purchaseID,
-      publisherID: publisherID,
-      bookCategoryID: bookCategoryID,
       purchaseDate: purchaseDate,
       bookID: bookID,
       quantityPurchased: quantity,
@@ -92,9 +90,9 @@ Future<void> editBookPurchase(
         bookCategoryID = await addBookCategory(bookCategoryName);
       }
 
-      existingData.publisherID = publisherID;
+      // existingData.publisherID = publisherID;
       existingData.bookID = bookID;
-      existingData.bookCategoryID = bookCategoryID;
+      // existingData.bookCategoryID = bookCategoryID;
       existingData.quantityPurchased = quantity;
       existingData.quantityLeft =
           quantity; //#pending - If editing after a sale is done, then data will conflict
@@ -134,35 +132,35 @@ Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
 
   List<BookPurchaseListItemModel> joinedData = [];
 
-  for (BookPurchaseModel purchase in purchases) {
-    final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
-    final publisher = publishers
-        .where((u) => u.publisherID == purchase.publisherID)
-        .firstOrNull;
-    final bookCategory = bookCategories
-        .where((u) => u.categoryID == purchase.bookCategoryID)
-        .firstOrNull;
+  // for (BookPurchaseModel purchase in purchases) {
+  //   final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
+  //   final publisher = publishers
+  //       .where((u) => u.publisherID == purchase.publisherID)
+  //       .firstOrNull;
+  //   final bookCategory = bookCategories
+  //       .where((u) => u.categoryID == purchase.bookCategoryID)
+  //       .firstOrNull;
 
-    if (book != null &&
-        publisher != null &&
-        bookCategory != null &&
-        !purchase.deleted) {
-      joinedData.add(BookPurchaseListItemModel(
-          purchaseID: purchase.purchaseID,
-          publisherID: purchase.publisherID,
-          publisherName: publisher.publisherName,
-          categoryID: bookCategory.categoryID,
-          categoryName: bookCategory.categoryName,
-          purchaseDate: purchase.purchaseDate,
-          formattedPurchaseDate: formatTimestamp(
-              timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-          bookID: book.bookID,
-          bookName: book.bookName,
-          quantityPurchased: purchase.quantityPurchased,
-          balanceStock: purchase.quantityLeft,
-          bookPrice: purchase.bookPrice));
-    }
-  }
+  //   if (book != null &&
+  //       publisher != null &&
+  //       bookCategory != null &&
+  //       !purchase.deleted) {
+  //     joinedData.add(BookPurchaseListItemModel(
+  //         purchaseID: purchase.purchaseID,
+  //         publisherID: purchase.publisherID,
+  //         publisherName: publisher.publisherName,
+  //         categoryID: bookCategory.categoryID,
+  //         categoryName: bookCategory.categoryName,
+  //         purchaseDate: purchase.purchaseDate,
+  //         formattedPurchaseDate: formatTimestamp(
+  //             timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
+  //         bookID: book.bookID,
+  //         bookName: book.bookName,
+  //         quantityPurchased: purchase.quantityPurchased,
+  //         balanceStock: purchase.quantityLeft,
+  //         bookPrice: purchase.bookPrice));
+  //   }
+  // }
 
   return joinedData;
 }

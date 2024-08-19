@@ -19,19 +19,25 @@ class BookModelAdapter extends TypeAdapter<BookModel> {
     return BookModel(
       bookID: fields[0] as String,
       bookName: fields[1] as String,
-      status: fields[2] as int,
+      publisherID: fields[2] as String,
+      bookCategoryID: fields[3] as String,
+      status: fields[4] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, BookModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.bookID)
       ..writeByte(1)
       ..write(obj.bookName)
       ..writeByte(2)
+      ..write(obj.publisherID)
+      ..writeByte(3)
+      ..write(obj.bookCategoryID)
+      ..writeByte(4)
       ..write(obj.status);
   }
 

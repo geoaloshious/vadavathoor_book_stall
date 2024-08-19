@@ -3,67 +3,44 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../constants.dart';
 part 'book_purchase.g.dart';
 
-BookPurchaseModel emptyBookPurchaseModel() => BookPurchaseModel(
-    purchaseID: '',
-    publisherID: '',
-    bookCategoryID: '',
-    purchaseDate: 0,
-    bookID: '',
-    quantityPurchased: 0,
-    quantityLeft: 0,
-    bookPrice: 0,
-    createdDate: 0,
-    createdBy: '',
-    modifiedDate: 0,
-    modifiedBy: '',
-    deleted: false);
-
 @HiveType(typeId: DBItemHiveType.bookPurchase)
 class BookPurchaseModel {
   @HiveField(0)
   final String purchaseID;
 
   @HiveField(1)
-  String publisherID;
-
-  @HiveField(2)
   int purchaseDate;
 
-  @HiveField(3)
+  @HiveField(2)
   String bookID;
 
-  @HiveField(4)
+  @HiveField(3)
   double bookPrice;
 
-  @HiveField(5)
+  @HiveField(4)
   int quantityPurchased;
 
-  @HiveField(6)
+  @HiveField(5)
   int quantityLeft;
 
-  @HiveField(7)
+  @HiveField(6)
   final int createdDate;
 
-  @HiveField(8)
+  @HiveField(7)
   final String createdBy;
 
-  @HiveField(9)
+  @HiveField(8)
   int modifiedDate;
 
-  @HiveField(10)
+  @HiveField(9)
   String modifiedBy;
 
-  @HiveField(11)
+  @HiveField(10)
   bool deleted;
-
-  @HiveField(12)
-  String bookCategoryID;
 
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
-      'publisherID': publisherID,
-      'bookCategoryID': bookCategoryID,
       'purchaseDate': purchaseDate,
       'bookID': bookID,
       'quantityPurchased': quantityPurchased,
@@ -79,8 +56,6 @@ class BookPurchaseModel {
 
   BookPurchaseModel(
       {required this.purchaseID,
-      required this.publisherID,
-      required this.bookCategoryID,
       required this.purchaseDate,
       required this.bookID,
       required this.quantityPurchased,
