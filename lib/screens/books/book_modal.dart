@@ -3,7 +3,6 @@ import 'package:vadavathoor_book_stall/classes/books.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
-import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_author.dart';
 import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';

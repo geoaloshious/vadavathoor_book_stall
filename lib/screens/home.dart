@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
-import 'package:vadavathoor_book_stall/screens/book_categories/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_stall_details.dart';
 import 'package:vadavathoor_book_stall/screens/books/index.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
-import 'package:vadavathoor_book_stall/screens/publishers/publishers.dart';
 import 'package:vadavathoor_book_stall/screens/sales/index.dart';
 import 'package:vadavathoor_book_stall/screens/under_development.dart';
 import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
@@ -22,14 +20,12 @@ final group1 = [
 ];
 
 final group2 = [
-  {'id': 4, 'label': 'Books', 'icon': Icons.book, 'showDivider': true},
-  {'id': 5, 'label': 'Publishers', 'icon': Icons.house},
-  {'id': 6, 'label': 'Book Categories', 'icon': Icons.shelves},
+  {'id': 4, 'label': 'Books', 'icon': Icons.book, 'showDivider': true}
 ];
 
 final group3 = [
-  {'id': 7, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
-  {'id': 8, 'label': 'Book Stall Details', 'icon': Icons.add_business}
+  {'id': 5, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
+  {'id': 6, 'label': 'Book Stall Details', 'icon': Icons.add_business}
 ];
 
 const int defaultPage = 1;
@@ -55,14 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         return const UnderDevelopment();
       case 4:
-        return const BooksWidget();
+        return const BookHomeWidget();
       case 5:
-        return const PublishersWidget();
-      case 6:
-        return const BookCategoriesWidget();
-      case 7:
         return const UsersWidget();
-      case 8:
+      case 6:
         return const BookStallDetailsWidget();
       default:
         return const EmptyScreenWidget();
@@ -71,27 +63,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void openDBViewer() {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Size screenSize = MediaQuery.of(context).size;
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
 
-        return Dialog(
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: screenSize.height,
-              maxWidth: screenSize.width * 0.8,
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                //#pending - while scrolling, header and submit should be sticky
-                child: DbViewer(),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+          return Dialog(
+              child: Container(
+                  constraints: BoxConstraints(
+                      minHeight: screenSize.height,
+                      maxWidth: screenSize.width * 0.8),
+                  child: const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                          //#pending - while scrolling, header and submit should be sticky
+                          child: DbViewer()))));
+        });
   }
 
   @override

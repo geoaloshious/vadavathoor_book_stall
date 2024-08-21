@@ -2,8 +2,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
-import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
@@ -22,13 +20,12 @@ Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
 
 Future<void> addBookPurchase(
     String bookID, int purchaseDate, double bookPrice, int quantity) async {
-  String purchaseID = generateID();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
-      purchaseID: purchaseID,
+      purchaseID: (db.values.length + 1).toString(),
       purchaseDate: purchaseDate,
       bookID: bookID,
       quantityPurchased: quantity,
@@ -84,40 +81,25 @@ Future<void> deleteBookPurchase(String purchaseID) async {
 Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
   final purchases = (await getBookPurchaseBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
-  final publishers = (await getPublishersBox()).values.toList();
-  final bookCategories = (await getBookCategoriesBox()).values.toList();
 
   List<BookPurchaseListItemModel> joinedData = [];
 
-  // for (BookPurchaseModel purchase in purchases) {
-  //   final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
-  //   final publisher = publishers
-  //       .where((u) => u.publisherID == purchase.publisherID)
-  //       .firstOrNull;
-  //   final bookCategory = bookCategories
-  //       .where((u) => u.categoryID == purchase.bookCategoryID)
-  //       .firstOrNull;
+  for (BookPurchaseModel purchase in purchases) {
+    final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
 
-  //   if (book != null &&
-  //       publisher != null &&
-  //       bookCategory != null &&
-  //       !purchase.deleted) {
-  //     joinedData.add(BookPurchaseListItemModel(
-  //         purchaseID: purchase.purchaseID,
-  //         publisherID: purchase.publisherID,
-  //         publisherName: publisher.publisherName,
-  //         categoryID: bookCategory.categoryID,
-  //         categoryName: bookCategory.categoryName,
-  //         purchaseDate: purchase.purchaseDate,
-  //         formattedPurchaseDate: formatTimestamp(
-  //             timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-  //         bookID: book.bookID,
-  //         bookName: book.bookName,
-  //         quantityPurchased: purchase.quantityPurchased,
-  //         balanceStock: purchase.quantityLeft,
-  //         bookPrice: purchase.bookPrice));
-  //   }
-  // }
+    if (book != null && !purchase.deleted) {
+      joinedData.add(BookPurchaseListItemModel(
+          purchaseID: purchase.purchaseID,
+          bookID: book.bookID,
+          bookName: book.bookName,
+          purchaseDate: purchase.purchaseDate,
+          formattedPurchaseDate: formatTimestamp(
+              timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
+          quantityPurchased: purchase.quantityPurchased,
+          balanceStock: purchase.quantityLeft,
+          bookPrice: purchase.bookPrice));
+    }
+  }
 
   return joinedData;
 }

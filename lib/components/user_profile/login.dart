@@ -31,15 +31,15 @@ class _LoginDialogState extends State<LoginDialogWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      final res = await login(context, username, password);
-
-      if (res['error'] != null) {
-        setState(() {
-          loginResponse = res['error']!;
-        });
-      } else {
-        Navigator.of(context).pop();
-      }
+      login(context, username, password).then((res) {
+        if (res['error'] != null) {
+          setState(() {
+            loginResponse = res['error']!;
+          });
+        } else {
+          Navigator.of(context).pop();
+        }
+      });
     } else {
       setState(() {
         inputErrors = tempInputErrors;

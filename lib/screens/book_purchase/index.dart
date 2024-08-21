@@ -50,10 +50,11 @@ class _BookPurchaseState extends State<BookPurchase> {
                     },
                     child: const Text('Cancel')),
                 ElevatedButton(
-                    onPressed: () async {
-                      await deleteBookPurchase(purchaseID);
-                      setData();
-                      Navigator.of(context).pop();
+                    onPressed: () {
+                      deleteBookPurchase(purchaseID).then((_) {
+                        setData();
+                        Navigator.of(context).pop();
+                      });
                     },
                     child: const Text('Delete'))
               ]);
@@ -97,26 +98,27 @@ class _BookPurchaseState extends State<BookPurchase> {
             const SizedBox(height: 20),
             Row(children: [
               const Expanded(
+                  flex: 1,
+                  child: Text('ID',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              const Expanded(
+                  flex: 3,
                   child: Text('Book',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Publisher',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  child: Text('Category',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
+                  flex: 2,
                   child: Text('Balance Stock/Purchased Quantity',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
+                  flex: 2,
                   child: Text('Price',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
+                  flex: 3,
                   child: Text('Purchase date',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
@@ -133,18 +135,22 @@ class _BookPurchaseState extends State<BookPurchase> {
                     ? ListView.builder(
                         itemCount: purchases.length,
                         itemBuilder: (context, index) => Row(children: [
-                              Expanded(child: Text(purchases[index].bookName)),
                               Expanded(
-                                  child: Text(purchases[index].publisherName)),
+                                  flex: 1,
+                                  child: Text(purchases[index].purchaseID)),
                               Expanded(
-                                  child: Text(purchases[index].categoryName)),
+                                  flex: 3,
+                                  child: Text(purchases[index].bookName)),
                               Expanded(
+                                  flex: 2,
                                   child: Text(
                                       '${purchases[index].balanceStock} / ${purchases[index].quantityPurchased}')),
                               Expanded(
+                                  flex: 2,
                                   child: Text(
                                       purchases[index].bookPrice.toString())),
                               Expanded(
+                                  flex: 3,
                                   child: Text(
                                       purchases[index].formattedPurchaseDate)),
                               if (loggedIn)

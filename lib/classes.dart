@@ -1,27 +1,20 @@
 class BookPurchaseListItemModel {
   final String purchaseID;
-  final String publisherID;
-  final String publisherName;
-  final String categoryID;
-  final String categoryName;
-  final int purchaseDate;
-  final String formattedPurchaseDate;
   final String bookID;
   final String bookName;
+  final int purchaseDate;
+  final String formattedPurchaseDate;
+
   final double bookPrice;
   final int quantityPurchased;
   final int balanceStock;
 
   BookPurchaseListItemModel(
       {required this.purchaseID,
-      required this.publisherID,
-      required this.publisherName,
-      required this.categoryID,
-      required this.categoryName,
-      required this.purchaseDate,
-      required this.formattedPurchaseDate,
       required this.bookID,
       required this.bookName,
+      required this.purchaseDate,
+      required this.formattedPurchaseDate,
       required this.quantityPurchased,
       required this.bookPrice,
       required this.balanceStock});

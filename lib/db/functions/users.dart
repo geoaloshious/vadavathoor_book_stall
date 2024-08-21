@@ -123,6 +123,7 @@ Future<void> addDeveloperUserIfEmpty() async {
 
 Future<Map<String, String>> login(
     BuildContext context, String username, String password) async {
+  UserProvider provider = context.read<UserProvider>();
   final box = await getUsersBox();
 
   final users =
@@ -137,7 +138,7 @@ Future<Map<String, String>> login(
           DateTime.now().millisecondsSinceEpoch.toString());
       await addLoginHistory(userID);
 
-      context.read<UserProvider>().setData(users.first);
+      provider.setData(users.first);
     } else {
       return {'error': ErrorMessages.userNotEnabled};
     }
@@ -149,22 +150,23 @@ Future<Map<String, String>> login(
 }
 
 Future<void> logout(BuildContext context) async {
+  UserProvider provider = context.read<UserProvider>();
   await updateMiscValue(MiscDBKeys.currentlyLoggedInUserID, '');
   await updateLogoutHistory();
-  context.read<UserProvider>().setData(emptyUserModel());
+  provider.setData(emptyUserModel());
 }
 
 void loadUserProviderValue(BuildContext context) async {
+  UserProvider provider = context.read<UserProvider>();
   String loggedInUserID =
       await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   if (loggedInUserID != '') {
     final box = await getUsersBox();
-
     final users = box.values.where((u) => u.userID == loggedInUserID);
 
     if (users.isNotEmpty) {
-      context.read<UserProvider>().setData(users.first);
+      provider.setData(users.first);
     }
   }
 }

@@ -35,9 +35,10 @@ class _SaleState extends State<SaleWidget> {
                     child: const Text('Cancel')),
                 ElevatedButton(
                     onPressed: () async {
-                      await deleteSale(widget.data.saleID);
-                      widget.updateUI();
-                      Navigator.of(context).pop();
+                      deleteSale(widget.data.saleID).then((_) {
+                        widget.updateUI();
+                        Navigator.of(context).pop();
+                      });
                     },
                     child: const Text('Delete'))
               ]);

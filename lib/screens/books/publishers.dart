@@ -4,7 +4,7 @@ import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/publishers/edit_publisher.dart';
+import 'package:vadavathoor_book_stall/screens/books/edit_modal.dart';
 
 class PublishersWidget extends StatefulWidget {
   const PublishersWidget({super.key});
@@ -28,60 +28,59 @@ class _PublishersState extends State<PublishersWidget> {
 
   onPressEdit(PublisherModel selectedItem) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Size screenSize = MediaQuery.of(context).size;
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
 
-        return Dialog(
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: screenSize.height * 0.2,
-              maxWidth: screenSize.width * 0.4,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: EditPublisherWidget(
-                    data: selectedItem,
-                    updateUI: () {
-                      setData();
-                      Navigator.of(context).pop();
-                    }),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+          return Dialog(
+            child: Container(
+                constraints: BoxConstraints(maxWidth: screenSize.width * 0.4),
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SingleChildScrollView(
+                        child: EditModalWidget(
+                            title: 'Publisher',
+                            name: selectedItem.publisherName,
+                            saveData: (name) {
+                              editPublisher(
+                                      publisherID: selectedItem.publisherID,
+                                      publisherName: name)
+                                  .then((_) {
+                                setData();
+                                Navigator.of(context).pop();
+                              });
+                            })))),
+          );
+        });
   }
 
   onPressDelete(String selectedID) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this item?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await editPublisher(
-                    publisherID: selectedID, status: DBRowStatus.deleted);
-                setData();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Confirm Delete'),
+              content: const Text('Are you sure you want to delete this item?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      editPublisher(
+                              publisherID: selectedID,
+                              status: DBRowStatus.deleted)
+                          .then((_) {
+                        setData();
+                        Navigator.of(context).pop();
+                      });
+                    },
+                    child: const Text('Delete'))
+              ]);
+        });
   }
 
   void setData() async {
@@ -123,9 +122,6 @@ class _PublishersState extends State<PublishersWidget> {
                         style: TextStyle(color: Colors.white)))
               ]),
             if (loggedIn) const SizedBox(height: 20),
-            const Text('Publishers',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
             Row(
               children: [
                 const Text('Name',
