@@ -35,31 +35,46 @@ class _BooksState extends State<BooksWidget> {
 
   onPressDelete(String selectedID) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this item?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                deleteBook(selectedID).then((_) {
-                  setData();
-                  Navigator.of(context).pop();
-                });
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Confirm Delete'),
+              content: const Text('Are you sure you want to delete this item?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                    onPressed: () async {
+                      deleteBook(selectedID).then((res) {
+                        Navigator.of(context).pop();
+
+                        if (res['message'] == null) {
+                          setData();
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    title: const Text('Error'),
+                                    content: Text(res['message']!),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('OK'))
+                                    ]);
+                              });
+                        }
+                      });
+                    },
+                    child: const Text('Delete'))
+              ]);
+        });
   }
 
   void setData() async {
@@ -80,85 +95,58 @@ class _BooksState extends State<BooksWidget> {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
       final loggedIn = user.user.userID != '';
 
-      return Padding(
+      return Stack(children: [
+        Container(
           padding: const EdgeInsets.only(left: 10, right: 10),
-          child: Stack(children: [
-            Column(children: [
-              const SizedBox(height: 20),
-              Row(children: [
-                const Expanded(
-                    child: Text('Book',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600))),
-                const Expanded(
-                    child: Text('Author',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600))),
-                const Expanded(
-                    child: Text('Publisher',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600))),
-                const Expanded(
-                    child: Text('Category',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600))),
-                const Expanded(
-                    child: Text('Balance Stock',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600))),
-                if (loggedIn) const SizedBox(width: 80)
-              ]),
-              Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 10),
-                  child: Container(
-                      decoration: BoxDecoration(
-                          border:
-                              Border.all(width: 0.2, color: Colors.blueGrey)))),
-              Expanded(
-                  child: books.isNotEmpty
-                      ? ListView.builder(
-                          itemBuilder: (ctx2, index) => Row(children: [
-                                Expanded(child: Text(books[index].bookName)),
-                                Expanded(child: Text(books[index].authorName)),
-                                Expanded(
-                                    child: Text(books[index].publisherName)),
-                                Expanded(
-                                    child: Text(books[index].categoryName)),
-                                Expanded(
-                                    child: Text(
-                                        books[index].balanceStock.toString())),
-                                if (loggedIn)
-                                  IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      tooltip: 'Edit',
-                                      onPressed: () {
-                                        onPressAddOrEdit(data: books[index]);
-                                      }),
-                                if (loggedIn)
-                                  IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      tooltip: 'Delete',
-                                      onPressed: () {
-                                        onPressDelete(books[index].bookID);
-                                      })
-                              ]),
-                          itemCount: books.length)
-                      : const Text("No records found")),
-            ]),
-            if (loggedIn)
-              Positioned(
-                  bottom: 30,
-                  right: 20,
-                  child: FloatingActionButton.extended(
-                      onPressed: () {
-                        onPressAddOrEdit();
-                      },
-                      backgroundColor: Colors.blueGrey,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      label: const Text('Add book',
-                          style: TextStyle(color: Colors.white))))
-          ]));
+          width: double.infinity,
+          child: DataTable(
+              columns: [
+                const DataColumn(label: Text('Book')),
+                const DataColumn(label: Text('Author')),
+                const DataColumn(label: Text('Publisher')),
+                const DataColumn(label: Text('Category')),
+                const DataColumn(label: Text('Balance Stock')),
+                if (loggedIn) const DataColumn(label: Text(''))
+              ],
+              rows: books
+                  .map((book) => DataRow(cells: [
+                        DataCell(Text(book.bookName)),
+                        DataCell(Text(book.authorName)),
+                        DataCell(Text(book.publisherName)),
+                        DataCell(Text(book.categoryName)),
+                        DataCell(Text(book.balanceStock.toString())),
+                        if (loggedIn)
+                          DataCell(Row(children: [
+                            IconButton(
+                                icon: const Icon(Icons.edit),
+                                tooltip: 'Edit',
+                                onPressed: () {
+                                  onPressAddOrEdit(data: book);
+                                }),
+                            IconButton(
+                                icon: const Icon(Icons.delete),
+                                tooltip: 'Delete',
+                                onPressed: () {
+                                  onPressDelete(book.bookID);
+                                })
+                          ]))
+                      ]))
+                  .toList()),
+        ),
+        if (loggedIn)
+          Positioned(
+              bottom: 30,
+              right: 20,
+              child: FloatingActionButton.extended(
+                  onPressed: () {
+                    onPressAddOrEdit();
+                  },
+                  backgroundColor: Colors.blueGrey,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                  label: const Text('Add book',
+                      style: TextStyle(color: Colors.white))))
+      ]);
     });
   }
 }

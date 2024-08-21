@@ -51,9 +51,27 @@ class _BookPurchaseState extends State<BookPurchase> {
                     child: const Text('Cancel')),
                 ElevatedButton(
                     onPressed: () {
-                      deleteBookPurchase(purchaseID).then((_) {
-                        setData();
+                      deleteBookPurchase(purchaseID).then((res) {
                         Navigator.of(context).pop();
+
+                        if (res['message'] == null) {
+                          setData();
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    title: const Text('Error'),
+                                    content: Text(res['message']!),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('OK'))
+                                    ]);
+                              });
+                        }
                       });
                     },
                     child: const Text('Delete'))

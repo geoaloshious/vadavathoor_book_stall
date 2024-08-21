@@ -19,12 +19,18 @@ class _BookHomeState extends State<BookHomeWidget> {
       body: DefaultTabController(
           length: 4,
           child: Column(children: [
-            TabBar(tabs: [
-              Tab(text: 'Books'),
-              Tab(text: 'Authors'),
-              Tab(text: 'Publishers'),
-              Tab(text: 'Categories')
-            ]),
+            TabBar(
+              tabs: [
+                Tab(text: 'Books'),
+                Tab(text: 'Authors'),
+                Tab(text: 'Publishers'),
+                Tab(text: 'Categories')
+              ],
+              dividerHeight: 0,
+              indicatorSize: TabBarIndicatorSize.tab,
+              unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+              labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            ),
             Expanded(
                 child: TabBarView(children: [
               BooksWidget(),

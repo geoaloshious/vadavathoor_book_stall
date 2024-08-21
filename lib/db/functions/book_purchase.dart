@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
+import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
@@ -61,9 +62,25 @@ Future<void> editBookPurchase(String purchaseID, String bookID, int quantity,
   }
 }
 
-Future<void> deleteBookPurchase(String purchaseID) async {
+Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
   final box = await getBookPurchaseBox();
+  final salesBox = await getSalesBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  final sales = salesBox.values.where((i) =>
+      i.books
+          .where((b) => b.purchaseVariants
+              .where((p) => p.purchaseID == purchaseID)
+              .isNotEmpty)
+          .isNotEmpty &&
+      i.status == DBRowStatus.active);
+
+  if (sales.isNotEmpty) {
+    return {
+      'message':
+          'Found some sales related to this purchase. Please delete them to continue.\nSale IDs: ${sales.map((p) => p.saleID).join(', ')}'
+    };
+  }
 
   for (int key in box.keys) {
     BookPurchaseModel? existingData = box.get(key);
@@ -76,6 +93,8 @@ Future<void> deleteBookPurchase(String purchaseID) async {
       break;
     }
   }
+
+  return {};
 }
 
 Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {

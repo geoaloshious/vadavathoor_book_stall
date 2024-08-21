@@ -37,7 +37,7 @@ Future<void> addBook(
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
   final currentTS = getCurrentTimestamp();
 
-   if (authorID == '') {
+  if (authorID == '') {
     authorID = await addBookAuthor(authorName);
   }
 
@@ -76,7 +76,7 @@ Future<void> editBook(
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
   final currentTS = getCurrentTimestamp();
 
-     if (authorID == '') {
+  if (authorID == '') {
     authorID = await addBookAuthor(authorName);
   }
 
@@ -105,22 +105,35 @@ Future<void> editBook(
   }
 }
 
-Future<void> deleteBook(String bookID) async {
-  final box = await getBooksBox();
+Future<Map<String, String>> deleteBook(String bookID) async {
+  final bookBox = await getBooksBox();
+  final purchaseBox = await getBookPurchaseBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  for (int key in box.keys) {
-    BookModel? existingData = box.get(key);
+  final purchases =
+      purchaseBox.values.where((p) => p.bookID == bookID && !p.deleted);
+
+  if (purchases.isNotEmpty) {
+    return {
+      'message':
+          'Found some purchases of this book. Please delete them to continue.\nPurchase IDs: ${purchases.map((p) => p.purchaseID).join(', ')}'
+    };
+  }
+
+  for (int key in bookBox.keys) {
+    BookModel? existingData = bookBox.get(key);
     if (existingData != null && existingData.bookID == bookID) {
       existingData.status = DBRowStatus.deleted;
 
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
 
-      await box.put(key, existingData);
+      await bookBox.put(key, existingData);
       break;
     }
   }
+
+  return {};
 }
 
 Future<List<BookModel>> getBooks() async {
@@ -130,7 +143,7 @@ Future<List<BookModel>> getBooks() async {
 
 Future<List<BookListItemModel>> getBookList() async {
   final books = (await getBooksBox()).values.toList();
-   final authors = (await getBookAuthorsBox()).values.toList();
+  final authors = (await getBookAuthorsBox()).values.toList();
   final publishers = (await getPublishersBox()).values.toList();
   final bookCategories = (await getBookCategoriesBox()).values.toList();
   final purchases = (await getBookPurchaseBox()).values.toList();
@@ -138,7 +151,7 @@ Future<List<BookListItemModel>> getBookList() async {
   List<BookListItemModel> joinedData = [];
 
   for (BookModel book in books) {
-     final author =
+    final author =
         authors.where((i) => i.authorID == book.authorID).firstOrNull;
     final publisher =
         publishers.where((i) => i.publisherID == book.publisherID).firstOrNull;
@@ -152,13 +165,14 @@ Future<List<BookListItemModel>> getBookList() async {
       balanceStock = balanceStock + p.quantityLeft;
     }
 
-    if (author != null &&publisher != null &&
+    if (author != null &&
+        publisher != null &&
         bookCategory != null &&
         book.status == DBRowStatus.active) {
       joinedData.add(BookListItemModel(
           bookID: book.bookID,
           bookName: book.bookName,
-          authorID:book.authorID,
+          authorID: book.authorID,
           authorName: author.authorName,
           publisherID: book.publisherID,
           publisherName: publisher.publisherName,
