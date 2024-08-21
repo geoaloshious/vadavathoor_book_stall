@@ -21,30 +21,10 @@ Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
 }
 
 Future<void> addBookPurchase(
-    String bookID,
-    String bookName,
-    String publisherID,
-    String publisherName,
-    String bookCategoryID,
-    String bookCategoryName,
-    int purchaseDate,
-    double bookPrice,
-    int quantity) async {
+    String bookID, int purchaseDate, double bookPrice, int quantity) async {
   String purchaseID = generateID();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
-
-  if (publisherID == '') {
-    publisherID = await addPublisher(publisherName);
-  }
-
-  if (bookID == '') {
-    bookID = await addBook(bookName);
-  }
-
-  if (bookCategoryID == '') {
-    bookCategoryID = await addBookCategory(bookCategoryName);
-  }
 
   final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
@@ -61,38 +41,15 @@ Future<void> addBookPurchase(
       deleted: false));
 }
 
-Future<void> editBookPurchase(
-    String purchaseID,
-    String publisherID,
-    String publisherName,
-    String bookID,
-    String bookName,
-    String bookCategoryID,
-    String bookCategoryName,
-    int quantity,
-    double bookPrice,
-    int purchaseDate) async {
+Future<void> editBookPurchase(String purchaseID, String bookID, int quantity,
+    double bookPrice, int purchaseDate) async {
   final box = await getBookPurchaseBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   for (int key in box.keys) {
     BookPurchaseModel? existingData = box.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
-      if (publisherID == '') {
-        publisherID = await addPublisher(publisherName);
-      }
-
-      if (bookID == '') {
-        bookID = await addBook(bookName);
-      }
-
-      if (bookCategoryID == '') {
-        bookCategoryID = await addBookCategory(bookCategoryName);
-      }
-
-      // existingData.publisherID = publisherID;
       existingData.bookID = bookID;
-      // existingData.bookCategoryID = bookCategoryID;
       existingData.quantityPurchased = quantity;
       existingData.quantityLeft =
           quantity; //#pending - If editing after a sale is done, then data will conflict

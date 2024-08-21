@@ -5,6 +5,7 @@ import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/screens/book_categories/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_stall_details.dart';
+import 'package:vadavathoor_book_stall/screens/books/index.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
 import 'package:vadavathoor_book_stall/screens/publishers/publishers.dart';
@@ -15,22 +16,23 @@ import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
 import '../providers/user.dart';
 
 final group1 = [
-  {'id': 4, 'label': 'Sales', 'icon': Icons.monetization_on},
-  {'id': 3, 'label': 'Book Purchases', 'icon': Icons.book},
-  {'id': 5, 'label': 'Stationary Purchases', 'icon': Icons.attach_file},
+  {'id': 1, 'label': 'Sales', 'icon': Icons.monetization_on},
+  {'id': 2, 'label': 'Book Purchases', 'icon': Icons.book},
+  {'id': 3, 'label': 'Stationary Purchases', 'icon': Icons.attach_file},
 ];
 
 final group2 = [
-  {'id': 6, 'label': 'Publishers', 'icon': Icons.house, 'showDivider': true},
-  {'id': 7, 'label': 'Book Categories', 'icon': Icons.shelves},
+  {'id': 4, 'label': 'Books', 'icon': Icons.book, 'showDivider': true},
+  {'id': 5, 'label': 'Publishers', 'icon': Icons.house},
+  {'id': 6, 'label': 'Book Categories', 'icon': Icons.shelves},
 ];
 
 final group3 = [
-  {'id': 1, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
-  {'id': 2, 'label': 'Book Stall Details', 'icon': Icons.add_business}
+  {'id': 7, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
+  {'id': 8, 'label': 'Book Stall Details', 'icon': Icons.add_business}
 ];
 
-final int defaultPage = 4;
+const int defaultPage = 1;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,19 +49,21 @@ class _HomeScreenState extends State<HomeScreen> {
   renderRightSide() {
     switch (currentPage) {
       case 1:
-        return const UsersWidget();
-      case 2:
-        return const BookStallDetailsWidget();
-      case 3:
-        return const BookPurchase();
-      case 4:
         return const SalesWidget();
-      case 5:
+      case 2:
+        return const BookPurchase();
+      case 3:
         return const UnderDevelopment();
-      case 6:
+      case 4:
+        return const BooksWidget();
+      case 5:
         return const PublishersWidget();
-      case 7:
+      case 6:
         return const BookCategoriesWidget();
+      case 7:
+        return const UsersWidget();
+      case 8:
+        return const BookStallDetailsWidget();
       default:
         return const EmptyScreenWidget();
     }

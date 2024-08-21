@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
+import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/classes/books.dart';
+import 'package:vadavathoor_book_stall/db/functions/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/book_purchase/purchase_modal.dart';
+import 'package:vadavathoor_book_stall/screens/books/book_modal.dart';
 
-import '../../classes.dart';
-
-class BookPurchase extends StatefulWidget {
-  const BookPurchase({super.key});
+class BooksWidget extends StatefulWidget {
+  const BooksWidget({super.key});
 
   @override
-  State<BookPurchase> createState() => _BookPurchaseState();
+  State<BooksWidget> createState() => _BooksState();
 }
 
-class _BookPurchaseState extends State<BookPurchase> {
-  List<BookPurchaseListItemModel> purchases = [];
+class _BooksState extends State<BooksWidget> {
+  List<BookListItemModel> books = [];
 
-  void onPressAddOrEdit({BookPurchaseListItemModel? data}) {
+  void onPressAddOrEdit({BookListItemModel? data}) {
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -25,45 +26,47 @@ class _BookPurchaseState extends State<BookPurchase> {
 
           return Dialog(
               child: Container(
-                  constraints: BoxConstraints(maxWidth: screenSize.width * 0.5),
+                  constraints: BoxConstraints(maxWidth: screenSize.width * 0.6),
                   child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SingleChildScrollView(
-                          //#pending - while scrolling, header and submit should be sticky
-                          child: BookPurchaseModalWidget(
+                          child: BookModalWidget(
                               data: data, updateUI: setData)))));
         });
   }
 
-  void _deletePurchase(String purchaseID) {
+  onPressDelete(String selectedID) {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text('Confirm Delete'),
-              content:
-                  const Text('Are you sure you want to delete this purchase?'),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancel')),
-                ElevatedButton(
-                    onPressed: () async {
-                      await deleteBookPurchase(purchaseID);
-                      setData();
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Delete'))
-              ]);
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this item?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await deleteBook(selectedID);
+                setData();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void setData() async {
-    var tempData = await getBookPurchaseList();
+    final temp = await getBookList();
     setState(() {
-      purchases = tempData;
+      books = temp;
     });
   }
 
@@ -79,11 +82,13 @@ class _BookPurchaseState extends State<BookPurchase> {
       final loggedIn = user.user.userID != '';
 
       return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Purchases',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                'Books',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               if (loggedIn)
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -91,13 +96,17 @@ class _BookPurchaseState extends State<BookPurchase> {
                     onPressed: () {
                       onPressAddOrEdit();
                     },
-                    child: const Text('New purchase',
+                    child: const Text('Add book',
                         style: TextStyle(color: Colors.white)))
             ]),
             const SizedBox(height: 20),
             Row(children: [
               const Expanded(
                   child: Text('Book',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              const Expanded(
+                  child: Text('Author',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
@@ -109,15 +118,7 @@ class _BookPurchaseState extends State<BookPurchase> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Balance Stock/Purchased Quantity',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  child: Text('Price',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  child: Text('Purchase date',
+                  child: Text('Balance Stock',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               if (loggedIn) const SizedBox(width: 80)
@@ -129,40 +130,32 @@ class _BookPurchaseState extends State<BookPurchase> {
                         border:
                             Border.all(width: 0.2, color: Colors.blueGrey)))),
             Expanded(
-                child: purchases.isNotEmpty
+                child: books.isNotEmpty
                     ? ListView.builder(
-                        itemCount: purchases.length,
-                        itemBuilder: (context, index) => Row(children: [
-                              Expanded(child: Text(purchases[index].bookName)),
-                              Expanded(
-                                  child: Text(purchases[index].publisherName)),
-                              Expanded(
-                                  child: Text(purchases[index].categoryName)),
+                        itemBuilder: (ctx2, index) => Row(children: [
+                              Expanded(child: Text(books[index].bookName)),
+                              Expanded(child: Text(books[index].authorName)),
+                              Expanded(child: Text(books[index].publisherName)),
+                              Expanded(child: Text(books[index].categoryName)),
                               Expanded(
                                   child: Text(
-                                      '${purchases[index].balanceStock} / ${purchases[index].quantityPurchased}')),
-                              Expanded(
-                                  child: Text(
-                                      purchases[index].bookPrice.toString())),
-                              Expanded(
-                                  child: Text(
-                                      purchases[index].formattedPurchaseDate)),
+                                      books[index].balanceStock.toString())),
                               if (loggedIn)
                                 IconButton(
                                     icon: const Icon(Icons.edit),
                                     tooltip: 'Edit',
                                     onPressed: () {
-                                      onPressAddOrEdit(data: purchases[index]);
+                                      onPressAddOrEdit(data: books[index]);
                                     }),
                               if (loggedIn)
                                 IconButton(
                                     icon: const Icon(Icons.delete),
                                     tooltip: 'Delete',
                                     onPressed: () {
-                                      _deletePurchase(
-                                          purchases[index].purchaseID);
+                                      onPressDelete(books[index].bookID);
                                     })
-                            ]))
+                            ]),
+                        itemCount: books.length)
                     : const Text("No records found"))
           ]));
     });

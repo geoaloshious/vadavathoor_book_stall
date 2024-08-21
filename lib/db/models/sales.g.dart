@@ -9,7 +9,7 @@ part of 'sales.dart';
 class SaleItemBookPurchaseVariantModelAdapter
     extends TypeAdapter<SaleItemBookPurchaseVariantModel> {
   @override
-  final int typeId = 7;
+  final int typeId = 8;
 
   @override
   SaleItemBookPurchaseVariantModel read(BinaryReader reader) {
@@ -49,7 +49,7 @@ class SaleItemBookPurchaseVariantModelAdapter
 
 class SaleItemBookModelAdapter extends TypeAdapter<SaleItemBookModel> {
   @override
-  final int typeId = 6;
+  final int typeId = 7;
 
   @override
   SaleItemBookModel read(BinaryReader reader) {
@@ -87,7 +87,7 @@ class SaleItemBookModelAdapter extends TypeAdapter<SaleItemBookModel> {
 
 class SaleModelAdapter extends TypeAdapter<SaleModel> {
   @override
-  final int typeId = 5;
+  final int typeId = 6;
 
   @override
   SaleModel read(BinaryReader reader) {

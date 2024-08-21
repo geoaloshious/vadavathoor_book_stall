@@ -24,19 +24,11 @@ class BookPurchaseModalWidget extends StatefulWidget {
 }
 
 class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
-  var _publisherController = TextEditingController();
-  var _bookNameController = TextEditingController();
-  var _categoryNameController = TextEditingController();
   var _quantityController = TextEditingController();
   var _priceController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
-  String _publisherID = '';
   String _bookID = '';
-  String _categoryID = '';
-  bool _isExistingCategory = false;
-  bool _isExistingPublisher = false;
-  bool _isExistingBook = false;
   Map<String, bool> inputErrors = {};
 
   List<PublisherModel> publishers = [];
@@ -62,44 +54,11 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
   }
 
   void _saveData() async {
-    final publisherName = _publisherController.text.trim();
-    final bookName = _bookNameController.text.trim();
-    final categoryName = _categoryNameController.text.trim();
     final quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
     final price = double.tryParse(_priceController.text.trim()) ?? 0;
     final purchaseDate = _selectedDate.millisecondsSinceEpoch;
 
     Map<String, bool> tempInputErrors = {};
-
-    if (_isExistingPublisher) {
-      if (_publisherID == '') {
-        tempInputErrors['publisherName'] = true;
-      }
-    } else {
-      if (publisherName == '') {
-        tempInputErrors['publisherName'] = true;
-      }
-    }
-
-    if (_isExistingBook) {
-      if (_bookID == '') {
-        tempInputErrors['bookName'] = true;
-      }
-    } else {
-      if (bookName == '') {
-        tempInputErrors['bookName'] = true;
-      }
-    }
-
-    if (_isExistingCategory) {
-      if (_categoryID == '') {
-        tempInputErrors['categoryName'] = true;
-      }
-    } else {
-      if (categoryName == '') {
-        tempInputErrors['categoryName'] = true;
-      }
-    }
 
     if (quantity == 0) {
       tempInputErrors['quantity'] = true;
@@ -112,19 +71,9 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
     if (tempInputErrors.isEmpty) {
       if (widget.data != null) {
         await editBookPurchase(
-            widget.data!.purchaseID,
-            _publisherID,
-            publisherName,
-            _bookID,
-            bookName,
-            _categoryID,
-            categoryName,
-            quantity,
-            price,
-            purchaseDate);
+            widget.data!.purchaseID, _bookID, quantity, price, purchaseDate);
       } else {
-        await addBookPurchase(_bookID, bookName, _publisherID, publisherName,
-            _categoryID, categoryName, purchaseDate, price, quantity);
+        await addBookPurchase(_bookID, purchaseDate, price, quantity);
       }
 
       widget.updateUI();
@@ -138,22 +87,11 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
 
   void setData() async {
     if (widget.data != null) {
-      _isExistingBook = true;
-      _isExistingCategory = true;
-      _isExistingPublisher = true;
-
       _bookID = widget.data!.bookID;
-      _publisherID = widget.data!.publisherID;
-      _categoryID = widget.data!.categoryID;
 
       _selectedDate =
           DateTime.fromMillisecondsSinceEpoch(widget.data!.purchaseDate);
 
-      _publisherController =
-          TextEditingController(text: widget.data!.publisherName);
-      _bookNameController = TextEditingController(text: widget.data!.bookName);
-      _categoryNameController =
-          TextEditingController(text: widget.data!.categoryName);
       _quantityController = TextEditingController(
           text: widget.data!.quantityPurchased.toString());
       _priceController =
@@ -190,161 +128,23 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
               showModalCloseConfirmation(context);
             }),
       ]),
-      Row(children: [
-        Expanded(
-            child: CheckboxListTile(
-                title: const Text('Existing Book'),
-                value: _isExistingBook,
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _isExistingBook = value ?? false;
-                    _bookID = '';
-                  });
-                })),
-        Expanded(
-            child: _isExistingBook
-                ? const SizedBox.shrink()
-                : CheckboxListTile(
-                    title: const Text('Existing Publisher'),
-                    value: _isExistingPublisher,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _isExistingPublisher = value ?? false;
-                        _publisherID = '';
-                      });
-                    })),
-        Expanded(
-            child: _isExistingBook
-                ? const SizedBox.shrink()
-                : CheckboxListTile(
-                    title: const Text('Existing Category'),
-                    value: _isExistingCategory,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _isExistingCategory = value ?? false;
-                        _categoryID = '';
-                      });
-                    }))
-      ]),
       const SizedBox(height: 10.0),
       Row(children: [
         Expanded(
-            child: _isExistingBook
-                ? CustomDropdown(
-                    items: books.map((i) => i.toDropdownData()).toList(),
-                    selectedValue: _bookID,
-                    label: 'Select Book',
-                    hasError: inputErrors['bookName'] == true,
-                    onValueChanged: (value) {
-                      if (_bookID != value) {
-                        setState(() {
-                          _bookID = value;
-                          inputErrors = {...inputErrors, 'bookName': false};
-                        });
-
-                        final bkData =
-                            books.where((bk) => bk.bookID == value).firstOrNull;
-                        if (bkData != null) {
-                          // _publisherController = TextEditingController(
-                          //     text: publishers
-                          //         .where((p) =>
-                          //             p.publisherID == bkData.publisherID)
-                          //         .firstOrNull
-                          //         ?.publisherName);
-
-                                    _publisherController = TextEditingController(
-                              text:'abcd');
-
-                          _categoryNameController = TextEditingController(
-                              text: bookCategories
-                                  .where((p) =>
-                                      p.categoryID == bkData.bookCategoryID)
-                                  .firstOrNull
-                                  ?.categoryName);
-                        }
-                      }
-                    })
-                : TextField(
-                    controller: _bookNameController,
-                    decoration: InputDecoration(
-                        labelText: 'Book name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['bookName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1))),
-                    onChanged: (value) {
-                      setState(() {
-                        inputErrors = {...inputErrors, 'bookName': false};
-                      });
-                    })),
+            child: CustomDropdown(
+                items: books.map((i) => i.toDropdownData()).toList(),
+                selectedValue: _bookID,
+                label: 'Select Book',
+                hasError: inputErrors['book'] == true,
+                onValueChanged: (value) {
+                  if (_bookID != value) {
+                    setState(() {
+                      _bookID = value;
+                      inputErrors = {...inputErrors, 'book': false};
+                    });
+                  }
+                })),
         const SizedBox(width: 16.0),
-        Expanded(
-            child: (_isExistingBook || !_isExistingPublisher)
-                ? TextField(
-                    controller: _publisherController,
-                    enabled: !_isExistingBook,
-                    decoration: InputDecoration(
-                        labelText: 'Publisher name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['publisherName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1))),
-                    onChanged: (value) {
-                      setState(() {
-                        inputErrors = {...inputErrors, 'publisherName': false};
-                      });
-                    })
-                : CustomDropdown(
-                    items: publishers.map((i) => i.toDropdownData()).toList(),
-                    selectedValue: _publisherID,
-                    label: 'Select Publisher',
-                    hasError: inputErrors['publisherName'] == true,
-                    onValueChanged: (value) {
-                      setState(() {
-                        _publisherID = value;
-                        inputErrors = {...inputErrors, 'publisherName': false};
-                      });
-                    })),
-        const SizedBox(width: 16.0),
-        Expanded(
-            child: _isExistingCategory
-                ? CustomDropdown(
-                    items:
-                        bookCategories.map((i) => i.toDropdownData()).toList(),
-                    selectedValue: _categoryID,
-                    label: 'Select Category',
-                    hasError: inputErrors['categoryName'] == true,
-                    onValueChanged: (value) {
-                      setState(() {
-                        _categoryID = value;
-                        inputErrors = {...inputErrors, 'categoryName': false};
-                      });
-                    })
-                : TextField(
-                    controller: _categoryNameController,
-                    decoration: InputDecoration(
-                        labelText: 'Category name',
-                        border: const OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: inputErrors['categoryName'] == true
-                                ? const BorderSide(color: Colors.red, width: 1)
-                                : const BorderSide(
-                                    color: Colors.grey, width: 1))),
-                    onChanged: (value) {
-                      setState(() {
-                        inputErrors = {...inputErrors, 'categoryName': false};
-                      });
-                    }))
-      ]),
-      const SizedBox(height: 20.0),
-      Row(children: [
         Expanded(
             child: TextField(
                 controller: _quantityController,
@@ -362,8 +162,10 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
                   setState(() {
                     inputErrors = {...inputErrors, 'quantity': false};
                   });
-                })),
-        const SizedBox(width: 16.0),
+                }))
+      ]),
+      const SizedBox(height: 20.0),
+      Row(children: [
         Expanded(
             child: TextField(
                 controller: _priceController,
