@@ -34,73 +34,88 @@ class _SaleModalState extends State<SaleModalWidget> {
   bool didSetData = false;
 
   Future<void> _handleSubmit() async {
-    // print(booksToCheckout.length);
-    // booksToCheckout.forEach((i) => print(i.toJson()));
+    final customerName = _customerNameController.text.trim();
+    final customerBatch = _customerBatchController.text.trim();
 
-    /**
+    Map<String, bool> tempInputErrors = {};
+
+    if (customerName == '') {
+      tempInputErrors['customerName'] = true;
+    }
+    if (customerBatch == '') {
+      tempInputErrors['customerBatch'] = true;
+    }
+
+    if (tempInputErrors.isEmpty) {
+      /**
        * Below statement following things:
        * Checks whether any purchases selected
        * Checks whether quantity > 0 in purchases
        * Copy original price to sold price if not specified.
        */
-    final validBooks = booksToCheckout.where((bk) {
-      final List<SaleItemBookPurchaseVariantModel> validPVs = [];
+      final validBooks = booksToCheckout.where((bk) {
+        final List<SaleItemBookPurchaseVariantModel> validPVs = [];
 
-      for (var pv in bk.purchaseVariants) {
-        if (pv.soldPrice == 0) {
-          pv.soldPrice = allBooksWithPurchases[bk.bookID]?[pv.purchaseID]
-              ?['price'] as double;
+        for (var pv in bk.purchaseVariants) {
+          if (pv.soldPrice == 0) {
+            pv.soldPrice = allBooksWithPurchases[bk.bookID]?[pv.purchaseID]
+                ?['price'] as double;
+          }
+
+          if (pv.quantity > 0) {
+            validPVs.add(pv);
+          }
         }
 
-        if (pv.quantity > 0) {
-          validPVs.add(pv);
+        bk.purchaseVariants = validPVs;
+
+        return validPVs.isNotEmpty;
+      }).toList();
+
+      if (validBooks.isNotEmpty) {
+        if (widget.saleID == '') {
+          await addSale(
+              validBooks,
+              grandTotal,
+              _customerNameController.text.trim(),
+              _customerBatchController.text.trim(),
+              _paymentMode);
+        } else {
+          await editSale(
+              widget.saleID,
+              validBooks,
+              grandTotal,
+              _customerNameController.text.trim(),
+              _customerBatchController.text.trim(),
+              _paymentMode);
         }
-      }
 
-      bk.purchaseVariants = validPVs;
-
-      return validPVs.isNotEmpty;
-    }).toList();
-
-    if (validBooks.isNotEmpty) {
-      if (widget.saleID == '') {
-        await addSale(
-            validBooks,
-            grandTotal,
-            _customerNameController.text.trim(),
-            _customerBatchController.text.trim(),
-            _paymentMode);
+        widget.updateUI();
+        Navigator.of(context).pop();
       } else {
-        await editSale(
-            widget.saleID,
-            validBooks,
-            grandTotal,
-            _customerNameController.text.trim(),
-            _customerBatchController.text.trim(),
-            _paymentMode);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Please add/complete book details'),
+              actions: [
+                TextButton(
+                  autofocus: true,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                )
+              ],
+            );
+          },
+        );
       }
-
-      widget.updateUI();
-      Navigator.of(context).pop();
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please add/complete book details'),
-            actions: [
-              TextButton(
-                autofocus: true,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              )
-            ],
-          );
-        },
-      );
+      setState(() {
+        inputErrors = tempInputErrors;
+      });
     }
   }
 
@@ -299,31 +314,45 @@ class _SaleModalState extends State<SaleModalWidget> {
       Row(children: [
         Expanded(
             child: TextField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey)),
-                    focusedBorder: OutlineInputBorder(
+                        borderSide: inputErrors['customerName'] == true
+                            ? const BorderSide(color: Colors.red, width: 2)
+                            : const BorderSide(color: Colors.grey, width: 1)),
+                    focusedBorder: const OutlineInputBorder(
                         borderSide:
                             BorderSide(color: Colors.blueGrey, width: 2)),
                     filled: true,
                     fillColor: Colors.white,
                     hoverColor: Colors.transparent,
                     hintText: 'Customer name'),
-                controller: _customerNameController)),
+                controller: _customerNameController,
+                onChanged: (value) {
+                  setState(() {
+                    inputErrors = {...inputErrors, 'customerName': false};
+                  });
+                })),
         const SizedBox(width: 10),
         Expanded(
             child: TextField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey)),
-                    focusedBorder: OutlineInputBorder(
+                        borderSide: inputErrors['customerBatch'] == true
+                            ? const BorderSide(color: Colors.red, width: 2)
+                            : const BorderSide(color: Colors.grey, width: 1)),
+                    focusedBorder: const OutlineInputBorder(
                         borderSide:
                             BorderSide(color: Colors.blueGrey, width: 2)),
                     filled: true,
                     fillColor: Colors.white,
                     hoverColor: Colors.transparent,
                     hintText: 'Customer batch'),
-                controller: _customerBatchController))
+                controller: _customerBatchController,
+                onChanged: (value) {
+                  setState(() {
+                    inputErrors = {...inputErrors, 'customerBatch': false};
+                  });
+                }))
       ]),
       const SizedBox(height: 20),
       Align(

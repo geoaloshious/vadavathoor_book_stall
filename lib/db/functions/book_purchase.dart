@@ -39,35 +39,13 @@ Future<void> addBookPurchase(
       deleted: false));
 }
 
-Future<void> editBookPurchase(String purchaseID, String bookID, int quantity,
-    double bookPrice, int purchaseDate) async {
-  final box = await getBookPurchaseBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
-
-  for (int key in box.keys) {
-    BookPurchaseModel? existingData = box.get(key);
-    if (existingData != null && existingData.purchaseID == purchaseID) {
-      existingData.bookID = bookID;
-      existingData.quantityPurchased = quantity;
-      existingData.quantityLeft =
-          quantity; //#pending - If editing after a sale is done, then data will conflict
-      existingData.bookPrice = bookPrice;
-      existingData.purchaseDate = purchaseDate;
-      existingData.modifiedDate = getCurrentTimestamp();
-      existingData.modifiedBy = loggedInUser;
-
-      await box.put(key, existingData);
-      break;
-    }
-  }
-}
-
-Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
-  final box = await getBookPurchaseBox();
+Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
+    int quantity, double bookPrice, int purchaseDate) async {
+  final purchaseBox = await getBookPurchaseBox();
   final salesBox = await getSalesBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  final sales = salesBox.values.where((i) =>
+  final relatedSales = salesBox.values.where((i) =>
       i.books
           .where((b) => b.purchaseVariants
               .where((p) => p.purchaseID == purchaseID)
@@ -75,10 +53,58 @@ Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
           .isNotEmpty &&
       i.status == DBRowStatus.active);
 
-  if (sales.isNotEmpty) {
+  for (int key in purchaseBox.keys) {
+    BookPurchaseModel? existingData = purchaseBox.get(key);
+    if (existingData != null && existingData.purchaseID == purchaseID) {
+      if (bookID != existingData.bookID) {
+        return {
+          'message':
+              'Found some sales related to this purchase.\nPlease edit/delete them to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
+        };
+      }
+
+      int quantitySold =
+          existingData.quantityPurchased = existingData.quantityLeft;
+      if (quantity < quantitySold) {
+        return {
+          'message':
+              '$quantitySold stocks are already sold from this purchase.\nPlease edit/delete the sales to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
+        };
+      }
+
+      existingData.bookID = bookID;
+      existingData.quantityPurchased = quantity;
+      existingData.quantityLeft = quantity - quantitySold;
+      existingData.bookPrice = bookPrice;
+      existingData.purchaseDate = purchaseDate;
+      existingData.modifiedDate = getCurrentTimestamp();
+      existingData.modifiedBy = loggedInUser;
+
+      await purchaseBox.put(key, existingData);
+      break;
+    }
+  }
+
+  return {};
+}
+
+Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
+  final box = await getBookPurchaseBox();
+  final salesBox = await getSalesBox();
+  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  final relatedSales = salesBox.values.where((i) =>
+      i.books
+          .where((b) => b.purchaseVariants
+              .where((p) => p.purchaseID == purchaseID)
+              .isNotEmpty)
+          .isNotEmpty &&
+      i.status == DBRowStatus.active);
+
+  if (relatedSales.isNotEmpty) {
     return {
       'message':
-          'Found some sales related to this purchase. Please delete them to continue.\nSale IDs: ${sales.map((p) => p.saleID).join(', ')}'
+          'Found some sales related to this purchase.\nPlease delete them to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
     };
   }
 

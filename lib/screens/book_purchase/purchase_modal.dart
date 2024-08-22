@@ -70,14 +70,34 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
 
     if (tempInputErrors.isEmpty) {
       if (widget.data != null) {
-        await editBookPurchase(
-            widget.data!.purchaseID, _bookID, quantity, price, purchaseDate);
+        editBookPurchase(
+                widget.data!.purchaseID, _bookID, quantity, price, purchaseDate)
+            .then((res) {
+          if (res['message'] == null) {
+            widget.updateUI();
+            Navigator.of(context).pop();
+          } else {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                      title: const Text('Error'),
+                      content: Text(res['message']!),
+                      actions: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('OK'))
+                      ]);
+                });
+          }
+        });
       } else {
         await addBookPurchase(_bookID, purchaseDate, price, quantity);
+        widget.updateUI();
+        Navigator.of(context).pop();
       }
-
-      widget.updateUI();
-      Navigator.of(context).pop();
     } else {
       setState(() {
         inputErrors = tempInputErrors;
