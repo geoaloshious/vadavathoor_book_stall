@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:archive/archive.dart';
+import 'package:restart_app/restart_app.dart';
 
 const botToken = '7217147107:AAHHkewwo3pl4DHU8NovfvRY9UcCc_OfYKw';
 const chatId = '-1002193520515';
@@ -133,7 +134,8 @@ Future<void> downloadAndUpdate(String downloadUrl) async {
   // File(zipFilePath).deleteSync();
 
   // // Optionally, restart the application
-  restartApplication();
+  // restartApplication();
+  Restart.restartApp();
 }
 
 void restartApplication() {

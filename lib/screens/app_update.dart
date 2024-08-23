@@ -24,10 +24,8 @@ class _AppUpdateState extends State<AppUpdateWidget> {
     if (tempLatest['version'] != null) {
       if (tempLatest['version'] != currentVersion) {
         setState(() {
-          setState(() {
-            message =
-                'Downloading and installing version ${tempLatest['version']}';
-          });
+          message =
+              'Downloading and installing version ${tempLatest['version']}';
         });
         await downloadAndUpdate(tempLatest['url']!);
       } else {
