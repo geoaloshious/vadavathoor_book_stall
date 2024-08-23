@@ -4,7 +4,7 @@ on:
     inputs:
       version:
         description: 'Version number'
-        required: false
+        required: true
         default: '0.0.0'
         
 jobs:
@@ -24,6 +24,9 @@ jobs:
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
           pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache of dart pub get dependencies
           pub-cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
+      - name: Update app version
+        run:
+          sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
       - name: Install project dependencies
         run: flutter pub get
       - name: Generate intermediates

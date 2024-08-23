@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/screens/app_update.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_stall_details.dart';
 import 'package:vadavathoor_book_stall/screens/books/index.dart';
@@ -80,6 +81,21 @@ class _HomeScreenState extends State<HomeScreen> {
         });
   }
 
+  void openAppUpdate() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
+
+          return Dialog(
+              child: Container(
+                  constraints: BoxConstraints(minWidth: screenSize.width * 0.4),
+                  child: const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(child: AppUpdateWidget()))));
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,6 +109,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }),
             actions: [
+              PopupMenuButton<int>(
+                  icon: const Icon(Icons.settings, size: 25),
+                  onSelected: (int value) {
+                    switch (value) {
+                      case 1:
+                        openAppUpdate();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                        const PopupMenuItem(
+                            value: 1, child: Text('Check for updates'))
+                      ]),
               Consumer<UserProvider>(builder: (cntx, user, _) {
                 if (user.user.role == UserRole.developer) {
                   return IconButton(
