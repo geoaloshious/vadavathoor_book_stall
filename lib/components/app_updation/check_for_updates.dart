@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/app_updation.dart';
+
+import 'app_updation.dart';
 
 class AppUpdateWidget extends StatefulWidget {
   const AppUpdateWidget({super.key});
