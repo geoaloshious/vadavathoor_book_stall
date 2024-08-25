@@ -25,8 +25,11 @@ jobs:
           pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache of dart pub get dependencies
           pub-cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
       - name: Update app version
-        run:
-          sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
+        shell: pwsh
+        run: |
+          (Get-Content pubspec.yaml) | 
+          ForEach-Object {$_ -replace '^version: .*', "version: ${{ github.event.inputs.version }}"} | 
+          Set-Content pubspec.yaml
       - name: Install project dependencies
         run: flutter pub get
       - name: Generate intermediates
