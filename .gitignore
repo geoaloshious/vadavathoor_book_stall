@@ -37,7 +37,6 @@ migrate_working_dir/
 /logs/
 flutter_windows.dll
 vadavathoor_book_stall.exe
-update.ps1
 
 # Symbolication related
 app.*.symbols
