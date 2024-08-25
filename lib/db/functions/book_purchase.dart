@@ -2,8 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
-import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
+import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
@@ -21,36 +20,13 @@ Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
 }
 
 Future<void> addBookPurchase(
-    String publisherID,
-    String publisherName,
-    int purchaseDate,
-    String bookID,
-    String bookName,
-    String bookCategoryID,
-    String bookCategoryName,
-    double bookPrice,
-    int quantity) async {
-  String purchaseID = generateID();
+    String bookID, int purchaseDate, double bookPrice, int quantity) async {
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  if (publisherID == '') {
-    publisherID = await addPublisher(publisherName);
-  }
-
-  if (bookID == '') {
-    bookID = await addBook(bookName);
-  }
-
-  if (bookCategoryID == '') {
-    bookCategoryID = await addBookCategory(bookCategoryName);
-  }
-
   final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
-      purchaseID: purchaseID,
-      publisherID: publisherID,
-      bookCategoryID: bookCategoryID,
+      purchaseID: (db.values.length + 1).toString(),
       purchaseDate: purchaseDate,
       bookID: bookID,
       quantityPurchased: quantity,
@@ -63,55 +39,74 @@ Future<void> addBookPurchase(
       deleted: false));
 }
 
-Future<void> editBookPurchase(
-    String purchaseID,
-    String publisherID,
-    String publisherName,
-    String bookID,
-    String bookName,
-    String bookCategoryID,
-    String bookCategoryName,
-    int quantity,
-    double bookPrice,
-    int purchaseDate) async {
-  final box = await getBookPurchaseBox();
+Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
+    int quantity, double bookPrice, int purchaseDate) async {
+  final purchaseBox = await getBookPurchaseBox();
+  final salesBox = await getSalesBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  for (int key in box.keys) {
-    BookPurchaseModel? existingData = box.get(key);
+  final relatedSales = salesBox.values.where((i) =>
+      i.books
+          .where((b) => b.purchaseVariants
+              .where((p) => p.purchaseID == purchaseID)
+              .isNotEmpty)
+          .isNotEmpty &&
+      i.status == DBRowStatus.active);
+
+  for (int key in purchaseBox.keys) {
+    BookPurchaseModel? existingData = purchaseBox.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
-      if (publisherID == '') {
-        publisherID = await addPublisher(publisherName);
+      if (bookID != existingData.bookID) {
+        return {
+          'message':
+              'Found some sales related to this purchase.\nPlease edit/delete them to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
+        };
       }
 
-      if (bookID == '') {
-        bookID = await addBook(bookName);
+      int quantitySold =
+          existingData.quantityPurchased = existingData.quantityLeft;
+      if (quantity < quantitySold) {
+        return {
+          'message':
+              '$quantitySold stocks are already sold from this purchase.\nPlease edit/delete the sales to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
+        };
       }
 
-      if (bookCategoryID == '') {
-        bookCategoryID = await addBookCategory(bookCategoryName);
-      }
-
-      existingData.publisherID = publisherID;
       existingData.bookID = bookID;
-      existingData.bookCategoryID = bookCategoryID;
       existingData.quantityPurchased = quantity;
-      existingData.quantityLeft =
-          quantity; //#pending - If editing after a sale is done, then data will conflict
+      existingData.quantityLeft = quantity - quantitySold;
       existingData.bookPrice = bookPrice;
       existingData.purchaseDate = purchaseDate;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
 
-      await box.put(key, existingData);
+      await purchaseBox.put(key, existingData);
       break;
     }
   }
+
+  return {};
 }
 
-Future<void> deleteBookPurchase(String purchaseID) async {
+Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
   final box = await getBookPurchaseBox();
+  final salesBox = await getSalesBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  final relatedSales = salesBox.values.where((i) =>
+      i.books
+          .where((b) => b.purchaseVariants
+              .where((p) => p.purchaseID == purchaseID)
+              .isNotEmpty)
+          .isNotEmpty &&
+      i.status == DBRowStatus.active);
+
+  if (relatedSales.isNotEmpty) {
+    return {
+      'message':
+          'Found some sales related to this purchase.\nPlease delete them to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
+    };
+  }
 
   for (int key in box.keys) {
     BookPurchaseModel? existingData = box.get(key);
@@ -124,41 +119,29 @@ Future<void> deleteBookPurchase(String purchaseID) async {
       break;
     }
   }
+
+  return {};
 }
 
 Future<List<BookPurchaseListItemModel>> getBookPurchaseList() async {
   final purchases = (await getBookPurchaseBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
-  final publishers = (await getPublishersBox()).values.toList();
-  final bookCategories = (await getBookCategoriesBox()).values.toList();
 
   List<BookPurchaseListItemModel> joinedData = [];
 
   for (BookPurchaseModel purchase in purchases) {
     final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
-    final publisher = publishers
-        .where((u) => u.publisherID == purchase.publisherID)
-        .firstOrNull;
-    final bookCategory = bookCategories
-        .where((u) => u.categoryID == purchase.bookCategoryID)
-        .firstOrNull;
 
-    if (book != null &&
-        publisher != null &&
-        bookCategory != null &&
-        !purchase.deleted) {
+    if (book != null && !purchase.deleted) {
       joinedData.add(BookPurchaseListItemModel(
           purchaseID: purchase.purchaseID,
-          publisherID: purchase.publisherID,
-          publisherName: publisher.publisherName,
-          categoryID: bookCategory.categoryID,
-          categoryName: bookCategory.categoryName,
+          bookID: book.bookID,
+          bookName: book.bookName,
           purchaseDate: purchase.purchaseDate,
           formattedPurchaseDate: formatTimestamp(
               timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-          bookID: book.bookID,
-          bookName: book.bookName,
           quantityPurchased: purchase.quantityPurchased,
+          balanceStock: purchase.quantityLeft,
           bookPrice: purchase.bookPrice));
     }
   }

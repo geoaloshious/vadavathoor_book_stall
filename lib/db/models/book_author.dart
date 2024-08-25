@@ -1,47 +1,35 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../constants.dart';
-part 'book.g.dart';
+part 'book_author.g.dart';
 
-@HiveType(typeId: DBItemHiveType.book)
-class BookModel {
+@HiveType(typeId: DBItemHiveType.bookAuthor)
+class BookAuthorModel {
   @HiveField(0)
-  final String bookID;
+  final String authorID;
 
   @HiveField(1)
-  String bookName;
+  String authorName;
 
   @HiveField(2)
-  String authorID;
-
-  @HiveField(3)
-  String publisherID;
-
-  @HiveField(4)
-  String bookCategoryID;
-
-  @HiveField(5)
   final int createdDate;
 
-  @HiveField(6)
+  @HiveField(3)
   final String createdBy;
 
-  @HiveField(7)
+  @HiveField(4)
   int modifiedDate;
 
-  @HiveField(8)
+  @HiveField(5)
   String modifiedBy;
 
-  @HiveField(9)
+  @HiveField(6)
   int status;
 
   Map<String, dynamic> toJson() {
     return {
-      'bookID': bookID,
-      'bookName': bookName,
       'authorID': authorID,
-      'publisherID': publisherID,
-      'bookCategoryID': bookCategoryID,
+      'authorName': authorName,
       'createdDate': createdDate,
       'createdBy': createdBy,
       'modifiedDate': modifiedDate,
@@ -51,15 +39,12 @@ class BookModel {
   }
 
   Map<String, String> toDropdownData() {
-    return {'id': bookID, 'name': bookName};
+    return {'id': authorID, 'name': authorName};
   }
 
-  BookModel(
-      {required this.bookID,
-      required this.bookName,
-      required this.authorID,
-      required this.publisherID,
-      required this.bookCategoryID,
+  BookAuthorModel(
+      {required this.authorID,
+      required this.authorName,
       required this.createdDate,
       required this.createdBy,
       required this.modifiedDate,

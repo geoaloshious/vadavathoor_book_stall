@@ -1,93 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
-import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
+import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
+import 'package:vadavathoor_book_stall/db/models/book_author.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/publishers/edit_publisher.dart';
+import 'package:vadavathoor_book_stall/screens/books/edit_modal.dart';
 
-class PublishersWidget extends StatefulWidget {
-  const PublishersWidget({super.key});
+class AuthorsWidget extends StatefulWidget {
+  const AuthorsWidget({super.key});
 
   @override
-  State<PublishersWidget> createState() => _PublishersState();
+  State<AuthorsWidget> createState() => _AuthorsWidget();
 }
 
-class _PublishersState extends State<PublishersWidget> {
+class _AuthorsWidget extends State<AuthorsWidget> {
   final _nameController = TextEditingController();
-  List<PublisherModel> publishers = [];
+  List<BookAuthorModel> authors = [];
 
   void add() async {
     final name = _nameController.text.trim();
     if (name != '') {
-      await addPublisher(name);
+      await addBookAuthor(name);
       _nameController.clear();
       setData();
     }
   }
 
-  onPressEdit(PublisherModel selectedItem) {
+  onPressEdit(BookAuthorModel selectedItem) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Size screenSize = MediaQuery.of(context).size;
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
 
-        return Dialog(
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: screenSize.height * 0.2,
-              maxWidth: screenSize.width * 0.4,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: EditPublisherWidget(
-                    data: selectedItem,
-                    updateUI: () {
-                      setData();
-                      Navigator.of(context).pop();
-                    }),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+          return Dialog(
+              child: Container(
+                  constraints: BoxConstraints(maxWidth: screenSize.width * 0.4),
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                          child: EditModalWidget(
+                              title: 'Author',
+                              name: selectedItem.authorName,
+                              saveData: (name) {
+                                editBookAuthor(
+                                        authorID: selectedItem.authorID,
+                                        authorName: name)
+                                    .then((_) {
+                                  setData();
+                                  Navigator.of(context).pop();
+                                });
+                              })))));
+        });
   }
 
   onPressDelete(String selectedID) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this item?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await editPublisher(
-                    publisherID: selectedID, status: DBRowStatus.deleted);
-                setData();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Confirm Delete'),
+              content: const Text('Are you sure you want to delete this item?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                    onPressed: () async {
+                      editBookAuthor(
+                              authorID: selectedID, status: DBRowStatus.deleted)
+                          .then((_) {
+                        setData();
+                        Navigator.of(context).pop();
+                      });
+                    },
+                    child: const Text('Delete'))
+              ]);
+        });
   }
 
   void setData() async {
-    final temp = await getPublishers();
+    final temp = await getBookAuthors();
     setState(() {
-      publishers = temp;
+      authors = temp;
     });
   }
 
@@ -112,7 +109,7 @@ class _PublishersState extends State<PublishersWidget> {
                     child: TextField(
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Publisher Name'),
+                            hintText: 'Author Name'),
                         controller: _nameController)),
                 const SizedBox(width: 20),
                 ElevatedButton(
@@ -123,9 +120,6 @@ class _PublishersState extends State<PublishersWidget> {
                         style: TextStyle(color: Colors.white)))
               ]),
             if (loggedIn) const SizedBox(height: 20),
-            const Text('Publishers',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
             Row(
               children: [
                 const Text('Name',
@@ -141,26 +135,24 @@ class _PublishersState extends State<PublishersWidget> {
                         border:
                             Border.all(width: 0.2, color: Colors.blueGrey)))),
             Expanded(
-                child: publishers.isNotEmpty
+                child: authors.isNotEmpty
                     ? ListView.builder(
-                        itemCount: publishers.length,
+                        itemCount: authors.length,
                         itemBuilder: (context, index) => Row(children: [
-                              Expanded(
-                                  child: Text(publishers[index].publisherName)),
+                              Expanded(child: Text(authors[index].authorName)),
                               if (loggedIn)
                                 IconButton(
                                     icon: const Icon(Icons.edit),
                                     tooltip: 'Edit',
                                     onPressed: () {
-                                      onPressEdit(publishers[index]);
+                                      onPressEdit(authors[index]);
                                     }),
                               if (loggedIn)
                                 IconButton(
                                     icon: const Icon(Icons.delete),
                                     tooltip: 'Delete',
                                     onPressed: () {
-                                      onPressDelete(
-                                          publishers[index].publisherID);
+                                      onPressDelete(authors[index].authorID);
                                     })
                             ]))
                     : const Text("No records found"))

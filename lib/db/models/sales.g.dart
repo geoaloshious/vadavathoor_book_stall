@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'book_sale.dart';
+part of 'sales.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -9,7 +9,7 @@ part of 'book_sale.dart';
 class SaleItemBookPurchaseVariantModelAdapter
     extends TypeAdapter<SaleItemBookPurchaseVariantModel> {
   @override
-  final int typeId = 7;
+  final int typeId = 8;
 
   @override
   SaleItemBookPurchaseVariantModel read(BinaryReader reader) {
@@ -19,7 +19,6 @@ class SaleItemBookPurchaseVariantModelAdapter
     };
     return SaleItemBookPurchaseVariantModel(
       purchaseID: fields[0] as String,
-      originalPrice: fields[1] as double,
       soldPrice: fields[2] as double,
       quantity: fields[3] as int,
     );
@@ -28,11 +27,9 @@ class SaleItemBookPurchaseVariantModelAdapter
   @override
   void write(BinaryWriter writer, SaleItemBookPurchaseVariantModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.purchaseID)
-      ..writeByte(1)
-      ..write(obj.originalPrice)
       ..writeByte(2)
       ..write(obj.soldPrice)
       ..writeByte(3)
@@ -52,7 +49,7 @@ class SaleItemBookPurchaseVariantModelAdapter
 
 class SaleItemBookModelAdapter extends TypeAdapter<SaleItemBookModel> {
   @override
-  final int typeId = 6;
+  final int typeId = 7;
 
   @override
   SaleItemBookModel read(BinaryReader reader) {
@@ -90,7 +87,7 @@ class SaleItemBookModelAdapter extends TypeAdapter<SaleItemBookModel> {
 
 class SaleModelAdapter extends TypeAdapter<SaleModel> {
   @override
-  final int typeId = 5;
+  final int typeId = 6;
 
   @override
   SaleModel read(BinaryReader reader) {

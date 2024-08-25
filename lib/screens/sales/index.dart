@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/sales/new_sale.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sale.dart';
+import 'package:vadavathoor_book_stall/screens/sales/sales_modal.dart';
 
 class SalesWidget extends StatefulWidget {
   const SalesWidget({super.key});
@@ -17,7 +17,7 @@ class _SalesState extends State<SalesWidget> {
   List<SaleListItemModel> sales = [];
 
   void setData() async {
-    final temp = await getBookSaleList();
+    final temp = await getSalesList();
     setState(() {
       sales = temp;
     });
@@ -48,7 +48,7 @@ class _SalesState extends State<SalesWidget> {
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
                 //#pending - while scrolling, header, grand total and submit should be sticky
-                child: NewSaleWidget(updateUI: setData),
+                child: SaleModalWidget(saleID: '', updateUI: setData),
               ),
             ),
           ),
@@ -81,15 +81,15 @@ class _SalesState extends State<SalesWidget> {
             const SizedBox(height: 20),
             Row(children: [
               const Expanded(
-                  child: Text('Book',
+                  child: Text('Customer',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Qty',
+                  child: Text('Book (Qty)',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Paid via',
+                  child: Text('Paid Via',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
@@ -97,7 +97,11 @@ class _SalesState extends State<SalesWidget> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Date',
+                  child: Text('Created Date',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              const Expanded(
+                  child: Text('Modified Date',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               if (loggedIn) const SizedBox(width: 80)

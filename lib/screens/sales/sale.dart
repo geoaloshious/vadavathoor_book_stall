@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_sale.dart';
+import 'package:vadavathoor_book_stall/db/functions/sales.dart';
+import 'package:vadavathoor_book_stall/screens/sales/sales_modal.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
 class SaleWidget extends StatefulWidget {
@@ -34,9 +35,10 @@ class _SaleState extends State<SaleWidget> {
                     child: const Text('Cancel')),
                 ElevatedButton(
                     onPressed: () async {
-                      await deleteBookSale(widget.data.saleID);
-                      widget.updateUI();
-                      Navigator.of(context).pop();
+                      deleteSale(widget.data.saleID).then((_) {
+                        widget.updateUI();
+                        Navigator.of(context).pop();
+                      });
                     },
                     child: const Text('Delete'))
               ]);
@@ -44,37 +46,37 @@ class _SaleState extends State<SaleWidget> {
   }
 
   void _onPressEdit() {
-    // showDialog(
-    //     barrierDismissible: false,
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       Size screenSize = MediaQuery.of(context).size;
-    //       double dialogWidth = screenSize.width * 0.7;
-    //       double dialogHeight = screenSize.height * 0.5;
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
+          double dialogWidth = screenSize.width * 0.7;
+          double dialogHeight = screenSize.height * 0.5;
 
-    //       return Dialog(
-    //           child: Container(
-    //               constraints: BoxConstraints(
-    //                 minHeight: dialogHeight,
-    //                 maxWidth: dialogWidth
-    //               ),
-    //               child: Padding(
-    //                   padding: const EdgeInsets.all(16.0),
-    //                   child: SingleChildScrollView(
-    //                       //#pending - while scrolling, header and submit should be sticky
-    //                       child: EditBookPurchaseWidget(
-    //                           data: widget.data, updateUI: widget.updateUI)))));
-    //     });
+          return Dialog(
+              child: Container(
+                  constraints: BoxConstraints(
+                      minHeight: dialogHeight, maxWidth: dialogWidth),
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                          //#pending - while scrolling, header and submit should be sticky
+                          child: SaleModalWidget(
+                              saleID: widget.data.saleID,
+                              updateUI: widget.updateUI)))));
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Expanded(child: Text(widget.data.bookName)),
-      Expanded(child: Text(widget.data.quantity.toString())),
+      Expanded(child: Text(widget.data.customerName)),
+      Expanded(child: Text(widget.data.books)),
       Expanded(child: Text(getPaymentModeName(widget.data.paymentMode))),
       Expanded(child: Text(widget.data.grandTotal.toString())),
-      Expanded(child: Text(widget.data.date)),
+      Expanded(child: Text(widget.data.createdDate)),
+      Expanded(child: Text(widget.data.modifiedDate)),
       if (widget.loggedIn)
         IconButton(
             icon: const Icon(Icons.edit),

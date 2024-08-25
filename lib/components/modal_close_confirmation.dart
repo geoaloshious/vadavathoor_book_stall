@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-showModalCloseConfirmation(BuildContext context) {
+void showModalCloseConfirmation(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {

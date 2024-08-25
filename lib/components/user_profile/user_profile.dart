@@ -33,30 +33,28 @@ class _UserProfileState extends State<UserProfileWidget> {
 
   void onPressLogout() {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              autofocus: true,
-              onPressed: () async {
-                await logout(context);
-                widget.resetPage();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              content: const Text('Are you sure you want to logout?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                    autofocus: true,
+                    onPressed: () {
+                      logout(context).then((_) {
+                        widget.resetPage();
+                        Navigator.of(context).pop();
+                      });
+                    },
+                    child: const Text('Confirm'))
+              ]);
+        });
   }
 
   void onSelected(int value) {

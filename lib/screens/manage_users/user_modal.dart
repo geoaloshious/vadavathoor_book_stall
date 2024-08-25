@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vadavathoor_book_stall/components/ModalCloseConfirmation.dart';
+import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
-import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 
-enum UserModalMode { add, edit }
+class EditModalWidget extends StatefulWidget {
+  final String name;
+  final String title;
+  final void Function(String name) saveData;
 
-class EditPublisherWidget extends StatefulWidget {
-  final PublisherModel data;
-  final void Function() updateUI;
-
-  const EditPublisherWidget(
-      {super.key, required this.data, required this.updateUI});
+  const EditModalWidget(
+      {super.key,
+      required this.name,
+      required this.title,
+      required this.saveData});
 
   @override
-  State<EditPublisherWidget> createState() => _EditPublisherState();
+  State<EditModalWidget> createState() => _EditModalState();
 }
 
-class _EditPublisherState extends State<EditPublisherWidget> {
+class _EditModalState extends State<EditModalWidget> {
   TextEditingController _nameController = TextEditingController();
 
   Map<String, bool> inputErrors = {};
@@ -30,9 +30,7 @@ class _EditPublisherState extends State<EditPublisherWidget> {
     }
 
     if (tempInputErrors.isEmpty) {
-      await editPublisher(
-          publisherID: widget.data.publisherID, publisherName: name);
-      widget.updateUI();
+      widget.saveData(name);
     } else {
       setState(() {
         inputErrors = tempInputErrors;
@@ -41,7 +39,7 @@ class _EditPublisherState extends State<EditPublisherWidget> {
   }
 
   void setData() {
-    _nameController = TextEditingController(text: widget.data.publisherName);
+    _nameController = TextEditingController(text: widget.name);
   }
 
   @override
@@ -57,9 +55,9 @@ class _EditPublisherState extends State<EditPublisherWidget> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Edit Publisher',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            Text(
+              'Edit ${widget.title}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             IconButton(
                 icon: const Icon(Icons.close),
@@ -76,7 +74,7 @@ class _EditPublisherState extends State<EditPublisherWidget> {
               child: TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Publisher Name',
+                  labelText: '${widget.title} Name',
                   border: const OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
                       borderSide: inputErrors['name'] == true

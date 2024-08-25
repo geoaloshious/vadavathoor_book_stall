@@ -8,7 +8,7 @@ part of 'misc.dart';
 
 class MiscModelAdapter extends TypeAdapter<MiscModel> {
   @override
-  final int typeId = 9;
+  final int typeId = 10;
 
   @override
   MiscModel read(BinaryReader reader) {

@@ -8,7 +8,7 @@ part of 'users.dart';
 
 class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
-  final int typeId = 10;
+  final int typeId = 11;
 
   @override
   UserModel read(BinaryReader reader) {

@@ -100,9 +100,10 @@ class _UsersState extends State<UsersWidget> {
             ),
             ElevatedButton(
               onPressed: () async {
-                await deleteUser(selectedUserID);
-                setData();
-                Navigator.of(context).pop();
+                deleteUser(selectedUserID).then((_) {
+                  setData();
+                  Navigator.of(context).pop();
+                });
               },
               child: const Text('Delete'),
             ),
@@ -113,10 +114,10 @@ class _UsersState extends State<UsersWidget> {
   }
 
   void setData() async {
-    var tempData = await getUsers();
+    final loggedInUser = Provider.of<UserProvider>(context, listen: false);
+    List<UserModel> tempData = await getUsers();
 
     //If logged in user is not developer, then filter out developer users.
-    final loggedInUser = Provider.of<UserProvider>(context, listen: false);
     if (loggedInUser.user.role != UserRole.developer) {
       tempData = tempData.where((i) => i.role != UserRole.developer).toList();
     }

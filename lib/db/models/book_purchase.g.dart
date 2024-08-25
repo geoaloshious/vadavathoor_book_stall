@@ -8,7 +8,7 @@ part of 'book_purchase.dart';
 
 class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
   @override
-  final int typeId = 4;
+  final int typeId = 5;
 
   @override
   BookPurchaseModel read(BinaryReader reader) {
@@ -18,51 +18,45 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
     };
     return BookPurchaseModel(
       purchaseID: fields[0] as String,
-      publisherID: fields[1] as String,
-      bookCategoryID: fields[12] as String,
-      purchaseDate: fields[2] as int,
-      bookID: fields[3] as String,
-      quantityPurchased: fields[5] as int,
-      quantityLeft: fields[6] as int,
-      bookPrice: fields[4] as double,
-      createdDate: fields[7] as int,
-      createdBy: fields[8] as String,
-      modifiedDate: fields[9] as int,
-      modifiedBy: fields[10] as String,
-      deleted: fields[11] as bool,
+      purchaseDate: fields[1] as int,
+      bookID: fields[2] as String,
+      quantityPurchased: fields[4] as int,
+      quantityLeft: fields[5] as int,
+      bookPrice: fields[3] as double,
+      createdDate: fields[6] as int,
+      createdBy: fields[7] as String,
+      modifiedDate: fields[8] as int,
+      modifiedBy: fields[9] as String,
+      deleted: fields[10] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, BookPurchaseModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.purchaseID)
       ..writeByte(1)
-      ..write(obj.publisherID)
-      ..writeByte(2)
       ..write(obj.purchaseDate)
-      ..writeByte(3)
+      ..writeByte(2)
       ..write(obj.bookID)
-      ..writeByte(4)
+      ..writeByte(3)
       ..write(obj.bookPrice)
-      ..writeByte(5)
+      ..writeByte(4)
       ..write(obj.quantityPurchased)
-      ..writeByte(6)
+      ..writeByte(5)
       ..write(obj.quantityLeft)
-      ..writeByte(7)
+      ..writeByte(6)
       ..write(obj.createdDate)
-      ..writeByte(8)
+      ..writeByte(7)
       ..write(obj.createdBy)
-      ..writeByte(9)
+      ..writeByte(8)
       ..write(obj.modifiedDate)
-      ..writeByte(10)
+      ..writeByte(9)
       ..write(obj.modifiedBy)
-      ..writeByte(11)
-      ..write(obj.deleted)
-      ..writeByte(12)
-      ..write(obj.bookCategoryID);
+      ..writeByte(10)
+      ..write(obj.deleted);
   }
 
   @override

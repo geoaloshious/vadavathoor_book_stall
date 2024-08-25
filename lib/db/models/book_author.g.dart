@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'book_category.dart';
+part of 'book_author.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class BookCategoryModelAdapter extends TypeAdapter<BookCategoryModel> {
+class BookAuthorModelAdapter extends TypeAdapter<BookAuthorModel> {
   @override
-  final int typeId = 4;
+  final int typeId = 2;
 
   @override
-  BookCategoryModel read(BinaryReader reader) {
+  BookAuthorModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return BookCategoryModel(
-      categoryID: fields[0] as String,
-      categoryName: fields[1] as String,
+    return BookAuthorModel(
+      authorID: fields[0] as String,
+      authorName: fields[1] as String,
       createdDate: fields[2] as int,
       createdBy: fields[3] as String,
       modifiedDate: fields[4] as int,
@@ -28,13 +28,13 @@ class BookCategoryModelAdapter extends TypeAdapter<BookCategoryModel> {
   }
 
   @override
-  void write(BinaryWriter writer, BookCategoryModel obj) {
+  void write(BinaryWriter writer, BookAuthorModel obj) {
     writer
       ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.categoryID)
+      ..write(obj.authorID)
       ..writeByte(1)
-      ..write(obj.categoryName)
+      ..write(obj.authorName)
       ..writeByte(2)
       ..write(obj.createdDate)
       ..writeByte(3)
@@ -53,7 +53,7 @@ class BookCategoryModelAdapter extends TypeAdapter<BookCategoryModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BookCategoryModelAdapter &&
+      other is BookAuthorModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
