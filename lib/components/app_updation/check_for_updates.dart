@@ -27,14 +27,20 @@ class _AppUpdateState extends State<AppUpdateWidget> {
       if (tempLatest['version'] != currentVersion) {
         setState(() {
           message =
-              'Downloading and installing version ${tempLatest['version']}';
+              'Found new version ${tempLatest['version']}\nApplication will be restarting in 5 seconds';
         });
-        await downloadAndUpdate(tempLatest['version']!, tempLatest['url']!);
-        setState(() {
-          downloaded = true;
-          message =
-              "\n• Go to Downloads folder\n• Extract bookstall_${tempLatest['version']!}.zip\n• Copy all files\n• Go to this application's folder\n• Close this application\n• Delete all files except database folder\n• Paste new files";
-        });
+        // setState(() {
+        //   message =
+        //       'Downloading and installing version ${tempLatest['version']}';
+        // });
+
+        await Future.delayed(const Duration(seconds: 5));
+        // await downloadAndUpdate(tempLatest['version']!, tempLatest['url']!);
+        // setState(() {
+        //   downloaded = true;
+        //   message =
+        //       "\n• Go to Downloads folder\n• Extract bookstall_${tempLatest['version']!}.zip\n• Copy all files\n• Go to this application's folder\n• Close this application\n• Delete all files except database folder\n• Paste new files";
+        // });
       } else {
         setState(() {
           message = 'No updates available';
