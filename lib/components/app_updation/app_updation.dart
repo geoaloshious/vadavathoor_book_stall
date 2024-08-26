@@ -30,29 +30,23 @@ Future<Map<String, String>> getLatestAppVersion() async {
 }
 
 Future<void> downloadAndUpdate(String version, String downloadUrl) async {
-  // final directory = await getDownloadsDirectory();
-  // final filePath = '${directory?.path ?? ''}\\bookstall_$version.zip';
-
-  // final response = await http.get(Uri.parse(downloadUrl));
-  // File(filePath).writeAsBytesSync(response.bodyBytes);
-
-   final appFolderPath = Directory.current.path;
+  final appFolderPath = Directory.current.path;
 
   final batchFile = File('$appFolderPath/update.bat');
   await batchFile.writeAsString(batchScript);
 
   try {
-   final process = await Process.start(
-    'cmd.exe',
-    ['/c', 'start', '$appFolderPath/update.bat', downloadUrl],
-    mode: ProcessStartMode.detached,
-    runInShell: true,
-  );
+    await Process.start(
+      'cmd.exe',
+      ['/c', 'start', '$appFolderPath/update.bat', downloadUrl],
+      mode: ProcessStartMode.detached,
+      runInShell: true,
+    );
 
     print('PowerShell script started in detached mode');
   } catch (e) {
     print('Error starting PowerShell script: $e');
   }
 
-   windowManager.destroy();
+  windowManager.destroy();
 }

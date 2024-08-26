@@ -11,14 +11,13 @@ set "ZIP_FILE_PATH=%TEMP_DIR%\\update.zip"
 set "EXTRACT_DIR=%TEMP_DIR%\\extracted"
 set "EXE_FILE_PATH=%AppFolderPath%\\vadavathoor_book_stall.exe"
 
-echo ==============================
-<nul set /p "=Step 1: Closing application... "
+<nul set /p "=Step 1: Waiting for application to close "
 timeout /t 5 /nobreak >nul
 echo [DONE]
 
 
-echo ==============================
-<nul set /p "=Step 2: Deleting existing files... "
+echo.
+<nul set /p "=Step 2: Deleting existing files "
 
 :: Delete all files except update.bat
 for %%F in (*) do (
@@ -33,8 +32,8 @@ for /d %%D in (*) do (
 echo [DONE]
 
 
-echo ==============================
-<nul set /p "=Step 3: Downloading update... "
+echo.
+<nul set /p "=Step 3: Downloading update "
 
 :: Create temp directory if it doesn't exist
 if not exist "%TEMP_DIR%" (
@@ -51,8 +50,8 @@ if %ERRORLEVEL% NEQ 0 (
 echo [DONE]
 
 
-echo ==============================
-<nul set /p "=Step 4: Unzipping new files... "
+echo.
+<nul set /p "=Step 4: Unzipping new files "
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -Path '%ZIP_FILE_PATH%' -DestinationPath '%EXTRACT_DIR%' -Force"
 if %ERRORLEVEL% NEQ 0 (
     echo Unzip failed with error code %ERRORLEVEL%.
@@ -62,9 +61,9 @@ if %ERRORLEVEL% NEQ 0 (
 echo [DONE]
 
 
-echo ==============================
-<nul set /p "=Step 5: Copying files to app directory... "
-robocopy "%EXTRACT_DIR%" "%AppFolderPath%" /E /IS /IT
+echo.
+<nul set /p "=Step 5: Copying files to app directory "
+robocopy "%EXTRACT_DIR%" "%AppFolderPath%" /E /IS /IT >NUL
 if %ERRORLEVEL% GEQ 8 (
     echo Copy failed with error code %ERRORLEVEL%.
     pause
@@ -73,7 +72,7 @@ if %ERRORLEVEL% GEQ 8 (
 echo [DONE]
 
 
-echo ==============================
+echo.
 <nul set /p "=Step 6: Cleaning up...: "%TEMP_DIR%" "
 if not exist "%TEMP_DIR%" (
     echo Warning: Temp directory not found: "%TEMP_DIR%"
@@ -95,22 +94,18 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo [DONE]
 
-echo ==============================
-<nul set /p "=Step 7: Starting application... "
 
-start "" "%EXE_FILE_PATH%"
-if %ERRORLEVEL% NEQ 0 (
-    echo Application failed to start with error code %ERRORLEVEL%.
-    pause
-    exit /b %ERRORLEVEL%
-)
+echo.
+<nul set /p "=Step 7: Starting application "
+powershell -Command "Start-Process -FilePath '%EXE_FILE_PATH%' -NoNewWindow"
 echo [DONE]
 
 
-echo ==============================
+echo.
 echo Update completed successfully!
-echo ==============================
+echo.
+
 echo The window will close in 5 seconds...
-:: timeout /t 5 >nul
-:: exit
+timeout /t 5 /nobreak >nul
+exit
 ''';
