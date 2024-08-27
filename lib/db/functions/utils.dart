@@ -61,8 +61,22 @@ Future<void> initializeHiveDB() async {
     Hive.registerAdapter(MiscModelAdapter());
   }
 
-  //#pending - might need to add user to table from TGDB.
+  //#pending - might need to add these from TGDB.
   await addDeveloperUserIfEmpty();
+  await setBookStallDetailsIfEmpty();
+}
+
+Future<void> setBookStallDetailsIfEmpty() async {
+  if ((await readMiscValue(MiscDBKeys.bookStallName)) == '') {
+    await updateMiscValue(MiscDBKeys.bookStallName, 'St. Thomas Book Stall');
+  }
+  if ((await readMiscValue(MiscDBKeys.bookStallAdress)) == '') {
+    await updateMiscValue(MiscDBKeys.bookStallAdress,
+        'Seminary Rd, Vadavathoor, Puthuppally, Kerala 686010');
+  }
+  if ((await readMiscValue(MiscDBKeys.bookStallPhoneNumber)) == '') {
+    await updateMiscValue(MiscDBKeys.bookStallPhoneNumber, '1234456789');
+  }
 }
 
 Future<Box<MiscModel>> getMiscBox() async {

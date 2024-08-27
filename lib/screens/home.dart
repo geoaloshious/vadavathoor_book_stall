@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/app_updation/check_for_updates.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
+import 'package:vadavathoor_book_stall/createBillPDF.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_stall_details.dart';
@@ -109,6 +110,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }),
             actions: [
+              IconButton(
+                  onPressed: () {
+                    saveAndOpenPDF('Geo', 'George');
+                  },
+                  icon: Icon(Icons.abc)),
               PopupMenuButton<int>(
                   icon: const Icon(Icons.settings, size: 25),
                   onSelected: (int value) {
