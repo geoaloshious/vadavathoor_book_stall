@@ -90,7 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
           return Dialog(
               child: Container(
-                  constraints: BoxConstraints(minWidth: screenSize.width * 0.3),
+                  constraints: BoxConstraints(
+                      minWidth: screenSize.width * 0.3,
+                      maxWidth: screenSize.width * 0.3),
                   child: const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: SingleChildScrollView(child: AppUpdateWidget()))));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import 'app_updation.dart';
 
@@ -11,8 +12,10 @@ class AppUpdateWidget extends StatefulWidget {
 
 class _AppUpdateState extends State<AppUpdateWidget> {
   String currentVersion = '';
+  String newVersion = '';
   String message = '';
-  bool downloaded = false;
+  String changeLog = '';
+  String downloadURL = '';
 
   void setData() async {
     final temp = await getAppVersion();
@@ -23,24 +26,14 @@ class _AppUpdateState extends State<AppUpdateWidget> {
 
     final tempLatest = await getLatestAppVersion();
 
-    if (tempLatest['version'] != null) {
+    if (tempLatest['version'] != null && tempLatest['changeLog'] != null) {
       if (tempLatest['version'] != currentVersion) {
         setState(() {
-          message =
-              'Found new version ${tempLatest['version']}\nApplication will be restarting in 5 seconds';
+          message = '';
+          newVersion = tempLatest['version']!;
+          changeLog = tempLatest['changeLog']!;
+          downloadURL = tempLatest['url']!;
         });
-        // setState(() {
-        //   message =
-        //       'Downloading and installing version ${tempLatest['version']}';
-        // });
-
-        await Future.delayed(const Duration(seconds: 5));
-        // await downloadAndUpdate(tempLatest['version']!, tempLatest['url']!);
-        // setState(() {
-        //   downloaded = true;
-        //   message =
-        //       "\n• Go to Downloads folder\n• Extract bookstall_${tempLatest['version']!}.zip\n• Copy all files\n• Go to this application's folder\n• Close this application\n• Delete all files except database folder\n• Paste new files";
-        // });
       } else {
         setState(() {
           message = 'No updates available';
@@ -61,21 +54,28 @@ class _AppUpdateState extends State<AppUpdateWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Current version : $currentVersion'),
-      if (downloaded)
-        Text.rich(
-            TextSpan(children: [
-              const TextSpan(text: "Download completed.\n\n"),
-              const TextSpan(
-                  text: "Instructions",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: message)
-            ]),
-            style: DefaultTextStyle.of(context).style)
-      else
-        Text(message)
-    ]));
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+          'Current version: $currentVersion ${newVersion == '' ? '' : '\nNew version: $newVersion'}'),
+      Text(message),
+      if (changeLog.isNotEmpty)
+        ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 400),
+            child: Markdown(data: changeLog, padding: const EdgeInsets.all(0))),
+      if (downloadURL.isNotEmpty)
+        Center(
+            child: Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.blueGrey,
+                    ),
+                    onPressed: () async {
+                      await Future.delayed(const Duration(seconds: 5));
+                      await downloadAndUpdate(downloadURL);
+                    },
+                    child: const Text('Update',
+                        style: TextStyle(color: Colors.white)))))
+    ]);
   }
 }

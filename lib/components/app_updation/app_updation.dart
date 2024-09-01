@@ -22,13 +22,17 @@ Future<Map<String, String>> getLatestAppVersion() async {
         latestRelease['tag_name'].toString().replaceFirst('v', '');
     String downloadUrl = latestRelease['assets'][0]['browser_download_url'];
 
-    return {'version': latestVersion, 'url': downloadUrl};
+    return {
+      'version': latestVersion,
+      'url': downloadUrl,
+      'changeLog': latestRelease['body']
+    };
   }
 
   return {};
 }
 
-Future<void> downloadAndUpdate(String version, String downloadUrl) async {
+Future<void> downloadAndUpdate(String downloadUrl) async {
   final appFolderPath = Directory.current.path;
 
   final batchFile = File('$appFolderPath/update.bat');
