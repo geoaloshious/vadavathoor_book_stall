@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/components/app_updation/check_for_updates.dart';
 import 'package:vadavathoor_book_stall/components/user_profile/user_profile.dart';
-import 'package:vadavathoor_book_stall/createBillPDF.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/book_stall_details.dart';
@@ -92,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                   constraints: BoxConstraints(
                       minWidth: screenSize.width * 0.3,
-                      maxWidth: screenSize.width * 0.3),
+                      maxWidth: screenSize.width * 0.5),
                   child: const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: SingleChildScrollView(child: AppUpdateWidget()))));
@@ -112,12 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }),
             actions: [
-              IconButton(
-                  onPressed: () {
-                    saveAndOpenPDF('Geo', 'George', '1234', '22/8/24 10:12 AM',
-                        'Theology');
-                  },
-                  icon: Icon(Icons.abc)),
               PopupMenuButton<int>(
                   icon: const Icon(Icons.settings, size: 25),
                   onSelected: (int value) {

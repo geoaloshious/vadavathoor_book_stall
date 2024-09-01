@@ -57,11 +57,11 @@ class _AppUpdateState extends State<AppUpdateWidget> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
           'Current version: $currentVersion ${newVersion == '' ? '' : '\nNew version: $newVersion'}'),
-      Text(message),
       if (changeLog.isNotEmpty)
         ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 400),
-            child: Markdown(data: changeLog, padding: const EdgeInsets.all(0))),
+            child: Markdown(data: changeLog)),
+      Text(message),
       if (downloadURL.isNotEmpty)
         Center(
             child: Padding(
@@ -71,6 +71,10 @@ class _AppUpdateState extends State<AppUpdateWidget> {
                       backgroundColor: Colors.blueGrey,
                     ),
                     onPressed: () async {
+                      setState(() {
+                        message =
+                            'Starting updation in 5 seconds. App will be closing automatically.';
+                      });
                       await Future.delayed(const Duration(seconds: 5));
                       await downloadAndUpdate(downloadURL);
                     },

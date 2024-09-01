@@ -43,7 +43,7 @@ Future<void> addSale(List<SaleItemBookModel> booksToCheckout, double grandTotal,
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
   saleBox.add(SaleModel(
-      saleID: generateID(),
+      saleID: '${saleBox.values.length + 1}',
       books: booksToCheckout,
       grandTotal: grandTotal,
       customerName: customerName,
@@ -252,15 +252,3 @@ Future<Map<String, Map<String, Map<String, Object>>>> getBookWithPurchases(
 
   return bks;
 }
-
-
-// {
-//   'b1':{
-//     name
-//     'p1':{
-//       'date':'1/1/24',
-//       'price':'1',
-//       'balanceStock':0
-//     }
-//   }
-// }

@@ -104,6 +104,7 @@ class _SalesState extends State<SalesWidget> {
                   child: Text('Modified Date',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
+              const SizedBox(width: 40),
               if (loggedIn) const SizedBox(width: 80)
             ]),
             Padding(

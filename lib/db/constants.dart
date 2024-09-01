@@ -10,6 +10,10 @@ class MiscDBKeys {
   static const String bookStallName = 'bookStallName';
   static const String bookStallAdress = 'bookStallAdress';
   static const String bookStallPhoneNumber = 'bookStallPhoneNumber';
+  static const String bankName = 'bankName';
+  static const String bankAccountNo = 'bankAccountNo';
+  static const String bankIFSC = 'bankIFSC';
+  static const String bankBranch = 'bankBranch';
 }
 
 class DBItemHiveType {
