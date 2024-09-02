@@ -29,7 +29,7 @@ Future<String> createPDF({
   final bankIFSC = await readMiscValue(MiscDBKeys.bankIFSC);
 
   final grandTotal = books.fold(
-      0.0, (total, book) => total + (book['amount'] * book['quantity']));
+      0.0, (total, book) => total + (book['soldPrice'] * book['quantity']));
 
   final pdf = pw.Document();
 
@@ -124,11 +124,11 @@ Future<String> createPDF({
                             child: pw.Text('${books[i]['discount']}%')),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${books[i]['amount']}')),
+                            child: pw.Text('${books[i]['soldPrice']}')),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                                '${books[i]['amount'] * books[i]['quantity']}'))
+                                '${books[i]['soldPrice'] * books[i]['quantity']}'))
                       ])
                   ]),
               pw.SizedBox(height: 10),
@@ -188,20 +188,46 @@ Future<String> createPDF({
             ])
           ]));
 
-  // Get the Downloads directory
-  final downloadsDirectory = await getApplicationDocumentsDirectory();
+  Directory? directory;
 
-  // Ensure the directory exists
-  if (downloadsDirectory == null) {
+  if (Platform.isWindows) {
+    directory = await getDownloadsDirectory();
+  } else {
+    directory = await getApplicationDocumentsDirectory();
+  }
+
+  if (directory == null) {
     throw Exception('Could not get Downloads directory');
   }
 
-  // Save the PDF file
-  final filePath = '${downloadsDirectory.path}/sale_bill_$billNo.pdf';
+  final filePath = '${directory.path}/sale_bill_$billNo.pdf';
   final file = File(filePath);
   await file.writeAsBytes(await pdf.save());
 
-  return filePath; // Return the file path
+  return filePath;
+}
+
+Future<void> openPdfWithDefaultApp(String filePath) async {
+  try {
+    ProcessResult result;
+
+    if (Platform.isWindows) {
+      result = await Process.run('cmd', ['/c', 'start', '', filePath]);
+    } else if (Platform.isMacOS) {
+      result = await Process.run('open', [filePath]);
+    } else if (Platform.isLinux) {
+      result = await Process.run('xdg-open', [filePath]);
+    } else {
+      throw UnsupportedError('Unsupported platform for opening PDF');
+    }
+
+    if (result.exitCode != 0) {
+      print(
+          'Error opening PDF on ${Platform.operatingSystem}: ${result.stderr}');
+    }
+  } catch (e) {
+    print('Failed to open PDF: $e');
+  }
 }
 
 void saveAndOpenPDF(String saleID) async {
@@ -215,14 +241,17 @@ void saveAndOpenPDF(String saleID) async {
 
   for (var b in sale.books) {
     for (var pv in b.purchaseVariants) {
+      final op =
+          purchaseDB.firstWhere((p) => p.purchaseID == pv.purchaseID).bookPrice;
+
+      final discount = 100 - ((pv.soldPrice / op) * 100);
+
       books.add({
         'name': bookDB.firstWhere((b) => b.bookID == b.bookID).bookName,
-        'original_price': purchaseDB
-            .firstWhere((p) => p.purchaseID == pv.purchaseID)
-            .bookPrice,
-        'discount': pv.soldPrice,
+        'original_price': op,
+        'soldPrice': pv.soldPrice,
         'quantity': pv.quantity,
-        'amount': pv.soldPrice
+        'discount': discount
       });
     }
   }
@@ -237,6 +266,5 @@ void saveAndOpenPDF(String saleID) async {
       billNo: saleID,
       date: formatTimestamp(timestamp: sale.createdDate));
 
-  print('PDF saved at: $filePath');
-  Process.run('open', ['-a', 'Google Chrome', filePath]);
+  openPdfWithDefaultApp(filePath);
 }

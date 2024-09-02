@@ -52,13 +52,11 @@ class _SaleState extends State<SaleWidget> {
         context: context,
         builder: (BuildContext context) {
           Size screenSize = MediaQuery.of(context).size;
-          double dialogWidth = screenSize.width * 0.7;
-          double dialogHeight = screenSize.height * 0.5;
 
           return Dialog(
               child: Container(
-                  constraints: BoxConstraints(
-                      minHeight: dialogHeight, maxWidth: dialogWidth),
+                  constraints:
+                      BoxConstraints(minHeight: screenSize.height * 0.5),
                   child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SingleChildScrollView(
