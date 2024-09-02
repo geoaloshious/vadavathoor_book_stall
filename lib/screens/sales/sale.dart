@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/create_bill_pdf.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales_modal.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
@@ -51,13 +52,11 @@ class _SaleState extends State<SaleWidget> {
         context: context,
         builder: (BuildContext context) {
           Size screenSize = MediaQuery.of(context).size;
-          double dialogWidth = screenSize.width * 0.7;
-          double dialogHeight = screenSize.height * 0.5;
 
           return Dialog(
               child: Container(
-                  constraints: BoxConstraints(
-                      minHeight: dialogHeight, maxWidth: dialogWidth),
+                  constraints:
+                      BoxConstraints(minHeight: screenSize.height * 0.5),
                   child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SingleChildScrollView(
@@ -77,6 +76,12 @@ class _SaleState extends State<SaleWidget> {
       Expanded(child: Text(widget.data.grandTotal.toString())),
       Expanded(child: Text(widget.data.createdDate)),
       Expanded(child: Text(widget.data.modifiedDate)),
+      IconButton(
+          icon: const Icon(Icons.print),
+          tooltip: 'Bill',
+          onPressed: () {
+            saveAndOpenPDF(widget.data.saleID);
+          }),
       if (widget.loggedIn)
         IconButton(
             icon: const Icon(Icons.edit),

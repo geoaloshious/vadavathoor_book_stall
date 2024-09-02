@@ -35,14 +35,11 @@ class _SalesState extends State<SalesWidget> {
       context: context,
       builder: (BuildContext context) {
         Size screenSize = MediaQuery.of(context).size;
-        double dialogWidth = screenSize.width * 0.8;
-        double dialogHeight = screenSize.height * 0.7;
 
         return Dialog(
           child: Container(
             constraints: BoxConstraints(
-              minHeight: dialogHeight,
-              maxWidth: dialogWidth, // Set the desired maximum width
+              minHeight: screenSize.height * 0.7,
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -104,6 +101,7 @@ class _SalesState extends State<SalesWidget> {
                   child: Text('Modified Date',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
+              const SizedBox(width: 40),
               if (loggedIn) const SizedBox(width: 80)
             ]),
             Padding(

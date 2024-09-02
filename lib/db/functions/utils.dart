@@ -61,8 +61,34 @@ Future<void> initializeHiveDB() async {
     Hive.registerAdapter(MiscModelAdapter());
   }
 
-  //#pending - might need to add user to table from TGDB.
+  //#pending - might need to add these from TGDB.
   await addDeveloperUserIfEmpty();
+  await setBookStallDetailsIfEmpty();
+}
+
+Future<void> setBookStallDetailsIfEmpty() async {
+  if ((await readMiscValue(MiscDBKeys.bookStallName)) == '') {
+    await updateMiscValue(MiscDBKeys.bookStallName, 'St. Thomas Book Stall');
+  }
+  if ((await readMiscValue(MiscDBKeys.bookStallAdress)) == '') {
+    await updateMiscValue(MiscDBKeys.bookStallAdress,
+        'St.Thomas Ap.Seminary, PB No.1, Kottayam - 686010');
+  }
+  if ((await readMiscValue(MiscDBKeys.bookStallPhoneNumber)) == '') {
+    await updateMiscValue(MiscDBKeys.bookStallPhoneNumber, '7593990978');
+  }
+  if ((await readMiscValue(MiscDBKeys.bankName)) == '') {
+    await updateMiscValue(MiscDBKeys.bankName, 'CSB Bank');
+  }
+  if ((await readMiscValue(MiscDBKeys.bankAccountNo)) == '') {
+    await updateMiscValue(MiscDBKeys.bankAccountNo, '030801736673190001');
+  }
+  if ((await readMiscValue(MiscDBKeys.bankIFSC)) == '') {
+    await updateMiscValue(MiscDBKeys.bankIFSC, 'CSBK0000308');
+  }
+  if ((await readMiscValue(MiscDBKeys.bankBranch)) == '') {
+    await updateMiscValue(MiscDBKeys.bankBranch, 'Kalathippady');
+  }
 }
 
 Future<Box<MiscModel>> getMiscBox() async {

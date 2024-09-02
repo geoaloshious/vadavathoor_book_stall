@@ -14,7 +14,8 @@ class PurchaseVariantWidget extends StatefulWidget {
 }
 
 class _PurchaseVariantState extends State<PurchaseVariantWidget> {
-  TextEditingController _discountPriceController = TextEditingController();
+  TextEditingController _sellingPriceController = TextEditingController();
+  TextEditingController _discountController = TextEditingController();
   TextEditingController _quantityController = TextEditingController(text: '0');
   bool didSetData = false;
 
@@ -42,19 +43,43 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
     }
   }
 
+  void calculateDiscount(double sellingPrice) {
+    double prtg = 100 - ((sellingPrice / widget.data.originalPrice) * 100);
+    setState(() {
+      _discountController = TextEditingController(text: prtg.toString());
+    });
+  }
+
+ void calculateSellingPrice(String percentage) {
+  double discountPercentage = double.tryParse(percentage) ?? 0;
+  double originalPrice = widget.data.originalPrice;
+  
+  double sellingPrice = originalPrice - (originalPrice * discountPercentage / 100);
+  
+  sellingPrice = double.parse(sellingPrice.toStringAsFixed(2));
+
+  setState(() {
+    _sellingPriceController = TextEditingController(text: sellingPrice.toString());
+  });
+
+  widget.updateData(dsPr: sellingPrice);
+}
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (!didSetData) {
-      _discountPriceController =
-          TextEditingController(text: widget.data.soldPrice.toString());
-      _quantityController =
-          TextEditingController(text: widget.data.quantitySold.toString());
-
+    if (!didSetData && widget.data.quantitySold > 0) {
       setState(() {
+        _sellingPriceController =
+            TextEditingController(text: widget.data.soldPrice.toString());
+        _quantityController =
+            TextEditingController(text: widget.data.quantitySold.toString());
+
         didSetData = true;
       });
+
+      calculateDiscount(widget.data.soldPrice);
     }
   }
 
@@ -65,54 +90,83 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
       child: Row(
         children: [
           Expanded(
-              flex: 4,
-              child: CheckboxListTile(
-                title: Text(
-                  widget.data.purchaseDate,
-                  style: const TextStyle(fontSize: 14),
-                ),
-                value: widget.data.selected,
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _quantityController.text = '0';
-                    _discountPriceController.clear();
-                    widget.updateData(selected: value == true);
-                  });
-                },
-              )),
-          const SizedBox(width: 20),
-          Expanded(
-            flex: 3,
-            child: Row(
-              children: [
-                Text('Price : ${widget.data.originalPrice}'),
-                const SizedBox(width: 10),
-                Expanded(
-                    child: TextField(
-                  enabled: widget.data.selected,
-                  decoration: const InputDecoration(
-                      hintStyle: TextStyle(fontSize: 14),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: InputBorder.none,
-                      hintText: 'Discount price'),
-                  controller: _discountPriceController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
-                  ],
-                  onChanged: (value) {
-                    widget.updateData(dsPr: double.tryParse(value) ?? 0);
-                  },
-                ))
-              ],
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
               flex: 3,
+              child: CheckboxListTile(
+                  title: Text(
+                    widget.data.purchaseDate,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  value: widget.data.selected,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _quantityController.text = '0';
+                      _sellingPriceController.clear();
+                      widget.updateData(selected: value == true);
+                    });
+                  })),
+          const SizedBox(width: 20),
+          Row(children: [
+            Text('Rate : ${widget.data.originalPrice}'),
+            const SizedBox(width: 10),
+            SizedBox(
+                width: 100,
+                child: TextField(
+                    enabled: widget.data.selected,
+                    decoration: const InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: InputBorder.none,
+                        labelStyle: TextStyle(fontSize: 12),
+                        labelText: 'Discount %'),
+                    controller: _discountController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}')),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        final number = double.tryParse(newValue.text) ?? 0;
+                        if (number > 100) {
+                          return oldValue;
+                        }
+                        return newValue;
+                      })
+                    ],
+                    onChanged: calculateSellingPrice)),
+            const SizedBox(width: 10),
+            SizedBox(
+                width: 130,
+                child: TextField(
+                    enabled: widget.data.selected,
+                    decoration: const InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: InputBorder.none,
+                        labelStyle: TextStyle(fontSize: 12),
+                        labelText: 'Amount'),
+                    controller: _sellingPriceController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}')),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        final number = double.tryParse(newValue.text) ?? 0;
+                        if (number > widget.data.originalPrice) {
+                          return oldValue;
+                        }
+                        return newValue;
+                      })
+                    ],
+                    onChanged: (value) {
+                      calculateDiscount(double.tryParse(value) ?? 0);
+                      widget.updateData(dsPr: double.tryParse(value) ?? 0);
+                    }))
+          ]),
+          const SizedBox(width: 20),
+          Expanded(
+              flex: 2,
               child: AbsorbPointer(
                   absorbing: !widget.data.selected,
                   child: Container(
@@ -146,16 +200,20 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
                                       const TextInputType.numberWithOptions(
                                           decimal: true),
                                   inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    TextInputFormatter.withFunction(
+                                        (oldValue, newValue) {
+                                      final number =
+                                          int.tryParse(newValue.text) ?? 0;
+                                      if (number > widget.data.balanceStock) {
+                                        return oldValue;
+                                      }
+                                      return newValue;
+                                    })
                                   ],
                                   onChanged: (value) {
-                                    int numVal = int.tryParse(value) ?? 0;
-                                    if (numVal > widget.data.balanceStock) {
-                                      numVal = widget.data.balanceStock;
-                                      _quantityController.text =
-                                          numVal.toString();
-                                    }
-                                    widget.updateData(qty: numVal);
+                                    widget.updateData(
+                                        qty: int.tryParse(value) ?? 0);
                                   })),
                           Expanded(
                               child: Text('/ ${widget.data.balanceStock}')),

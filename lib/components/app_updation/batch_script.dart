@@ -26,7 +26,7 @@ for %%F in (*) do (
 
 :: Delete all folders except folder 'database'
 for /d %%D in (*) do (
-    if /I not "%%D"=="database" rd /s /q "%%D"
+    if /I not "%%D"=="databs" rd /s /q "%%D"
 )
 
 echo [DONE]

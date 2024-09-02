@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:vadavathoor_book_stall/components/app_updation/batch_script.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -23,13 +22,17 @@ Future<Map<String, String>> getLatestAppVersion() async {
         latestRelease['tag_name'].toString().replaceFirst('v', '');
     String downloadUrl = latestRelease['assets'][0]['browser_download_url'];
 
-    return {'version': latestVersion, 'url': downloadUrl};
+    return {
+      'version': latestVersion,
+      'url': downloadUrl,
+      'changeLog': latestRelease['body']
+    };
   }
 
   return {};
 }
 
-Future<void> downloadAndUpdate(String version, String downloadUrl) async {
+Future<void> downloadAndUpdate(String downloadUrl) async {
   final appFolderPath = Directory.current.path;
 
   final batchFile = File('$appFolderPath/update.bat');
