@@ -78,22 +78,16 @@ class _UserProfileState extends State<UserProfileWidget> {
       return PopupMenuButton<int>(
           padding: const EdgeInsets.all(5),
           icon: user.user.userID == ''
-              ? const Icon(
-                  Icons.account_circle,
-                  size: 35,
-                )
+              ? const Icon(Icons.account_circle, size: 35)
               : Container(
                   width: 35,
                   height: 35,
                   decoration: const BoxDecoration(
-                    color: Colors.blueGrey,
-                    shape: BoxShape.circle,
-                  ),
+                      color: Colors.blueGrey, shape: BoxShape.circle),
                   alignment: Alignment.center,
-                  child: Text(user.user.name,
+                  child: Text(user.user.name[0],
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white)),
-                ),
+                          fontWeight: FontWeight.bold, color: Colors.white))),
           tooltip: user.user.userID == '' ? 'Guest user' : user.user.name,
           onSelected: onSelected,
           itemBuilder: (context) => [

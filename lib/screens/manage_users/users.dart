@@ -200,14 +200,14 @@ class _UsersState extends State<UsersWidget> {
                                     onPressEdit(users[index]);
                                   }),
                               //Logged user cannot delete himself
-                              if (users[index].userID !=
-                                  loggedInUser.user.userID)
-                                IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    tooltip: 'Delete',
-                                    onPressed: () {
-                                      onPressDelete(users[index].userID);
-                                    })
+                              users[index].userID == loggedInUser.user.userID
+                                  ? const SizedBox(width: 40)
+                                  : IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      tooltip: 'Delete',
+                                      onPressed: () {
+                                        onPressDelete(users[index].userID);
+                                      })
                             ]))
                     : const Text("No records found"))
           ]));
