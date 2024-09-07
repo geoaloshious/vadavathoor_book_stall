@@ -4,7 +4,7 @@ import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/books/edit_modal.dart';
+import 'package:vadavathoor_book_stall/components/edit_modal.dart';
 
 class BookCategoriesWidget extends StatefulWidget {
   const BookCategoriesWidget({super.key});

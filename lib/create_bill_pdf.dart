@@ -3,7 +3,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
+import 'package:vadavathoor_book_stall/logger.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 import 'db/functions/book.dart';
 import 'db/functions/book_purchase.dart';
@@ -105,7 +107,7 @@ Future<String> createPDF({
                               style:
                                   pw.TextStyle(fontWeight: pw.FontWeight.bold)))
                     ]),
-                    for (var i = 0; i < books.length; i++) //
+                    for (int i = 0; i < books.length; i++) //
                       pw.TableRow(children: [
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
@@ -222,11 +224,11 @@ Future<void> openPdfWithDefaultApp(String filePath) async {
     }
 
     if (result.exitCode != 0) {
-      print(
+      writeToLog(
           'Error opening PDF on ${Platform.operatingSystem}: ${result.stderr}');
     }
   } catch (e) {
-    print('Failed to open PDF: $e');
+    writeToLog('Failed to open PDF: $e');
   }
 }
 
@@ -235,12 +237,13 @@ void saveAndOpenPDF(String saleID) async {
   final bookDB = (await getBooksBox()).values.toList();
   final purchaseDB = (await getBookPurchaseBox()).values.toList();
   final userDB = (await getUsersBox()).values.toList();
+  final userBatches = (await getUserBatchBox()).values.toList();
 
   SaleModel sale = salesDB.firstWhere((s) => s.saleID == saleID);
   List<Map<String, dynamic>> books = [];
 
-  for (var b in sale.books) {
-    for (var pv in b.purchaseVariants) {
+  for (SaleItemBookModel b in sale.books) {
+    for (SaleItemBookPurchaseVariantModel pv in b.purchaseVariants) {
       final op =
           purchaseDB.firstWhere((p) => p.purchaseID == pv.purchaseID).bookPrice;
 
@@ -260,9 +263,11 @@ void saveAndOpenPDF(String saleID) async {
 
   String filePath = await createPDF(
       books: books,
-      customerName: sale.customerName,
-      customerBatch: sale.customerBatch,
-      salesPerson: '${salesPerson.firstName} ${salesPerson.lastName}',
+      customerName: userDB.firstWhere((u) => u.userID == sale.customerID).name,
+      customerBatch: userBatches
+          .firstWhere((u) => u.batchID == sale.customerBatchID)
+          .batchName,
+      salesPerson: salesPerson.name,
       billNo: saleID,
       date: formatTimestamp(timestamp: sale.createdDate));
 

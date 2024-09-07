@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
-import 'package:vadavathoor_book_stall/db/models/book_author.dart';
+import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
+import 'package:vadavathoor_book_stall/db/models/user_batch.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/components/edit_modal.dart';
 
-class AuthorsWidget extends StatefulWidget {
-  const AuthorsWidget({super.key});
+class UserBatchWidget extends StatefulWidget {
+  const UserBatchWidget({super.key});
 
   @override
-  State<AuthorsWidget> createState() => _AuthorsWidget();
+  State<UserBatchWidget> createState() => _UserBatchState();
 }
 
-class _AuthorsWidget extends State<AuthorsWidget> {
+class _UserBatchState extends State<UserBatchWidget> {
   final _nameController = TextEditingController();
-  List<BookAuthorModel> authors = [];
+  List<UserBatchModel> batchList = [];
 
   void add() async {
     final name = _nameController.text.trim();
     if (name != '') {
-      await addBookAuthor(name);
+      await addUserBatch(name);
       _nameController.clear();
       setData();
     }
   }
 
-  onPressEdit(BookAuthorModel selectedItem) {
+  onPressEdit(UserBatchModel selectedItem) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -39,12 +39,12 @@ class _AuthorsWidget extends State<AuthorsWidget> {
                       padding: const EdgeInsets.all(16.0),
                       child: SingleChildScrollView(
                           child: EditModalWidget(
-                              title: 'Author',
-                              name: selectedItem.authorName,
+                              title: 'Batch',
+                              name: selectedItem.batchName,
                               saveData: (name) {
-                                editBookAuthor(
-                                        authorID: selectedItem.authorID,
-                                        authorName: name)
+                                editUserBatch(
+                                        batchID: selectedItem.batchID,
+                                        batchName: name)
                                     .then((_) {
                                   setData();
                                   Navigator.of(context).pop();
@@ -69,8 +69,8 @@ class _AuthorsWidget extends State<AuthorsWidget> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      editBookAuthor(
-                              authorID: selectedID, status: DBRowStatus.deleted)
+                      editUserBatch(
+                              batchID: selectedID, status: DBRowStatus.deleted)
                           .then((_) {
                         setData();
                         Navigator.of(context).pop();
@@ -82,9 +82,9 @@ class _AuthorsWidget extends State<AuthorsWidget> {
   }
 
   void setData() async {
-    final temp = await getBookAuthors();
+    final temp = await getUserBatchList();
     setState(() {
-      authors = temp;
+      batchList = temp;
     });
   }
 
@@ -109,7 +109,7 @@ class _AuthorsWidget extends State<AuthorsWidget> {
                     child: TextField(
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Author Name'),
+                            hintText: 'Batch Name'),
                         controller: _nameController)),
                 const SizedBox(width: 20),
                 ElevatedButton(
@@ -135,24 +135,24 @@ class _AuthorsWidget extends State<AuthorsWidget> {
                         border:
                             Border.all(width: 0.2, color: Colors.blueGrey)))),
             Expanded(
-                child: authors.isNotEmpty
+                child: batchList.isNotEmpty
                     ? ListView.builder(
-                        itemCount: authors.length,
+                        itemCount: batchList.length,
                         itemBuilder: (context, index) => Row(children: [
-                              Expanded(child: Text(authors[index].authorName)),
+                              Expanded(child: Text(batchList[index].batchName)),
                               if (loggedIn)
                                 IconButton(
                                     icon: const Icon(Icons.edit),
                                     tooltip: 'Edit',
                                     onPressed: () {
-                                      onPressEdit(authors[index]);
+                                      onPressEdit(batchList[index]);
                                     }),
                               if (loggedIn)
                                 IconButton(
                                     icon: const Icon(Icons.delete),
                                     tooltip: 'Delete',
                                     onPressed: () {
-                                      onPressDelete(authors[index].authorID);
+                                      onPressDelete(batchList[index].batchID);
                                     })
                             ]))
                     : const Text("No records found"))

@@ -28,7 +28,8 @@ class DBItemHiveType {
   static const int attachment = 9;
   static const int misc = 10;
   static const int users = 11;
-  static const int loginHistory = 12;
+  static const int userBatch = 12;
+  static const int loginHistory = 13;
 }
 
 class DBNames {
@@ -44,6 +45,7 @@ class DBNames {
   static const String attachment = 'attachment_db';
   static const String misc = 'misc_db';
   static const String users = 'users_db';
+  static const String userBatch = 'user_batch_db';
   static const String loginHistory = 'login_history_db';
 }
 

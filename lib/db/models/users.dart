@@ -5,11 +5,11 @@ part 'users.g.dart';
 
 UserModel emptyUserModel() => UserModel(
     userID: '',
-    firstName: '',
-    lastName: '',
+    name: '',
     username: '',
     password: '',
     role: 0,
+    batchID: '',
     status: 0,
     createdDate: 0,
     createdBy: '',
@@ -22,10 +22,7 @@ class UserModel {
   final String userID;
 
   @HiveField(1)
-  String firstName;
-
-  @HiveField(2)
-  String lastName;
+  String name;
 
   @HiveField(3)
   String username;
@@ -37,28 +34,31 @@ class UserModel {
   int role;
 
   @HiveField(6)
-  int status;
+  String batchID;
 
   @HiveField(7)
-  final int createdDate;
+  int status;
 
   @HiveField(8)
-  final String createdBy;
+  final int createdDate;
 
   @HiveField(9)
-  int modifiedDate;
+  final String createdBy;
 
   @HiveField(10)
+  int modifiedDate;
+
+  @HiveField(11)
   String modifiedBy;
 
   Map<String, dynamic> toJson() {
     return {
       'userID': userID,
-      'firstName': firstName,
-      'lastName': lastName,
+      'name': name,
       'username': username,
       'password': password,
       'role': role,
+      'batchID': batchID,
       'status': status,
       'createdDate': createdDate,
       'createdBy': createdBy,
@@ -68,16 +68,16 @@ class UserModel {
   }
 
   Map<String, String> toDropdownData() {
-    return {'id': userID, 'name': '$firstName $lastName'};
+    return {'id': userID, 'name': name};
   }
 
   UserModel(
       {required this.userID,
-      required this.firstName,
-      required this.lastName,
+      required this.name,
       required this.username,
       required this.password,
       required this.role,
+      required this.batchID,
       required this.status,
       required this.createdDate,
       required this.createdBy,

@@ -1,8 +1,11 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
+import 'package:vadavathoor_book_stall/db/models/users.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
 
 import '../constants.dart';
@@ -36,18 +39,60 @@ Future<Map<String, int>> getPurchaseKeysAndIDs(
   return purchaseKeys;
 }
 
-Future<void> addSale(List<SaleItemBookModel> booksToCheckout, double grandTotal,
-    String customerName, String customerBatch, String paymentMode) async {
+Future<Map<String, String>> getCustomerIDAndBatchID(
+  String customerID,
+  String customerName,
+  String customerBatch,
+) async {
+  final userDB = await getUsersBox();
+
+  String customerBatchID = '';
+
+  if (customerID == '') {
+    customerBatchID = await addUserBatch(customerBatch);
+    customerID = (await addUser(UserModel(
+            userID: '',
+            name: customerName,
+            username: '',
+            password: '',
+            role: UserRole.normal,
+            batchID: customerBatchID,
+            status: UserStatus.enabled,
+            createdDate: 0,
+            createdBy: '',
+            modifiedDate: 0,
+            modifiedBy: '')))['userID'] ??
+        '';
+  } else {
+    customerBatchID =
+        userDB.values.firstWhere((b) => b.userID == customerID).batchID;
+  }
+
+  return {'customerID': customerID, 'customerBatchID': customerBatchID};
+}
+
+Future<void> addSale(
+    List<SaleItemBookModel> booksToCheckout,
+    double grandTotal,
+    String customerID,
+    String customerName,
+    String customerBatch,
+    String paymentMode) async {
   final saleBox = await getSalesBox();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+
+  final tempRes =
+      await getCustomerIDAndBatchID(customerID, customerName, customerBatch);
+  customerID = tempRes['customerID']!;
+  String customerBatchID = tempRes['customerBatchID']!;
 
   saleBox.add(SaleModel(
       saleID: '${saleBox.values.length + 1}',
       books: booksToCheckout,
       grandTotal: grandTotal,
-      customerName: customerName,
-      customerBatch: customerBatch,
+      customerID: customerID,
+      customerBatchID: customerBatchID,
       paymentMode: paymentMode,
       createdDate: currentTS,
       createdBy: loggedInUser,
@@ -58,8 +103,8 @@ Future<void> addSale(List<SaleItemBookModel> booksToCheckout, double grandTotal,
   final purchaseBox = await getBookPurchaseBox();
   final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
-  for (var book in booksToCheckout) {
-    for (var pv in book.purchaseVariants) {
+  for (SaleItemBookModel book in booksToCheckout) {
+    for (SaleItemBookPurchaseVariantModel pv in book.purchaseVariants) {
       BookPurchaseModel? existingData =
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
       if (existingData != null) {
@@ -75,6 +120,7 @@ Future<void> editSale(
     String saleID,
     List<SaleItemBookModel> booksToCheckout,
     double grandTotal,
+    String customerID,
     String customerName,
     String customerBatch,
     String paymentMode) async {
@@ -85,12 +131,17 @@ Future<void> editSale(
 
   final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
+  final tempRes =
+      await getCustomerIDAndBatchID(customerID, customerName, customerBatch);
+  customerID = tempRes['customerID']!;
+  String customerBatchID = tempRes['customerBatchID']!;
+
   for (int saleKey in salesBox.keys) {
     SaleModel? existingSale = salesBox.get(saleKey);
     if (existingSale != null && existingSale.saleID == saleID) {
       //Prepare the object which contains the exisintg sold quantities
-      for (var esb in existingSale.books) {
-        for (var espv in esb.purchaseVariants) {
+      for (SaleItemBookModel esb in existingSale.books) {
+        for (SaleItemBookPurchaseVariantModel espv in esb.purchaseVariants) {
           final existingPurchase =
               purchaseBox.get(purchaseKeys[espv.purchaseID]);
           if (existingPurchase != null) {
@@ -107,8 +158,8 @@ Future<void> editSale(
 
       existingSale.books = booksToCheckout;
       existingSale.grandTotal = grandTotal;
-      existingSale.customerName = customerName;
-      existingSale.customerBatch = customerBatch;
+      existingSale.customerID = customerID;
+      existingSale.customerBatchID = customerBatchID;
       existingSale.paymentMode = paymentMode;
 
       existingSale.modifiedDate = currentTS;
@@ -183,6 +234,7 @@ Future<SaleModel?> getSaleData(String saleID) async {
 Future<List<SaleListItemModel>> getSalesList() async {
   final sales = (await getSalesBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
+  final users = await getUsersBox();
 
   List<SaleListItemModel> joinedData = [];
 
@@ -207,7 +259,8 @@ Future<List<SaleListItemModel>> getSalesList() async {
 
       joinedData.add(SaleListItemModel(
           saleID: sale.saleID,
-          customerName: sale.customerName,
+          customerName:
+              users.values.firstWhere((u) => u.userID == sale.customerID).name,
           books: bookNames.join('\n'),
           grandTotal: sale.grandTotal,
           paymentMode: sale.paymentMode,

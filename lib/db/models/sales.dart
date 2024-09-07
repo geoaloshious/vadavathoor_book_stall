@@ -75,10 +75,10 @@ class SaleModel {
   double grandTotal;
 
   @HiveField(3)
-  String customerName;
+  String customerID;
 
   @HiveField(4)
-  String customerBatch;
+  String customerBatchID;
 
   @HiveField(5)
   String paymentMode;
@@ -102,8 +102,8 @@ class SaleModel {
     return {
       'saleID': saleID,
       'grandTotal': grandTotal,
-      'customerName': customerName,
-      'customerBatch': customerBatch,
+      'customerID': customerID,
+      'customerBatchID': customerBatchID,
       'paymentMode': paymentMode,
       'createdDate': createdDate,
       'createdBy': createdBy,
@@ -118,8 +118,8 @@ class SaleModel {
     return SaleModel(
         books: books.map((b) => b.clone()).toList(),
         grandTotal: grandTotal,
-        customerName: customerName,
-        customerBatch: customerBatch,
+        customerID: customerID,
+        customerBatchID: customerBatchID,
         paymentMode: paymentMode,
         createdDate: createdDate,
         createdBy: createdBy,
@@ -132,8 +132,8 @@ class SaleModel {
   SaleModel(
       {required this.books,
       required this.grandTotal,
-      required this.customerName,
-      required this.customerBatch,
+      required this.customerID,
+      required this.customerBatchID,
       required this.paymentMode,
       required this.createdDate,
       required this.createdBy,

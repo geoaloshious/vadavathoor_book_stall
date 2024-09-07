@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:vadavathoor_book_stall/classes/sales.dart';
+import 'package:vadavathoor_book_stall/components/drop_down.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
 import 'package:vadavathoor_book_stall/components/button.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sale_item_book.dart';
@@ -23,13 +26,18 @@ class _SaleModalState extends State<SaleModalWidget> {
   TextEditingController _customerNameController = TextEditingController();
   TextEditingController _customerBatchController = TextEditingController();
 
-  Map<String, bool> inputErrors = {};
+  bool newUser = false;
+  String _selectedUserID = '';
+  List<UserModelForSales> users = [];
+
   List<SaleItemBookModel> booksToCheckout = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
   String _paymentMode = PaymentModes.cash;
   Map<String, Map<String, Map<String, Object>>> allBooksWithPurchases = {};
   List<BookModel> allBooks = [];
+
+  Map<String, bool> inputErrors = {};
 
   bool didSetData = false;
 
@@ -39,11 +47,17 @@ class _SaleModalState extends State<SaleModalWidget> {
 
     Map<String, bool> tempInputErrors = {};
 
-    if (customerName == '') {
-      tempInputErrors['customerName'] = true;
-    }
-    if (customerBatch == '') {
-      tempInputErrors['customerBatch'] = true;
+    if (newUser) {
+      if (customerName == '') {
+        tempInputErrors['customerName'] = true;
+      }
+      if (customerBatch == '') {
+        tempInputErrors['customerBatch'] = true;
+      }
+    } else {
+      if (_selectedUserID == '') {
+        tempInputErrors['customer'] = true;
+      }
     }
 
     if (tempInputErrors.isEmpty) {
@@ -77,6 +91,7 @@ class _SaleModalState extends State<SaleModalWidget> {
           await addSale(
               validBooks,
               grandTotal,
+              _selectedUserID,
               _customerNameController.text.trim(),
               _customerBatchController.text.trim(),
               _paymentMode);
@@ -85,6 +100,7 @@ class _SaleModalState extends State<SaleModalWidget> {
               widget.saleID,
               validBooks,
               grandTotal,
+              _selectedUserID,
               _customerNameController.text.trim(),
               _customerBatchController.text.trim(),
               _paymentMode);
@@ -94,23 +110,20 @@ class _SaleModalState extends State<SaleModalWidget> {
         Navigator.of(context).pop();
       } else {
         showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text('Please add/complete book details'),
-              actions: [
-                TextButton(
-                  autofocus: true,
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                )
-              ],
-            );
-          },
-        );
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  title: const Text('Error'),
+                  content: const Text('Please add/complete book details'),
+                  actions: [
+                    TextButton(
+                        autofocus: true,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'))
+                  ]);
+            });
       }
     } else {
       setState(() {
@@ -160,18 +173,15 @@ class _SaleModalState extends State<SaleModalWidget> {
     List<SaleItemBookModel> tempBooksCheckout = [];
     String tempPaymentMode = PaymentModes.cash;
     double tempGrandTotal = 0;
+    String tempCustomerID = '';
 
     if (widget.saleID != '') {
       final temp = await getSaleData(widget.saleID);
       if (temp != null) {
-        _customerNameController =
-            TextEditingController(text: temp.customerName);
-        _customerBatchController =
-            TextEditingController(text: temp.customerBatch);
-
         tempBooksCheckout = temp.books;
         tempPaymentMode = temp.paymentMode;
         tempGrandTotal = temp.grandTotal;
+        tempCustomerID = temp.customerID;
 
         for (SaleItemBookModel b in temp.books) {
           for (SaleItemBookPurchaseVariantModel p in b.purchaseVariants) {
@@ -183,10 +193,13 @@ class _SaleModalState extends State<SaleModalWidget> {
 
     final tempBookPurchases = await getBookWithPurchases(savedPurchaseIDs);
     final tempBooks = await getBooks();
+    final tempUsers = await getUsersForSales();
 
     setState(() {
       allBooksWithPurchases = tempBookPurchases;
       allBooks = tempBooks;
+      users = tempUsers;
+      _selectedUserID = tempCustomerID;
 
       booksToCheckout = tempBooksCheckout;
       _paymentMode = tempPaymentMode;
@@ -311,49 +324,93 @@ class _SaleModalState extends State<SaleModalWidget> {
             ])
           ])),
       const SizedBox(height: 30),
-      Row(children: [
-        Expanded(
-            child: TextField(
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: inputErrors['customerName'] == true
-                            ? const BorderSide(color: Colors.red, width: 2)
-                            : const BorderSide(color: Colors.grey, width: 1)),
-                    focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.blueGrey, width: 2)),
-                    filled: true,
-                    fillColor: Colors.white,
-                    hoverColor: Colors.transparent,
-                    hintText: 'Customer name'),
-                controller: _customerNameController,
-                onChanged: (value) {
-                  setState(() {
-                    inputErrors = {...inputErrors, 'customerName': false};
-                  });
-                })),
-        const SizedBox(width: 10),
-        Expanded(
-            child: TextField(
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: inputErrors['customerBatch'] == true
-                            ? const BorderSide(color: Colors.red, width: 2)
-                            : const BorderSide(color: Colors.grey, width: 1)),
-                    focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.blueGrey, width: 2)),
-                    filled: true,
-                    fillColor: Colors.white,
-                    hoverColor: Colors.transparent,
-                    hintText: 'Customer batch'),
-                controller: _customerBatchController,
-                onChanged: (value) {
-                  setState(() {
-                    inputErrors = {...inputErrors, 'customerBatch': false};
-                  });
-                }))
-      ]),
+      CheckboxListTile(
+          title: const Text('New Customer'),
+          value: newUser,
+          controlAffinity: ListTileControlAffinity.leading,
+          onChanged: (bool? value) {
+            setState(() {
+              newUser = value ?? false;
+              _selectedUserID = '';
+            });
+          }),
+      const SizedBox(height: 15),
+      newUser
+          ? Row(children: [
+              Expanded(
+                  child: TextField(
+                      decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: inputErrors['customerName'] == true
+                                  ? const BorderSide(
+                                      color: Colors.red, width: 2)
+                                  : const BorderSide(
+                                      color: Colors.grey, width: 1)),
+                          focusedBorder: const OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.blueGrey, width: 2)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          hoverColor: Colors.transparent,
+                          hintText: 'Customer name'),
+                      controller: _customerNameController,
+                      onChanged: (value) {
+                        setState(() {
+                          inputErrors = {...inputErrors, 'customerName': false};
+                        });
+                      })),
+              const SizedBox(width: 10),
+              Expanded(
+                  child: TextField(
+                      decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: inputErrors['customerBatch'] == true
+                                  ? const BorderSide(
+                                      color: Colors.red, width: 2)
+                                  : const BorderSide(
+                                      color: Colors.grey, width: 1)),
+                          focusedBorder: const OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.blueGrey, width: 2)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          hoverColor: Colors.transparent,
+                          hintText: 'Customer batch'),
+                      controller: _customerBatchController,
+                      onChanged: (value) {
+                        setState(() {
+                          inputErrors = {
+                            ...inputErrors,
+                            'customerBatch': false
+                          };
+                        });
+                      }))
+            ])
+          : Row(
+              children: [
+                const Text('Customer',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 0.5,
+                    child: CustomDropdown(
+                        items: users.map((i) => i.toDropdownData()).toList(),
+                        selectedValue: _selectedUserID,
+                        label: 'Select',
+                        hasError: inputErrors['customer'] == true,
+                        onValueChanged: (value) {
+                          setState(() {
+                            _selectedUserID = value;
+                            inputErrors = {...inputErrors, 'customer': false};
+                          });
+                        }),
+                  ),
+                )
+              ],
+            ),
       const SizedBox(height: 20),
       Align(
           alignment: Alignment.centerRight,

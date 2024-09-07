@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
+import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 
 import '../db/functions/book.dart';
@@ -77,6 +78,13 @@ class _DbViewerState extends State<DbViewer> {
       'label': 'Users',
       'value': getPrettyJSONString(
           json.encode(usersDB.map((p) => p.toJson()).toList()))
+    });
+
+    final batchDB = (await getUserBatchBox()).values.toList();
+    tempArr.add({
+      'label': 'User batch',
+      'value': getPrettyJSONString(
+          json.encode(batchDB.map((p) => p.toJson()).toList()))
     });
 
     final miscDB = (await getMiscBox()).values.toList();
