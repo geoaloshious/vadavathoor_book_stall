@@ -5,8 +5,7 @@ part 'users.g.dart';
 
 UserModel emptyUserModel() => UserModel(
     userID: '',
-    firstName: '',
-    lastName: '',
+    name: '',
     username: '',
     password: '',
     role: 0,
@@ -23,10 +22,7 @@ class UserModel {
   final String userID;
 
   @HiveField(1)
-  String firstName;
-
-  @HiveField(2)
-  String lastName;
+  String name;
 
   @HiveField(3)
   String username;
@@ -58,8 +54,7 @@ class UserModel {
   Map<String, dynamic> toJson() {
     return {
       'userID': userID,
-      'firstName': firstName,
-      'lastName': lastName,
+      'name': name,
       'username': username,
       'password': password,
       'role': role,
@@ -73,13 +68,12 @@ class UserModel {
   }
 
   Map<String, String> toDropdownData() {
-    return {'id': userID, 'name': '$firstName $lastName'};
+    return {'id': userID, 'name': name};
   }
 
   UserModel(
       {required this.userID,
-      required this.firstName,
-      required this.lastName,
+      required this.name,
       required this.username,
       required this.password,
       required this.role,

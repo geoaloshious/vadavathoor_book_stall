@@ -90,13 +90,11 @@ class _UserProfileState extends State<UserProfileWidget> {
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: Text(user.user.firstName[0] + user.user.lastName[0],
+                  child: Text(user.user.name,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
-          tooltip: user.user.userID == ''
-              ? 'Guest user'
-              : '${user.user.firstName} ${user.user.lastName}',
+          tooltip: user.user.userID == '' ? 'Guest user' : user.user.name,
           onSelected: onSelected,
           itemBuilder: (context) => [
                 if (user.user.userID == '')

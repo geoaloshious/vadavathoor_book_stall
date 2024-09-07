@@ -3,6 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 import 'package:vadavathoor_book_stall/logger.dart';
 import 'package:vadavathoor_book_stall/utils.dart';
@@ -236,6 +237,7 @@ void saveAndOpenPDF(String saleID) async {
   final bookDB = (await getBooksBox()).values.toList();
   final purchaseDB = (await getBookPurchaseBox()).values.toList();
   final userDB = (await getUsersBox()).values.toList();
+  final userBatches = (await getUserBatchBox()).values.toList();
 
   SaleModel sale = salesDB.firstWhere((s) => s.saleID == saleID);
   List<Map<String, dynamic>> books = [];
@@ -261,9 +263,11 @@ void saveAndOpenPDF(String saleID) async {
 
   String filePath = await createPDF(
       books: books,
-      customerName: sale.customerName,
-      customerBatch: sale.customerBatch,
-      salesPerson: '${salesPerson.firstName} ${salesPerson.lastName}',
+      customerName: userDB.firstWhere((u) => u.userID == sale.customerID).name,
+      customerBatch: userBatches
+          .firstWhere((u) => u.batchID == sale.customerBatchID)
+          .batchName,
+      salesPerson: salesPerson.name,
       billNo: saleID,
       date: formatTimestamp(timestamp: sale.createdDate));
 

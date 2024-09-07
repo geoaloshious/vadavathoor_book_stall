@@ -65,3 +65,20 @@ class ForNewSaleBookItem {
     required this.purchases,
   });
 }
+
+class UserModelForSales {
+  String userID;
+  String name;
+  String batchID;
+  String batchName;
+
+  Map<String, String> toDropdownData() {
+    return {'id': userID, 'name': '$name  (Batch: $batchName)'};
+  }
+
+  UserModelForSales(
+      {required this.userID,
+      required this.name,
+      required this.batchID,
+      required this.batchName});
+}

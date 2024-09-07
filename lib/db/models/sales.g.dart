@@ -98,8 +98,8 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
     return SaleModel(
       books: (fields[1] as List).cast<SaleItemBookModel>(),
       grandTotal: fields[2] as double,
-      customerName: fields[3] as String,
-      customerBatch: fields[4] as String,
+      customerID: fields[3] as String,
+      customerBatchID: fields[4] as String,
       paymentMode: fields[5] as String,
       createdDate: fields[6] as int,
       createdBy: fields[7] as String,
@@ -121,9 +121,9 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       ..writeByte(2)
       ..write(obj.grandTotal)
       ..writeByte(3)
-      ..write(obj.customerName)
+      ..write(obj.customerID)
       ..writeByte(4)
-      ..write(obj.customerBatch)
+      ..write(obj.customerBatchID)
       ..writeByte(5)
       ..write(obj.paymentMode)
       ..writeByte(6)

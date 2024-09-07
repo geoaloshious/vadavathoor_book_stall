@@ -183,9 +183,7 @@ class _UsersState extends State<UsersWidget> {
                     ? ListView.builder(
                         itemCount: users.length,
                         itemBuilder: (context, index) => Row(children: [
-                              Expanded(
-                                  child: Text(
-                                      '${users[index].firstName} ${users[index].lastName}')),
+                              Expanded(child: Text(users[index].name)),
                               Expanded(child: Text(users[index].username)),
                               Expanded(
                                   child: Text(getRoleName(users[index].role))),
