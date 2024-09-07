@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 4:
         return const BookHomeWidget();
       case 5:
-        return const UsersWidget();
+        return const ManageUsersIndexWidget();
       case 6:
         return const BookStallDetailsWidget();
       default:

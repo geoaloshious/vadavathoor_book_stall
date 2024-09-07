@@ -58,8 +58,8 @@ Future<void> addSale(List<SaleItemBookModel> booksToCheckout, double grandTotal,
   final purchaseBox = await getBookPurchaseBox();
   final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
-  for (var book in booksToCheckout) {
-    for (var pv in book.purchaseVariants) {
+  for (SaleItemBookModel book in booksToCheckout) {
+    for (SaleItemBookPurchaseVariantModel pv in book.purchaseVariants) {
       BookPurchaseModel? existingData =
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
       if (existingData != null) {
@@ -89,8 +89,8 @@ Future<void> editSale(
     SaleModel? existingSale = salesBox.get(saleKey);
     if (existingSale != null && existingSale.saleID == saleID) {
       //Prepare the object which contains the exisintg sold quantities
-      for (var esb in existingSale.books) {
-        for (var espv in esb.purchaseVariants) {
+      for (SaleItemBookModel esb in existingSale.books) {
+        for (SaleItemBookPurchaseVariantModel espv in esb.purchaseVariants) {
           final existingPurchase =
               purchaseBox.get(purchaseKeys[espv.purchaseID]);
           if (existingPurchase != null) {

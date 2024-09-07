@@ -32,14 +32,8 @@ class _UserModalState extends State<UsermodalWidget> {
   Map<String, bool> inputErrors = {};
   String submitErrorMessage = '';
 
-  var _roles = [
-    {'id': UserRole.admin.toString(), 'name': 'Admin'},
-    {'id': UserRole.normal.toString(), 'name': 'Normal user'}
-  ];
-  var _statuses = [
-    {'id': UserStatus.enabled.toString(), 'name': 'Enabled'},
-    {'id': UserStatus.disabled.toString(), 'name': 'Disabled'}
-  ];
+  List<Map<String, String>> _roles = [];
+  List<Map<String, String>> _statuses = [];
 
   void _saveData() async {
     final firstName = _firstNameController.text.trim();
@@ -75,6 +69,7 @@ class _UserModalState extends State<UsermodalWidget> {
           username: username,
           password: password,
           role: int.tryParse(_role) ?? UserRole.normal,
+          batchID: '',
           status: int.tryParse(_status) ?? UserStatus.enabled,
           createdDate: 0,
           createdBy: '',

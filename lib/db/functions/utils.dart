@@ -8,6 +8,7 @@ import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 import 'package:vadavathoor_book_stall/db/models/book_author.dart';
+import 'package:vadavathoor_book_stall/db/models/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 
 import '../../utils.dart';
@@ -59,6 +60,9 @@ Future<void> initializeHiveDB() async {
   }
   if (!Hive.isAdapterRegistered(MiscModelAdapter().typeId)) {
     Hive.registerAdapter(MiscModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(UserBatchModelAdapter().typeId)) {
+    Hive.registerAdapter(UserBatchModelAdapter());
   }
 
   //#pending - might need to add these from TGDB.

@@ -41,6 +41,7 @@ Future<Map<String, String>> addUser(UserModel userData) async {
         username: userData.username,
         password: userData.password,
         role: userData.role,
+        batchID: userData.batchID,
         status: userData.status,
         createdDate: currentTS,
         createdBy: loggedInUser,
@@ -70,6 +71,7 @@ Future<Map<String, String>> editUser(UserModel userData) async {
         existingData.username = userData.username;
         existingData.password = userData.password;
         existingData.role = userData.role;
+        existingData.batchID = userData.batchID;
         existingData.status = userData.status;
         existingData.modifiedDate = getCurrentTimestamp();
         existingData.modifiedBy = loggedInUser;
@@ -113,6 +115,7 @@ Future<void> addDeveloperUserIfEmpty() async {
         username: 'dev',
         password: 'dev',
         role: UserRole.developer,
+        batchID: '',
         status: UserStatus.enabled,
         createdDate: currentTS,
         createdBy: '',

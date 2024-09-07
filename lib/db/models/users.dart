@@ -10,6 +10,7 @@ UserModel emptyUserModel() => UserModel(
     username: '',
     password: '',
     role: 0,
+    batchID: '',
     status: 0,
     createdDate: 0,
     createdBy: '',
@@ -37,18 +38,21 @@ class UserModel {
   int role;
 
   @HiveField(6)
-  int status;
+  String batchID;
 
   @HiveField(7)
-  final int createdDate;
+  int status;
 
   @HiveField(8)
-  final String createdBy;
+  final int createdDate;
 
   @HiveField(9)
-  int modifiedDate;
+  final String createdBy;
 
   @HiveField(10)
+  int modifiedDate;
+
+  @HiveField(11)
   String modifiedBy;
 
   Map<String, dynamic> toJson() {
@@ -59,6 +63,7 @@ class UserModel {
       'username': username,
       'password': password,
       'role': role,
+      'batchID': batchID,
       'status': status,
       'createdDate': createdDate,
       'createdBy': createdBy,
@@ -78,6 +83,7 @@ class UserModel {
       required this.username,
       required this.password,
       required this.role,
+      required this.batchID,
       required this.status,
       required this.createdDate,
       required this.createdBy,

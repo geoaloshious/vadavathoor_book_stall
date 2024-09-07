@@ -23,18 +23,19 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       username: fields[3] as String,
       password: fields[4] as String,
       role: fields[5] as int,
-      status: fields[6] as int,
-      createdDate: fields[7] as int,
-      createdBy: fields[8] as String,
-      modifiedDate: fields[9] as int,
-      modifiedBy: fields[10] as String,
+      batchID: fields[6] as String,
+      status: fields[7] as int,
+      createdDate: fields[8] as int,
+      createdBy: fields[9] as String,
+      modifiedDate: fields[10] as int,
+      modifiedBy: fields[11] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.userID)
       ..writeByte(1)
@@ -48,14 +49,16 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(5)
       ..write(obj.role)
       ..writeByte(6)
-      ..write(obj.status)
+      ..write(obj.batchID)
       ..writeByte(7)
-      ..write(obj.createdDate)
+      ..write(obj.status)
       ..writeByte(8)
-      ..write(obj.createdBy)
+      ..write(obj.createdDate)
       ..writeByte(9)
-      ..write(obj.modifiedDate)
+      ..write(obj.createdBy)
       ..writeByte(10)
+      ..write(obj.modifiedDate)
+      ..writeByte(11)
       ..write(obj.modifiedBy);
   }
 

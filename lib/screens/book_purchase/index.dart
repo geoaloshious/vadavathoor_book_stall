@@ -80,7 +80,7 @@ class _BookPurchaseState extends State<BookPurchase> {
   }
 
   void setData() async {
-    var tempData = await getBookPurchaseList();
+    final tempData = await getBookPurchaseList();
     setState(() {
       purchases = tempData;
     });
