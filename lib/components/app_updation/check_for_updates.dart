@@ -16,6 +16,7 @@ class _AppUpdateState extends State<AppUpdateWidget> {
   String message = '';
   String changeLog = '';
   String downloadURL = '';
+  bool isButtonDisabled = false;
 
   void setData() async {
     final temp = await getAppVersion();
@@ -68,16 +69,19 @@ class _AppUpdateState extends State<AppUpdateWidget> {
                 padding: const EdgeInsets.only(top: 20),
                 child: TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.blueGrey,
-                    ),
-                    onPressed: () async {
-                      setState(() {
-                        message =
-                            'Starting updation in 5 seconds. App will be closing automatically.';
-                      });
-                      await Future.delayed(const Duration(seconds: 5));
-                      await downloadAndUpdate(downloadURL);
-                    },
+                        backgroundColor:
+                            isButtonDisabled ? Colors.grey : Colors.blueGrey),
+                    onPressed: isButtonDisabled
+                        ? null
+                        : () async {
+                            setState(() {
+                              message =
+                                  'Starting updation in 5 seconds. App will be closing automatically.';
+                              isButtonDisabled = true;
+                            });
+                            await Future.delayed(const Duration(seconds: 5));
+                            await downloadAndUpdate(downloadURL);
+                          },
                     child: const Text('Update',
                         style: TextStyle(color: Colors.white)))))
     ]);
