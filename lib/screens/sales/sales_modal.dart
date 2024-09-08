@@ -23,8 +23,8 @@ class SaleModalWidget extends StatefulWidget {
 }
 
 class _SaleModalState extends State<SaleModalWidget> {
-  TextEditingController _customerNameController = TextEditingController();
-  TextEditingController _customerBatchController = TextEditingController();
+  final _customerNameController = TextEditingController();
+  final _customerBatchController = TextEditingController();
 
   bool newUser = false;
   String _selectedUserID = '';

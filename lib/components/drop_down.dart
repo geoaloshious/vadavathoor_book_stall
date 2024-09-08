@@ -20,10 +20,10 @@ class CustomDropdown extends StatefulWidget {
       this.disabled});
 
   @override
-  _CustomPopupDropdownState createState() => _CustomPopupDropdownState();
+  CustomPopupDropdownState createState() => CustomPopupDropdownState();
 }
 
-class _CustomPopupDropdownState extends State<CustomDropdown> {
+class CustomPopupDropdownState extends State<CustomDropdown> {
   String getSelectedItemName() {
     if (widget.selectedValue == '') {
       return widget.label;
