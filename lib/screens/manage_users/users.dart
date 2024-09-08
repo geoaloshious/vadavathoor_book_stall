@@ -5,7 +5,7 @@ import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/screens/manage_users/user_modal.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 class UsersWidget extends StatefulWidget {
   const UsersWidget({super.key});

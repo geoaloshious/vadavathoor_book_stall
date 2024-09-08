@@ -9,7 +9,7 @@ import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sale_item_book.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 class SaleModalWidget extends StatefulWidget {
   final String saleID;

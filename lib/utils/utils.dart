@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-import 'db/constants.dart';
+import '../db/constants.dart';
 
 class PaymentModes {
   static const String cash = '1';

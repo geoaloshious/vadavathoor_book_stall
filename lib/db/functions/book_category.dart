@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/models/book_category.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 import '../constants.dart';
 import 'utils.dart';

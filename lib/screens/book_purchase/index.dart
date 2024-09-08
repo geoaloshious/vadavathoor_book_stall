@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
+import 'package:vadavathoor_book_stall/utils/export_excel.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/screens/book_purchase/purchase_modal.dart';
 
@@ -103,15 +104,26 @@ class _BookPurchaseState extends State<BookPurchase> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               const Text('Purchases',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              if (loggedIn)
+              Row(children: [
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueGrey),
                     onPressed: () {
-                      onPressAddOrEdit();
+                      exportExcel(context: context, purchases: purchases);
                     },
-                    child: const Text('New purchase',
-                        style: TextStyle(color: Colors.white)))
+                    child: const Text('Export Excel',
+                        style: TextStyle(color: Colors.white))),
+                const SizedBox(width: 10),
+                if (loggedIn)
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueGrey),
+                      onPressed: () {
+                        onPressAddOrEdit();
+                      },
+                      child: const Text('New purchase',
+                          style: TextStyle(color: Colors.white)))
+              ])
             ]),
             const SizedBox(height: 20),
             Row(children: [
