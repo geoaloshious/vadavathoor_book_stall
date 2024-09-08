@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:intl/intl.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 Future<void> writeToLog(String message) async {
   final logDirPath = '${Directory.current.path}/logs';

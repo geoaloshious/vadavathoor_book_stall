@@ -5,7 +5,7 @@ import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
   Box<BookPurchaseModel> box;

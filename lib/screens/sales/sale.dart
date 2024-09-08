@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
-import 'package:vadavathoor_book_stall/create_bill_pdf.dart';
+import 'package:vadavathoor_book_stall/utils/create_bill_pdf.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales_modal.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 class SaleWidget extends StatefulWidget {
   final SaleListItemModel data;
@@ -72,7 +72,7 @@ class _SaleState extends State<SaleWidget> {
     return Row(children: [
       Expanded(child: Text(widget.data.customerName)),
       Expanded(child: Text(widget.data.books)),
-      Expanded(child: Text(getPaymentModeName(widget.data.paymentMode))),
+      Expanded(child: Text(widget.data.paymentMode)),
       Expanded(child: Text(widget.data.grandTotal.toString())),
       Expanded(child: Text(widget.data.createdDate)),
       Expanded(child: Text(widget.data.modifiedDate)),

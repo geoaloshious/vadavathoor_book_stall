@@ -11,7 +11,7 @@ import 'package:vadavathoor_book_stall/db/models/book_author.dart';
 import 'package:vadavathoor_book_stall/db/models/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 
-import '../../utils.dart';
+import '../../utils/utils.dart';
 import '../constants.dart';
 import '../models/login_history.dart';
 import '../models/misc.dart';

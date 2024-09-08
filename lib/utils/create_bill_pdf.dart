@@ -5,14 +5,14 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
-import 'package:vadavathoor_book_stall/logger.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
-import 'db/functions/book.dart';
-import 'db/functions/book_purchase.dart';
-import 'db/functions/sales.dart';
-import 'db/functions/users.dart';
-import 'db/functions/utils.dart';
-import 'db/models/sales.dart';
+import 'package:vadavathoor_book_stall/utils/logger.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
+import '../db/functions/book.dart';
+import '../db/functions/book_purchase.dart';
+import '../db/functions/sales.dart';
+import '../db/functions/users.dart';
+import '../db/functions/utils.dart';
+import '../db/models/sales.dart';
 
 Future<String> createPDF({
   required List<Map<String, dynamic>> books,

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 
-import '../../utils.dart';
+import '../../utils/utils.dart';
 import '../models/users.dart';
 import 'utils.dart';
 

@@ -6,7 +6,7 @@ import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
-import 'package:vadavathoor_book_stall/utils.dart';
+import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 import '../constants.dart';
 import 'book.dart';
@@ -263,7 +263,7 @@ Future<List<SaleListItemModel>> getSalesList() async {
               users.values.firstWhere((u) => u.userID == sale.customerID).name,
           books: bookNames.join('\n'),
           grandTotal: sale.grandTotal,
-          paymentMode: sale.paymentMode,
+          paymentMode: getPaymentModeName(sale.paymentMode),
           createdDate: formatTimestamp(timestamp: sale.createdDate),
           modifiedDate: formatTimestamp(timestamp: sale.modifiedDate)));
     }
