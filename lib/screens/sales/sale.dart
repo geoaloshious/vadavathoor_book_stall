@@ -3,7 +3,6 @@ import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/utils/create_bill_pdf.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sales_modal.dart';
-import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 class SaleWidget extends StatefulWidget {
   final SaleListItemModel data;
