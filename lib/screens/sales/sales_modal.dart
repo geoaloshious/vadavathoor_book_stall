@@ -324,93 +324,113 @@ class _SaleModalState extends State<SaleModalWidget> {
             ])
           ])),
       const SizedBox(height: 30),
-      CheckboxListTile(
-          title: const Text('New Customer'),
-          value: newUser,
-          controlAffinity: ListTileControlAffinity.leading,
-          onChanged: (bool? value) {
-            setState(() {
-              newUser = value ?? false;
-              _selectedUserID = '';
-            });
-          }),
-      const SizedBox(height: 15),
-      newUser
-          ? Row(children: [
-              Expanded(
-                  child: TextField(
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: inputErrors['customerName'] == true
-                                  ? const BorderSide(
-                                      color: Colors.red, width: 2)
-                                  : const BorderSide(
-                                      color: Colors.grey, width: 1)),
-                          focusedBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.blueGrey, width: 2)),
-                          filled: true,
-                          fillColor: Colors.white,
-                          hoverColor: Colors.transparent,
-                          hintText: 'Customer name'),
-                      controller: _customerNameController,
-                      onChanged: (value) {
-                        setState(() {
-                          inputErrors = {...inputErrors, 'customerName': false};
-                        });
-                      })),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: TextField(
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: inputErrors['customerBatch'] == true
-                                  ? const BorderSide(
-                                      color: Colors.red, width: 2)
-                                  : const BorderSide(
-                                      color: Colors.grey, width: 1)),
-                          focusedBorder: const OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.blueGrey, width: 2)),
-                          filled: true,
-                          fillColor: Colors.white,
-                          hoverColor: Colors.transparent,
-                          hintText: 'Customer batch'),
-                      controller: _customerBatchController,
-                      onChanged: (value) {
-                        setState(() {
-                          inputErrors = {
-                            ...inputErrors,
-                            'customerBatch': false
-                          };
-                        });
-                      }))
-            ])
-          : Row(
-              children: [
-                const Text('Customer',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: 0.5,
-                    child: CustomDropdown(
-                        items: users.map((i) => i.toDropdownData()).toList(),
-                        selectedValue: _selectedUserID,
-                        label: 'Select',
-                        hasError: inputErrors['customer'] == true,
-                        onValueChanged: (value) {
-                          setState(() {
-                            _selectedUserID = value;
-                            inputErrors = {...inputErrors, 'customer': false};
-                          });
-                        }),
-                  ),
-                )
-              ],
-            ),
+      Row(
+        children: [
+          const Text('Customer',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(width: 20),
+          SizedBox(
+            width: 150,
+            child: CheckboxListTile(
+                title: const Text('New'),
+                value: newUser,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool? value) {
+                  setState(() {
+                    newUser = value ?? false;
+                    _selectedUserID = '';
+                  });
+                }),
+          ),
+          const SizedBox(width: 20),
+          const SizedBox(height: 15),
+          Expanded(
+              child: newUser
+                  ? Row(children: [
+                      Expanded(
+                          child: TextField(
+                              decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          inputErrors['customerName'] == true
+                                              ? const BorderSide(
+                                                  color: Colors.red, width: 2)
+                                              : const BorderSide(
+                                                  color: Colors.grey,
+                                                  width: 1)),
+                                  focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.blueGrey, width: 2)),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hoverColor: Colors.transparent,
+                                  hintText: 'Customer name'),
+                              controller: _customerNameController,
+                              onChanged: (value) {
+                                setState(() {
+                                  inputErrors = {
+                                    ...inputErrors,
+                                    'customerName': false
+                                  };
+                                });
+                              })),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          child: TextField(
+                              decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          inputErrors['customerBatch'] == true
+                                              ? const BorderSide(
+                                                  color: Colors.red, width: 2)
+                                              : const BorderSide(
+                                                  color: Colors.grey,
+                                                  width: 1)),
+                                  focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.blueGrey, width: 2)),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hoverColor: Colors.transparent,
+                                  hintText: 'Customer batch'),
+                              controller: _customerBatchController,
+                              onChanged: (value) {
+                                setState(() {
+                                  inputErrors = {
+                                    ...inputErrors,
+                                    'customerBatch': false
+                                  };
+                                });
+                              }))
+                    ])
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: FractionallySizedBox(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: 0.5,
+                            child: CustomDropdown(
+                                items: users
+                                    .map((i) => i.toDropdownData())
+                                    .toList(),
+                                selectedValue: _selectedUserID,
+                                label: 'Select',
+                                hasError: inputErrors['customer'] == true,
+                                onValueChanged: (value) {
+                                  setState(() {
+                                    _selectedUserID = value;
+                                    inputErrors = {
+                                      ...inputErrors,
+                                      'customer': false
+                                    };
+                                  });
+                                }),
+                          ),
+                        )
+                      ],
+                    ))
+        ],
+      ),
       const SizedBox(height: 20),
       Align(
           alignment: Alignment.centerRight,

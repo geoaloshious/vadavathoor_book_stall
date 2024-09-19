@@ -20,6 +20,7 @@ Future<String> createPDF({
   required String customerBatch,
   required String salesPerson,
   required String billNo,
+  required String paymentMode,
   required String date,
 }) async {
   final stallName = await readMiscValue(MiscDBKeys.bookStallName);
@@ -51,6 +52,7 @@ Future<String> createPDF({
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.Text('Bill No: $billNo'),
+                    pw.Text('Payment : ${getPaymentModeName(paymentMode)}'),
                     pw.Text('Date: $date')
                   ]),
               pw.SizedBox(height: 10),
@@ -58,13 +60,10 @@ Future<String> createPDF({
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.Text('To: $customerName'),
-                    pw.Row(children: [
-                      pw.Text('Category '),
-                      pw.Container(
-                          padding: const pw.EdgeInsets.all(4),
-                          decoration: pw.BoxDecoration(border: pw.Border.all()),
-                          child: pw.Text(customerBatch))
-                    ])
+                    pw.Container(
+                        padding: const pw.EdgeInsets.all(4),
+                        decoration: pw.BoxDecoration(border: pw.Border.all()),
+                        child: pw.Text(customerBatch))
                   ]),
               pw.SizedBox(height: 10),
               pw.Table(
@@ -269,6 +268,7 @@ void saveAndOpenPDF(String saleID) async {
           .batchName,
       salesPerson: salesPerson.name,
       billNo: saleID,
+      paymentMode: sale.paymentMode,
       date: formatTimestamp(timestamp: sale.createdDate));
 
   openPdfWithDefaultApp(filePath);
