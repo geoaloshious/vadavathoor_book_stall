@@ -20,3 +20,14 @@ class BookListItemModel {
       required this.categoryName,
       required this.balanceStock});
 }
+
+class StationaryListItemModel {
+  final String itemID;
+  final String itemName;
+  final int balanceStock;
+
+  StationaryListItemModel(
+      {required this.itemID,
+      required this.itemName,
+      required this.balanceStock});
+}

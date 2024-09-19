@@ -1,22 +1,21 @@
-class BookPurchaseListItemModel {
+class PurchaseListItemModel {
   final String purchaseID;
-  final String bookID;
-  final String bookName;
+  final String itemID;
+  final String itemName;
   final int purchaseDate;
   final String formattedPurchaseDate;
-
-  final double bookPrice;
+  final double price;
   final int quantityPurchased;
   final int balanceStock;
 
-  BookPurchaseListItemModel(
+  PurchaseListItemModel(
       {required this.purchaseID,
-      required this.bookID,
-      required this.bookName,
+      required this.itemID,
+      required this.itemName,
       required this.purchaseDate,
       required this.formattedPurchaseDate,
       required this.quantityPurchased,
-      required this.bookPrice,
+      required this.price,
       required this.balanceStock});
 }
 

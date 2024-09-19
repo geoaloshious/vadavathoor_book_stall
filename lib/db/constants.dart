@@ -30,12 +30,15 @@ class DBItemHiveType {
   static const int users = 11;
   static const int userBatch = 12;
   static const int loginHistory = 13;
+  static const int stationaryItem = 14;
+  static const int stationaryPurchase = 15;
 }
 
 class DBNames {
   static const String book = 'book_db';
   static const String bookAuthor = 'book_author_db';
   static const String bookPurchase = 'book_purchase_db';
+  static const String stationaryPurchase = 'stationary_purchase_db';
   static const String bookCategories = 'book_categories_db';
   static const String sale = 'sale_db';
   static const String saleItemBook = 'sale_item_book_db';

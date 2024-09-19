@@ -14,7 +14,7 @@ import '../../db/functions/book_purchase.dart';
 import '../../db/functions/publisher.dart';
 
 class BookPurchaseModalWidget extends StatefulWidget {
-  final BookPurchaseListItemModel? data;
+  final PurchaseListItemModel? data;
   final void Function() updateUI;
 
   const BookPurchaseModalWidget({super.key, this.data, required this.updateUI});
@@ -107,7 +107,7 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
 
   void setData() async {
     if (widget.data != null) {
-      _bookID = widget.data!.bookID;
+      _bookID = widget.data!.itemID;
 
       _selectedDate =
           DateTime.fromMillisecondsSinceEpoch(widget.data!.purchaseDate);
@@ -115,7 +115,7 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
       _quantityController = TextEditingController(
           text: widget.data!.quantityPurchased.toString());
       _priceController =
-          TextEditingController(text: widget.data!.bookPrice.toString());
+          TextEditingController(text: widget.data!.price.toString());
     }
 
     final tempPubs = await getPublishers();

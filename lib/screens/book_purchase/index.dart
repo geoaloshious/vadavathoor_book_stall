@@ -15,9 +15,9 @@ class BookPurchase extends StatefulWidget {
 }
 
 class _BookPurchaseState extends State<BookPurchase> {
-  List<BookPurchaseListItemModel> purchases = [];
+  List<PurchaseListItemModel> purchases = [];
 
-  void onPressAddOrEdit({BookPurchaseListItemModel? data}) {
+  void onPressAddOrEdit({PurchaseListItemModel? data}) {
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -170,15 +170,15 @@ class _BookPurchaseState extends State<BookPurchase> {
                                   child: Text(purchases[index].purchaseID)),
                               Expanded(
                                   flex: 3,
-                                  child: Text(purchases[index].bookName)),
+                                  child: Text(purchases[index].itemName)),
                               Expanded(
                                   flex: 2,
                                   child: Text(
                                       '${purchases[index].balanceStock} / ${purchases[index].quantityPurchased}')),
                               Expanded(
                                   flex: 2,
-                                  child: Text(
-                                      purchases[index].bookPrice.toString())),
+                                  child:
+                                      Text(purchases[index].price.toString())),
                               Expanded(
                                   flex: 3,
                                   child: Text(

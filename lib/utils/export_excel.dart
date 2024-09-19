@@ -30,7 +30,7 @@ const purchaseHeadings = [
 void exportExcel(
     {required BuildContext context,
     List<SaleListItemModel>? sales,
-    List<BookPurchaseListItemModel>? purchases}) async {
+    List<PurchaseListItemModel>? purchases}) async {
   Excel excel = Excel.createExcel();
   Sheet sheet = excel['Sheet1'];
 
@@ -55,10 +55,10 @@ void exportExcel(
       sheet.appendRow([
         TextCellValue('${i + 1}'),
         TextCellValue(purchases[i].purchaseID),
-        TextCellValue(purchases[i].bookName),
+        TextCellValue(purchases[i].itemName),
         TextCellValue('${purchases[i].balanceStock}'),
         TextCellValue('${purchases[i].quantityPurchased}'),
-        TextCellValue('${purchases[i].bookPrice}'),
+        TextCellValue('${purchases[i].price}'),
         TextCellValue(purchases[i].formattedPurchaseDate),
       ]);
     }

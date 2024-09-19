@@ -3,45 +3,47 @@ import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
-import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/models/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
-Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
-  Box<BookPurchaseModel> box;
+Future<Box<StationaryPurchaseModel>> getStationaryPurchaseBox() async {
+  Box<StationaryPurchaseModel> box;
 
-  if (Hive.isBoxOpen(DBNames.bookPurchase)) {
-    box = Hive.box<BookPurchaseModel>(DBNames.bookPurchase);
+  if (Hive.isBoxOpen(DBNames.stationaryPurchase)) {
+    box = Hive.box<StationaryPurchaseModel>(DBNames.stationaryPurchase);
   } else {
-    box = await Hive.openBox<BookPurchaseModel>(DBNames.bookPurchase);
+    box =
+        await Hive.openBox<StationaryPurchaseModel>(DBNames.stationaryPurchase);
   }
 
   return box;
 }
 
-Future<void> addBookPurchase(
-    String bookID, int purchaseDate, double bookPrice, int quantity) async {
+Future<void> addStationaryPurchase(
+    String itemID, int purchaseDate, double price, int quantity) async {
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  final db = await getBookPurchaseBox();
-  await db.add(BookPurchaseModel(
+  final db = await getStationaryPurchaseBox();
+  await db.add(StationaryPurchaseModel(
       purchaseID: (db.values.length + 1).toString(),
       purchaseDate: purchaseDate,
-      bookID: bookID,
+      itemID: itemID,
       quantityPurchased: quantity,
       quantityLeft: quantity,
-      bookPrice: bookPrice,
+      price: price,
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
       modifiedBy: '',
-      deleted: false));
+      status: DBRowStatus.active));
 }
 
-Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
-    int quantity, double bookPrice, int purchaseDate) async {
-  final purchaseBox = await getBookPurchaseBox();
+Future<Map<String, String>> editStationaryPurchase(String purchaseID,
+    String itemID, int quantity, double price, int purchaseDate) async {
+  final purchaseBox = await getStationaryPurchaseBox();
   final salesBox = await getSalesBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
@@ -54,9 +56,9 @@ Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
       i.status == DBRowStatus.active);
 
   for (int key in purchaseBox.keys) {
-    BookPurchaseModel? existingData = purchaseBox.get(key);
+    StationaryPurchaseModel? existingData = purchaseBox.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
-      if (bookID != existingData.bookID) {
+      if (itemID != existingData.itemID) {
         return {
           'message':
               'Found some sales related to this purchase.\nPlease edit/delete them to continue.\nSale IDs: ${relatedSales.map((p) => p.saleID).join(', ')}'
@@ -72,10 +74,10 @@ Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
         };
       }
 
-      existingData.bookID = bookID;
+      existingData.itemID = itemID;
       existingData.quantityPurchased = quantity;
       existingData.quantityLeft = quantity - quantitySold;
-      existingData.bookPrice = bookPrice;
+      existingData.price = price;
       existingData.purchaseDate = purchaseDate;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
@@ -88,8 +90,8 @@ Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
   return {};
 }
 
-Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
-  final box = await getBookPurchaseBox();
+Future<Map<String, String>> deleteStationaryPurchase(String purchaseID) async {
+  final box = await getStationaryPurchaseBox();
   final salesBox = await getSalesBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
@@ -109,9 +111,9 @@ Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
   }
 
   for (int key in box.keys) {
-    BookPurchaseModel? existingData = box.get(key);
+    StationaryPurchaseModel? existingData = box.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
-      existingData.deleted = true;
+      existingData.status = DBRowStatus.deleted;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
 
@@ -123,26 +125,28 @@ Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
   return {};
 }
 
-Future<List<PurchaseListItemModel>> getBookPurchaseList() async {
-  final purchases = (await getBookPurchaseBox()).values.toList();
-  final books = (await getBooksBox()).values.toList();
+Future<List<PurchaseListItemModel>> getStationaryPurchaseList() async {
+  final purchases = (await getStationaryPurchaseBox()).values.toList();
+  final items = (await getStationaryItemBox()).values.toList();
 
   List<PurchaseListItemModel> joinedData = [];
 
-  for (BookPurchaseModel purchase in purchases) {
-    final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
+  for (StationaryPurchaseModel stationaryPurchase in purchases) {
+    final item =
+        items.where((u) => u.itemID == stationaryPurchase.itemID).firstOrNull;
 
-    if (book != null && !purchase.deleted) {
+    if (item != null && stationaryPurchase.status == DBRowStatus.active) {
       joinedData.add(PurchaseListItemModel(
-          purchaseID: purchase.purchaseID,
-          itemID: book.bookID,
-          itemName: book.bookName,
-          purchaseDate: purchase.purchaseDate,
+          purchaseID: stationaryPurchase.purchaseID,
+          itemID: item.itemID,
+          itemName: item.itemName,
+          purchaseDate: stationaryPurchase.purchaseDate,
           formattedPurchaseDate: formatTimestamp(
-              timestamp: purchase.purchaseDate, format: 'dd MMM yyyy hh:mm a'),
-          quantityPurchased: purchase.quantityPurchased,
-          balanceStock: purchase.quantityLeft,
-          price: purchase.bookPrice));
+              timestamp: stationaryPurchase.purchaseDate,
+              format: 'dd MMM yyyy hh:mm a'),
+          quantityPurchased: stationaryPurchase.quantityPurchased,
+          balanceStock: stationaryPurchase.quantityLeft,
+          price: stationaryPurchase.price));
     }
   }
 
