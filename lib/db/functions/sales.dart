@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
@@ -8,6 +10,7 @@ import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/models/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -28,8 +31,7 @@ Future<Box<SaleModel>> getSalesBox() async {
   return box;
 }
 
-Future<Map<String, int>> getPurchaseKeysAndIDs(
-    Box<BookPurchaseModel> purchaseBox) async {
+Future<Map<String, int>> getPurchaseKeysAndIDs(Box purchaseBox) async {
   Map<String, int> purchaseKeys = {};
 
   for (int key in purchaseBox.keys) {
@@ -105,17 +107,32 @@ Future<void> addSale(
       modifiedBy: '',
       status: DBRowStatus.active));
 
-  final purchaseBox = await getBookPurchaseBox();
-  final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
+  final bkPurchaseBox = await getBookPurchaseBox();
+  final bkPurchaseKeys = await getPurchaseKeysAndIDs(bkPurchaseBox);
 
   for (SaleItemModel book in booksToCheckout) {
     for (SaleItemPurchaseVariantModel pv in book.purchaseVariants) {
       BookPurchaseModel? existingData =
-          purchaseBox.get(purchaseKeys[pv.purchaseID]);
+          bkPurchaseBox.get(bkPurchaseKeys[pv.purchaseID]);
       if (existingData != null) {
         existingData.quantityLeft = existingData.quantityLeft - pv.quantity;
         existingData.modifiedDate = currentTS;
-        await purchaseBox.put(purchaseKeys[pv.purchaseID], existingData);
+        await bkPurchaseBox.put(bkPurchaseKeys[pv.purchaseID], existingData);
+      }
+    }
+  }
+
+  final siPurchaseBox = await getStationaryPurchaseBox();
+  final siPurchaseKeys = await getPurchaseKeysAndIDs(siPurchaseBox);
+
+  for (SaleItemModel si in stationaryItemsToCheckout) {
+    for (SaleItemPurchaseVariantModel pv in si.purchaseVariants) {
+      StationaryPurchaseModel? existingData =
+          siPurchaseBox.get(siPurchaseKeys[pv.purchaseID]);
+      if (existingData != null) {
+        existingData.quantityLeft = existingData.quantityLeft - pv.quantity;
+        existingData.modifiedDate = currentTS;
+        await siPurchaseBox.put(siPurchaseKeys[pv.purchaseID], existingData);
       }
     }
   }
@@ -131,11 +148,13 @@ Future<void> editSale(
     String customerBatch,
     String paymentMode) async {
   final salesBox = await getSalesBox();
-  final purchaseBox = await getBookPurchaseBox();
+  final bkPurchaseBox = await getBookPurchaseBox();
+  final siPurchaseBox = await getStationaryPurchaseBox();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
 
-  final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
+  final bkPurchaseKeys = await getPurchaseKeysAndIDs(bkPurchaseBox);
+  final siPurchaseKeys = await getPurchaseKeysAndIDs(siPurchaseBox);
 
   final tempRes =
       await getCustomerIDAndBatchID(customerID, customerName, customerBatch);
@@ -145,22 +164,29 @@ Future<void> editSale(
   for (int saleKey in salesBox.keys) {
     SaleModel? existingSale = salesBox.get(saleKey);
     if (existingSale != null && existingSale.saleID == saleID) {
-      //Prepare the object which contains the exisintg sold quantities
-      for (SaleItemModel esb in existingSale.books) {
-        for (SaleItemPurchaseVariantModel espv in esb.purchaseVariants) {
-          final existingPurchase =
-              purchaseBox.get(purchaseKeys[espv.purchaseID]);
-          if (existingPurchase != null) {
-            //Undo the balance stock reduction that have done when the sale is created.
-            int newBalance = existingPurchase.quantityLeft + espv.quantity;
+      Future<void> updateQty(List<SaleItemModel> saleItemList, Box purchaseBox,
+          Map<String, int> purchaseKeys) async {
+        //Prepare the object which contains the exisintg sold quantities
+        for (SaleItemModel esb in saleItemList) {
+          for (SaleItemPurchaseVariantModel espv in esb.purchaseVariants) {
+            final existingPurchase =
+                purchaseBox.get(purchaseKeys[espv.purchaseID]);
+            if (existingPurchase != null) {
+              //Undo the balance stock reduction that have done when the sale is created.
+              int newBalance = existingPurchase.quantityLeft + espv.quantity;
 
-            existingPurchase.quantityLeft = newBalance;
-            existingPurchase.modifiedDate = currentTS;
-            await purchaseBox.put(
-                purchaseKeys[espv.purchaseID], existingPurchase);
+              existingPurchase.quantityLeft = newBalance;
+              existingPurchase.modifiedDate = currentTS;
+              await purchaseBox.put(
+                  purchaseKeys[espv.purchaseID], existingPurchase);
+            }
           }
         }
       }
+
+      await updateQty(existingSale.books, bkPurchaseBox, bkPurchaseKeys);
+      await updateQty(
+          existingSale.stationaryItems, siPurchaseBox, siPurchaseKeys);
 
       existingSale.books = booksToCheckout;
       existingSale.stationaryItems = stationaryItemsToCheckout;
@@ -178,49 +204,63 @@ Future<void> editSale(
   }
 
   //Update balance stock in purchase table
-  for (var book in booksToCheckout) {
-    for (var pv in book.purchaseVariants) {
-      BookPurchaseModel? existingPurchase =
-          purchaseBox.get(purchaseKeys[pv.purchaseID]);
-      if (existingPurchase != null) {
-        //Reduce the new quantity from balance stock.
-        int newBalance = existingPurchase.quantityLeft - pv.quantity;
+  Future<void> updateQty2(List<SaleItemModel> saleItemList, Box purchaseBox,
+      Map<String, int> purchaseKeys) async {
+    for (var item in saleItemList) {
+      for (var pv in item.purchaseVariants) {
+        final existingPurchase = purchaseBox.get(purchaseKeys[pv.purchaseID]);
+        if (existingPurchase != null) {
+          //Reduce the new quantity from balance stock.
+          int newBalance = existingPurchase.quantityLeft - pv.quantity;
 
-        existingPurchase.quantityLeft = newBalance;
-        existingPurchase.modifiedDate = currentTS;
-        await purchaseBox.put(purchaseKeys[pv.purchaseID], existingPurchase);
+          existingPurchase.quantityLeft = newBalance;
+          existingPurchase.modifiedDate = currentTS;
+          await purchaseBox.put(purchaseKeys[pv.purchaseID], existingPurchase);
+        }
       }
     }
   }
+
+  await updateQty2(booksToCheckout, bkPurchaseBox, bkPurchaseKeys);
+  await updateQty2(stationaryItemsToCheckout, siPurchaseBox, siPurchaseKeys);
 }
 
 Future<void> deleteSale(String saleID) async {
   final salesBox = await getSalesBox();
-  final purchaseBox = await getBookPurchaseBox();
+  final bkPurchaseBox = await getBookPurchaseBox();
+  final siPurchaseBox = await getStationaryPurchaseBox();
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
   final currentTS = getCurrentTimestamp();
 
-  final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
+  final bkPurchaseKeys = await getPurchaseKeysAndIDs(bkPurchaseBox);
+  final siPurchaseKeys = await getPurchaseKeysAndIDs(siPurchaseBox);
 
   for (int saleKey in salesBox.keys) {
     SaleModel? existingSale = salesBox.get(saleKey);
     if (existingSale != null && existingSale.saleID == saleID) {
-      //Prepare the object which contains the exisintg sold quantities
-      for (var esb in existingSale.books) {
-        for (var espv in esb.purchaseVariants) {
-          BookPurchaseModel? existingPurchase =
-              purchaseBox.get(purchaseKeys[espv.purchaseID]);
-          if (existingPurchase != null) {
-            //Undo the balance stock reduction that have done when the sale is created.
-            int newCount = existingPurchase.quantityLeft + espv.quantity;
+      Future<void> updateQty(List<SaleItemModel> saleItemList, Box purchaseBox,
+          Map<String, int> purchaseKeys) async {
+        //Prepare the object which contains the exisintg sold quantities
+        for (var esb in saleItemList) {
+          for (var espv in esb.purchaseVariants) {
+            final existingPurchase =
+                purchaseBox.get(purchaseKeys[espv.purchaseID]);
+            if (existingPurchase != null) {
+              //Undo the balance stock reduction that have done when the sale is created.
+              int newCount = existingPurchase.quantityLeft + espv.quantity;
 
-            existingPurchase.quantityLeft = newCount;
-            existingPurchase.modifiedDate = currentTS;
-            await purchaseBox.put(
-                purchaseKeys[espv.purchaseID], existingPurchase);
+              existingPurchase.quantityLeft = newCount;
+              existingPurchase.modifiedDate = currentTS;
+              await purchaseBox.put(
+                  purchaseKeys[espv.purchaseID], existingPurchase);
+            }
           }
         }
       }
+
+      await updateQty(existingSale.books, bkPurchaseBox, bkPurchaseKeys);
+      await updateQty(
+          existingSale.stationaryItems, siPurchaseBox, siPurchaseKeys);
 
       existingSale.status = DBRowStatus.deleted;
       existingSale.modifiedDate = getCurrentTimestamp();

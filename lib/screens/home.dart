@@ -18,12 +18,12 @@ import '../providers/user.dart';
 final group1 = [
   {'id': 1, 'label': 'Sales', 'icon': Icons.monetization_on},
   {'id': 2, 'label': 'Book Purchases', 'icon': Icons.book},
-  {'id': 3, 'label': 'Stationary Purchases', 'icon': Icons.attach_file},
+  {'id': 3, 'label': 'Stationary Purchases', 'icon': Icons.add_shopping_cart},
 ];
 
 final group2 = [
-  {'id': 4, 'label': 'Books', 'icon': Icons.book, 'showDivider': true},
-  {'id': 5, 'label': 'Stationary items', 'icon': Icons.book}
+  {'id': 4, 'label': 'Books', 'icon': Icons.auto_stories, 'showDivider': true},
+  {'id': 5, 'label': 'Stationary items', 'icon': Icons.attach_file}
 ];
 
 final group3 = [
