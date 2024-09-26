@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
+import 'package:vadavathoor_book_stall/screens/stationary_purchase/modal.dart';
 import 'package:vadavathoor_book_stall/utils/export_excel.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
-import 'package:vadavathoor_book_stall/screens/book_purchase/purchase_modal.dart';
 
 import '../../classes.dart';
 
-class BookPurchase extends StatefulWidget {
-  const BookPurchase({super.key});
+class StationaryPurchaseWidget extends StatefulWidget {
+  const StationaryPurchaseWidget({super.key});
 
   @override
-  State<BookPurchase> createState() => _BookPurchaseState();
+  State<StationaryPurchaseWidget> createState() => _StationaryPurchaseState();
 }
 
-class _BookPurchaseState extends State<BookPurchase> {
+class _StationaryPurchaseState extends State<StationaryPurchaseWidget> {
   List<PurchaseListItemModel> purchases = [];
 
   void onPressAddOrEdit({PurchaseListItemModel? data}) {
@@ -31,7 +31,7 @@ class _BookPurchaseState extends State<BookPurchase> {
                       padding: const EdgeInsets.all(16.0),
                       child: SingleChildScrollView(
                           //#pending - while scrolling, header and submit should be sticky
-                          child: BookPurchaseModalWidget(
+                          child: StationaryPurchaseModalWidget(
                               data: data, updateUI: setData)))));
         });
   }
@@ -52,7 +52,7 @@ class _BookPurchaseState extends State<BookPurchase> {
                     child: const Text('Cancel')),
                 ElevatedButton(
                     onPressed: () {
-                      deleteBookPurchase(purchaseID).then((res) {
+                      deleteStationaryPurchase(purchaseID).then((res) {
                         Navigator.of(context).pop();
 
                         if (res['message'] == null) {
@@ -81,7 +81,7 @@ class _BookPurchaseState extends State<BookPurchase> {
   }
 
   void setData() async {
-    final tempData = await getBookPurchaseList();
+    final tempData = await getStationaryPurchaseList();
     setState(() {
       purchases = tempData;
     });
@@ -134,7 +134,7 @@ class _BookPurchaseState extends State<BookPurchase> {
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
                   flex: 3,
-                  child: Text('Book',
+                  child: Text('Items',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(

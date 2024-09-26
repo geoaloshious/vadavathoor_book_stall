@@ -71,6 +71,7 @@ class _SaleState extends State<SaleWidget> {
     return Row(children: [
       Expanded(child: Text(widget.data.customerName)),
       Expanded(child: Text(widget.data.books)),
+      Expanded(child: Text(widget.data.stationaryItems)),
       Expanded(child: Text(widget.data.paymentMode)),
       Expanded(child: Text(widget.data.grandTotal.toString())),
       Expanded(child: Text(widget.data.createdDate)),

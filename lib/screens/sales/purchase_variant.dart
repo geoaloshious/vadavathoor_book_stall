@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 
 class PurchaseVariantWidget extends StatefulWidget {
-  final ForNewSaleBookPurchaseVariant data;
+  final ForNewSalePurchaseVariant data;
   final void Function({bool? selected, double? dsPr, int? qty}) updateData;
 
   const PurchaseVariantWidget(
@@ -50,20 +50,22 @@ class _PurchaseVariantState extends State<PurchaseVariantWidget> {
     });
   }
 
- void calculateSellingPrice(String percentage) {
-  double discountPercentage = double.tryParse(percentage) ?? 0;
-  double originalPrice = widget.data.originalPrice;
-  
-  double sellingPrice = originalPrice - (originalPrice * discountPercentage / 100);
-  
-  sellingPrice = double.parse(sellingPrice.toStringAsFixed(2));
+  void calculateSellingPrice(String percentage) {
+    double discountPercentage = double.tryParse(percentage) ?? 0;
+    double originalPrice = widget.data.originalPrice;
 
-  setState(() {
-    _sellingPriceController = TextEditingController(text: sellingPrice.toString());
-  });
+    double sellingPrice =
+        originalPrice - (originalPrice * discountPercentage / 100);
 
-  widget.updateData(dsPr: sellingPrice);
-}
+    sellingPrice = double.parse(sellingPrice.toStringAsFixed(2));
+
+    setState(() {
+      _sellingPriceController =
+          TextEditingController(text: sellingPrice.toString());
+    });
+
+    widget.updateData(dsPr: sellingPrice);
+  }
 
   @override
   void didChangeDependencies() {

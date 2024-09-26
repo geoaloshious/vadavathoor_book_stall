@@ -12,6 +12,7 @@ const salesHeadings = [
   'Sale ID',
   'Customer name',
   'Books',
+  'Stationaries',
   'Created Date',
   'Grand Total',
   'Payment Mode'
@@ -20,17 +21,18 @@ const salesHeadings = [
 const purchaseHeadings = [
   'SlNo.',
   'Purchase ID',
-  'Book name',
+  'Item name',
   'Balance stock',
   'Quantity purchased',
-  'Book price',
+  'Price',
   'Purchase date'
 ];
 
 void exportExcel(
     {required BuildContext context,
     List<SaleListItemModel>? sales,
-    List<BookPurchaseListItemModel>? purchases}) async {
+    List<PurchaseListItemModel>? purchases,
+    bool? stationary}) async {
   Excel excel = Excel.createExcel();
   Sheet sheet = excel['Sheet1'];
 
@@ -45,6 +47,7 @@ void exportExcel(
         TextCellValue(sales[i].saleID),
         TextCellValue(sales[i].customerName),
         TextCellValue(sales[i].books),
+        TextCellValue(sales[i].stationaryItems),
         TextCellValue(sales[i].createdDate),
         TextCellValue(sales[i].grandTotal.toString()),
         TextCellValue(sales[i].paymentMode),
@@ -55,10 +58,10 @@ void exportExcel(
       sheet.appendRow([
         TextCellValue('${i + 1}'),
         TextCellValue(purchases[i].purchaseID),
-        TextCellValue(purchases[i].bookName),
+        TextCellValue(purchases[i].itemName),
         TextCellValue('${purchases[i].balanceStock}'),
         TextCellValue('${purchases[i].quantityPurchased}'),
-        TextCellValue('${purchases[i].bookPrice}'),
+        TextCellValue('${purchases[i].price}'),
         TextCellValue(purchases[i].formattedPurchaseDate),
       ]);
     }

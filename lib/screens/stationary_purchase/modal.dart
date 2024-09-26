@@ -2,36 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
-import 'package:vadavathoor_book_stall/db/models/book.dart';
-import 'package:vadavathoor_book_stall/db/models/book_category.dart';
-import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
+import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
 
 import '../../classes.dart';
 import '../../components/drop_down.dart';
-import '../../db/functions/book.dart';
-import '../../db/functions/book_purchase.dart';
-import '../../db/functions/publisher.dart';
 
-class BookPurchaseModalWidget extends StatefulWidget {
+class StationaryPurchaseModalWidget extends StatefulWidget {
   final PurchaseListItemModel? data;
   final void Function() updateUI;
 
-  const BookPurchaseModalWidget({super.key, this.data, required this.updateUI});
+  const StationaryPurchaseModalWidget(
+      {super.key, this.data, required this.updateUI});
 
   @override
-  State<BookPurchaseModalWidget> createState() => _BookPurchaseModalState();
+  State<StationaryPurchaseModalWidget> createState() =>
+      _StationaryPurchaseModalState();
 }
 
-class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
+class _StationaryPurchaseModalState
+    extends State<StationaryPurchaseModalWidget> {
   var _quantityController = TextEditingController();
   var _priceController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
-  String _bookID = '';
+  String _itemID = '';
   Map<String, bool> inputErrors = {};
 
-  List<BookModel> books = [];
+  List<StationaryItemModel> items = [];
 
   void _selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -63,13 +62,13 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
     }
 
     if (price == 0) {
-      tempInputErrors['bookPrice'] = true;
+      tempInputErrors['price'] = true;
     }
 
     if (tempInputErrors.isEmpty) {
       if (widget.data != null) {
-        editBookPurchase(
-                widget.data!.purchaseID, _bookID, quantity, price, purchaseDate)
+        editStationaryPurchase(
+                widget.data!.purchaseID, _itemID, quantity, price, purchaseDate)
             .then((res) {
           if (res['message'] == null) {
             widget.updateUI();
@@ -92,7 +91,7 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
           }
         });
       } else {
-        await addBookPurchase(_bookID, purchaseDate, price, quantity);
+        await addStationaryPurchase(_itemID, purchaseDate, price, quantity);
         widget.updateUI();
         Navigator.of(context).pop();
       }
@@ -105,7 +104,7 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
 
   void setData() async {
     if (widget.data != null) {
-      _bookID = widget.data!.itemID;
+      _itemID = widget.data!.itemID;
 
       _selectedDate =
           DateTime.fromMillisecondsSinceEpoch(widget.data!.purchaseDate);
@@ -116,10 +115,10 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
           TextEditingController(text: widget.data!.price.toString());
     }
 
-    final tempBooks = await getBooks();
+    final tempItems = await getStationaryItems();
 
     setState(() {
-      books = tempBooks;
+      items = tempItems;
     });
   }
 
@@ -146,15 +145,15 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
       Row(children: [
         Expanded(
             child: CustomDropdown(
-                items: books.map((i) => i.toDropdownData()).toList(),
-                selectedValue: _bookID,
-                label: 'Select Book',
-                hasError: inputErrors['book'] == true,
+                items: items.map((i) => i.toDropdownData()).toList(),
+                selectedValue: _itemID,
+                label: 'Select item',
+                hasError: inputErrors['item'] == true,
                 onValueChanged: (value) {
-                  if (_bookID != value) {
+                  if (_itemID != value) {
                     setState(() {
-                      _bookID = value;
-                      inputErrors = {...inputErrors, 'book': false};
+                      _itemID = value;
+                      inputErrors = {...inputErrors, 'item': false};
                     });
                   }
                 })),
@@ -189,15 +188,15 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
                 decoration: InputDecoration(
-                    labelText: 'Book price',
+                    labelText: 'Price',
                     border: const OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                        borderSide: inputErrors['bookPrice'] == true
+                        borderSide: inputErrors['price'] == true
                             ? const BorderSide(color: Colors.red, width: 1)
                             : const BorderSide(color: Colors.grey, width: 1))),
                 onChanged: (value) {
                   setState(() {
-                    inputErrors = {...inputErrors, 'bookPrice': false};
+                    inputErrors = {...inputErrors, 'price': false};
                   });
                 })),
         const SizedBox(width: 16.0),

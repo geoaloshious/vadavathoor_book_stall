@@ -6,18 +6,18 @@ part of 'sales.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SaleItemBookPurchaseVariantModelAdapter
-    extends TypeAdapter<SaleItemBookPurchaseVariantModel> {
+class SaleItemPurchaseVariantModelAdapter
+    extends TypeAdapter<SaleItemPurchaseVariantModel> {
   @override
   final int typeId = 8;
 
   @override
-  SaleItemBookPurchaseVariantModel read(BinaryReader reader) {
+  SaleItemPurchaseVariantModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SaleItemBookPurchaseVariantModel(
+    return SaleItemPurchaseVariantModel(
       purchaseID: fields[0] as String,
       soldPrice: fields[2] as double,
       quantity: fields[3] as int,
@@ -25,7 +25,7 @@ class SaleItemBookPurchaseVariantModelAdapter
   }
 
   @override
-  void write(BinaryWriter writer, SaleItemBookPurchaseVariantModel obj) {
+  void write(BinaryWriter writer, SaleItemPurchaseVariantModel obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
@@ -42,34 +42,34 @@ class SaleItemBookPurchaseVariantModelAdapter
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SaleItemBookPurchaseVariantModelAdapter &&
+      other is SaleItemPurchaseVariantModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class SaleItemBookModelAdapter extends TypeAdapter<SaleItemBookModel> {
+class SaleItemModelAdapter extends TypeAdapter<SaleItemModel> {
   @override
   final int typeId = 7;
 
   @override
-  SaleItemBookModel read(BinaryReader reader) {
+  SaleItemModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SaleItemBookModel(
-      bookID: fields[0] as String,
+    return SaleItemModel(
+      itemID: fields[0] as String,
       purchaseVariants:
-          (fields[1] as List).cast<SaleItemBookPurchaseVariantModel>(),
+          (fields[1] as List).cast<SaleItemPurchaseVariantModel>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, SaleItemBookModel obj) {
+  void write(BinaryWriter writer, SaleItemModel obj) {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.bookID)
+      ..write(obj.itemID)
       ..writeByte(1)
       ..write(obj.purchaseVariants);
   }
@@ -80,7 +80,7 @@ class SaleItemBookModelAdapter extends TypeAdapter<SaleItemBookModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SaleItemBookModelAdapter &&
+      other is SaleItemModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -96,16 +96,17 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SaleModel(
-      books: (fields[1] as List).cast<SaleItemBookModel>(),
-      grandTotal: fields[2] as double,
-      customerID: fields[3] as String,
-      customerBatchID: fields[4] as String,
-      paymentMode: fields[5] as String,
-      createdDate: fields[6] as int,
-      createdBy: fields[7] as String,
-      modifiedDate: fields[8] as int,
-      modifiedBy: fields[9] as String,
-      status: fields[10] as int,
+      books: (fields[1] as List).cast<SaleItemModel>(),
+      stationaryItems: (fields[2] as List).cast<SaleItemModel>(),
+      grandTotal: fields[3] as double,
+      customerID: fields[4] as String,
+      customerBatchID: fields[5] as String,
+      paymentMode: fields[6] as String,
+      createdDate: fields[7] as int,
+      createdBy: fields[8] as String,
+      modifiedDate: fields[9] as int,
+      modifiedBy: fields[10] as String,
+      status: fields[11] as int,
       saleID: fields[0] as String,
     );
   }
@@ -113,28 +114,30 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
   @override
   void write(BinaryWriter writer, SaleModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.saleID)
       ..writeByte(1)
       ..write(obj.books)
       ..writeByte(2)
-      ..write(obj.grandTotal)
+      ..write(obj.stationaryItems)
       ..writeByte(3)
-      ..write(obj.customerID)
+      ..write(obj.grandTotal)
       ..writeByte(4)
-      ..write(obj.customerBatchID)
+      ..write(obj.customerID)
       ..writeByte(5)
-      ..write(obj.paymentMode)
+      ..write(obj.customerBatchID)
       ..writeByte(6)
-      ..write(obj.createdDate)
+      ..write(obj.paymentMode)
       ..writeByte(7)
-      ..write(obj.createdBy)
+      ..write(obj.createdDate)
       ..writeByte(8)
-      ..write(obj.modifiedDate)
+      ..write(obj.createdBy)
       ..writeByte(9)
-      ..write(obj.modifiedBy)
+      ..write(obj.modifiedDate)
       ..writeByte(10)
+      ..write(obj.modifiedBy)
+      ..writeByte(11)
       ..write(obj.status);
   }
 
