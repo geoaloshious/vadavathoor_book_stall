@@ -241,7 +241,7 @@ void saveAndOpenPDF(String saleID) async {
   SaleModel sale = salesDB.firstWhere((s) => s.saleID == saleID);
   List<Map<String, dynamic>> books = [];
 
-  for (SaleItemBookModel b in sale.books) {
+  for (SaleItemModel b in sale.books) {
     for (SaleItemBookPurchaseVariantModel pv in b.purchaseVariants) {
       final op =
           purchaseDB.firstWhere((p) => p.purchaseID == pv.purchaseID).bookPrice;

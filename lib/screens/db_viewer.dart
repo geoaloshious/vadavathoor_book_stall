@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/functions/publisher.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
 
@@ -31,11 +33,18 @@ class _DbViewerState extends State<DbViewer> {
   void setData() async {
     List<Map<String, String>> tempArr = [];
 
-    final purchaseDB = (await getBookPurchaseBox()).values.toList();
+    final bkPurchaseDB = (await getBookPurchaseBox()).values.toList();
     tempArr.add({
-      'label': 'Purchases',
+      'label': 'Book Purchases',
       'value': getPrettyJSONString(
-          json.encode(purchaseDB.map((p) => p.toJson()).toList()))
+          json.encode(bkPurchaseDB.map((p) => p.toJson()).toList()))
+    });
+
+    final stPurchaseDB = (await getStationaryPurchaseBox()).values.toList();
+    tempArr.add({
+      'label': 'Stationary Purchases',
+      'value': getPrettyJSONString(
+          json.encode(stPurchaseDB.map((p) => p.toJson()).toList()))
     });
 
     final salesDB = (await getSalesBox()).values.toList();
@@ -43,6 +52,13 @@ class _DbViewerState extends State<DbViewer> {
       'label': 'Sales',
       'value': getPrettyJSONString(
           json.encode(salesDB.map((p) => p.toJson()).toList()))
+    });
+
+    final stationaryItems = (await getStationaryItemBox()).values.toList();
+    tempArr.add({
+      'label': 'Stationary Items',
+      'value': getPrettyJSONString(
+          json.encode(stationaryItems.map((p) => p.toJson()).toList()))
     });
 
     final booksDB = (await getBooksBox()).values.toList();

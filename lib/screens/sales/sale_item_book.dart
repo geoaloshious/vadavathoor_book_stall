@@ -8,7 +8,7 @@ import 'package:vadavathoor_book_stall/screens/sales/purchase_variant.dart';
 class SaleItemBookWidget extends StatefulWidget {
   final Map<String, Map<String, Map<String, Object>>> allBooksWithPurchases;
   final List<BookModel> allBooks;
-  final SaleItemBookModel savedData;
+  final SaleItemModel savedData;
   final List<String> selectedBookIDs;
   final VoidCallback onClickDelete;
   final void Function(
@@ -64,12 +64,12 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
     super.didChangeDependencies();
 
     if (!didSetData &&
-        widget.savedData.bookID != '' &&
+        widget.savedData.itemID != '' &&
         widget.allBooksWithPurchases.keys.isNotEmpty) {
       final List<ForNewSaleBookPurchaseVariant> tempPurchases = [];
 
       final bookPurchases =
-          widget.allBooksWithPurchases[widget.savedData.bookID];
+          widget.allBooksWithPurchases[widget.savedData.itemID];
 
       if (bookPurchases != null) {
         for (String purchaseID in bookPurchases.keys) {
@@ -93,7 +93,7 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
       }
 
       setState(() {
-        selectedBook.bookID = widget.savedData.bookID;
+        selectedBook.bookID = widget.savedData.itemID;
         selectedBook.purchases = tempPurchases;
 
         didSetData = true;

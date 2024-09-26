@@ -11,10 +11,10 @@ import 'utils.dart';
 Future<Box<StationaryItemModel>> getStationaryItemBox() async {
   Box<StationaryItemModel> box;
 
-  if (Hive.isBoxOpen(DBNames.book)) {
-    box = Hive.box<StationaryItemModel>(DBNames.book);
+  if (Hive.isBoxOpen(DBNames.stationaryItem)) {
+    box = Hive.box<StationaryItemModel>(DBNames.stationaryItem);
   } else {
-    box = await Hive.openBox<StationaryItemModel>(DBNames.book);
+    box = await Hive.openBox<StationaryItemModel>(DBNames.stationaryItem);
   }
 
   return box;

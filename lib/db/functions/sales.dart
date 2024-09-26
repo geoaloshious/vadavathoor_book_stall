@@ -72,7 +72,7 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
 }
 
 Future<void> addSale(
-    List<SaleItemBookModel> booksToCheckout,
+    List<SaleItemModel> booksToCheckout,
     double grandTotal,
     String customerID,
     String customerName,
@@ -103,7 +103,7 @@ Future<void> addSale(
   final purchaseBox = await getBookPurchaseBox();
   final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
-  for (SaleItemBookModel book in booksToCheckout) {
+  for (SaleItemModel book in booksToCheckout) {
     for (SaleItemBookPurchaseVariantModel pv in book.purchaseVariants) {
       BookPurchaseModel? existingData =
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
@@ -118,7 +118,7 @@ Future<void> addSale(
 
 Future<void> editSale(
     String saleID,
-    List<SaleItemBookModel> booksToCheckout,
+    List<SaleItemModel> booksToCheckout,
     double grandTotal,
     String customerID,
     String customerName,
@@ -140,7 +140,7 @@ Future<void> editSale(
     SaleModel? existingSale = salesBox.get(saleKey);
     if (existingSale != null && existingSale.saleID == saleID) {
       //Prepare the object which contains the exisintg sold quantities
-      for (SaleItemBookModel esb in existingSale.books) {
+      for (SaleItemModel esb in existingSale.books) {
         for (SaleItemBookPurchaseVariantModel espv in esb.purchaseVariants) {
           final existingPurchase =
               purchaseBox.get(purchaseKeys[espv.purchaseID]);
@@ -242,7 +242,7 @@ Future<List<SaleListItemModel>> getSalesList() async {
     if (sale.status == DBRowStatus.active) {
       List<String> bookNames = [];
 
-      for (SaleItemBookModel saleItem in sale.books) {
+      for (SaleItemModel saleItem in sale.books) {
         final book =
             books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
         int bookQty = 0;

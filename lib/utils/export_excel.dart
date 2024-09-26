@@ -20,17 +20,18 @@ const salesHeadings = [
 const purchaseHeadings = [
   'SlNo.',
   'Purchase ID',
-  'Book name',
+  'Item name',
   'Balance stock',
   'Quantity purchased',
-  'Book price',
+  'Price',
   'Purchase date'
 ];
 
 void exportExcel(
     {required BuildContext context,
     List<SaleListItemModel>? sales,
-    List<PurchaseListItemModel>? purchases}) async {
+    List<PurchaseListItemModel>? purchases,
+    bool? stationary}) async {
   Excel excel = Excel.createExcel();
   Sheet sheet = excel['Sheet1'];
 

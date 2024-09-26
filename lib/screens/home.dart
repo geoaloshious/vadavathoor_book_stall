@@ -9,7 +9,8 @@ import 'package:vadavathoor_book_stall/screens/books/index.dart';
 import 'package:vadavathoor_book_stall/screens/db_viewer.dart';
 import 'package:vadavathoor_book_stall/screens/empty_screen.dart';
 import 'package:vadavathoor_book_stall/screens/sales/index.dart';
-import 'package:vadavathoor_book_stall/screens/under_development.dart';
+import 'package:vadavathoor_book_stall/screens/stationary_items/index.dart';
+import 'package:vadavathoor_book_stall/screens/stationary_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
 
 import '../providers/user.dart';
@@ -21,12 +22,13 @@ final group1 = [
 ];
 
 final group2 = [
-  {'id': 4, 'label': 'Books', 'icon': Icons.book, 'showDivider': true}
+  {'id': 4, 'label': 'Books', 'icon': Icons.book, 'showDivider': true},
+  {'id': 5, 'label': 'Stationary items', 'icon': Icons.book}
 ];
 
 final group3 = [
-  {'id': 5, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
-  {'id': 6, 'label': 'Book Stall Details', 'icon': Icons.add_business}
+  {'id': 6, 'label': 'Users', 'icon': Icons.account_box, 'showDivider': true},
+  {'id': 7, 'label': 'Book Stall Details', 'icon': Icons.add_business}
 ];
 
 const int defaultPage = 1;
@@ -50,12 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const BookPurchase();
       case 3:
-        return const UnderDevelopment();
+        return const StationaryPurchaseWidget();
       case 4:
         return const BookHomeWidget();
       case 5:
-        return const ManageUsersIndexWidget();
+        return const StationaryItemsWidget();
       case 6:
+        return const ManageUsersIndexWidget();
+      case 7:
         return const BookStallDetailsWidget();
       default:
         return const EmptyScreenWidget();

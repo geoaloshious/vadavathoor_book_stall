@@ -3,8 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../constants.dart';
 part 'sales.g.dart';
 
-SaleItemBookModel emptyBookSaleItem() =>
-    SaleItemBookModel(bookID: '', purchaseVariants: []);
+SaleItemModel emptyBookSaleItem() =>
+    SaleItemModel(itemType: 0, itemID: '', purchaseVariants: []);
 
 SaleItemBookPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
     SaleItemBookPurchaseVariantModel(purchaseID: '', soldPrice: 0, quantity: 0);
@@ -40,27 +40,34 @@ class SaleItemBookPurchaseVariantModel {
 }
 
 @HiveType(typeId: DBItemHiveType.saleItemBook)
-class SaleItemBookModel {
+class SaleItemModel {
   @HiveField(0)
-  String bookID;
+  int itemType;
 
   @HiveField(1)
+  String itemID;
+
+  @HiveField(2)
   List<SaleItemBookPurchaseVariantModel> purchaseVariants;
 
   Map<String, dynamic> toJson() {
     return {
-      'bookID': bookID,
+      'itemID': itemID,
       'purchaseVariants': purchaseVariants.map((b) => b.toJson()).toString()
     };
   }
 
-  SaleItemBookModel clone() {
-    return SaleItemBookModel(
-        bookID: bookID,
+  SaleItemModel clone() {
+    return SaleItemModel(
+        itemType: itemType,
+        itemID: itemID,
         purchaseVariants: purchaseVariants.map((i) => i.clone()).toList());
   }
 
-  SaleItemBookModel({required this.bookID, required this.purchaseVariants});
+  SaleItemModel(
+      {required this.itemType,
+      required this.itemID,
+      required this.purchaseVariants});
 }
 
 @HiveType(typeId: DBItemHiveType.sale)
@@ -69,33 +76,36 @@ class SaleModel {
   final String saleID;
 
   @HiveField(1)
-  List<SaleItemBookModel> books;
+  List<SaleItemModel> books;
 
   @HiveField(2)
-  double grandTotal;
+  List<SaleItemModel> stationaryItems;
 
   @HiveField(3)
-  String customerID;
+  double grandTotal;
 
   @HiveField(4)
-  String customerBatchID;
+  String customerID;
 
   @HiveField(5)
-  String paymentMode;
+  String customerBatchID;
 
   @HiveField(6)
-  final int createdDate;
+  String paymentMode;
 
   @HiveField(7)
-  final String createdBy;
+  final int createdDate;
 
   @HiveField(8)
-  int modifiedDate;
+  final String createdBy;
 
   @HiveField(9)
-  String modifiedBy;
+  int modifiedDate;
 
   @HiveField(10)
+  String modifiedBy;
+
+  @HiveField(11)
   int status;
 
   Map<String, dynamic> toJson() {
@@ -110,13 +120,15 @@ class SaleModel {
       'modifiedDate': modifiedDate,
       'modifiedBy': modifiedBy,
       'status': status,
-      'books': books.map((b) => b.toJson()).toString()
+      'books': books.map((b) => b.toJson()).toString(),
+      'stationaryItems': stationaryItems.map((b) => b.toJson()).toString()
     };
   }
 
   SaleModel clone() {
     return SaleModel(
         books: books.map((b) => b.clone()).toList(),
+        stationaryItems: stationaryItems.map((b) => b.clone()).toList(),
         grandTotal: grandTotal,
         customerID: customerID,
         customerBatchID: customerBatchID,
@@ -131,6 +143,7 @@ class SaleModel {
 
   SaleModel(
       {required this.books,
+      required this.stationaryItems,
       required this.grandTotal,
       required this.customerID,
       required this.customerBatchID,

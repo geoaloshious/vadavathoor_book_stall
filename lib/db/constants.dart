@@ -38,6 +38,7 @@ class DBNames {
   static const String book = 'book_db';
   static const String bookAuthor = 'book_author_db';
   static const String bookPurchase = 'book_purchase_db';
+  static const String stationaryItem = 'stationary_item_db';
   static const String stationaryPurchase = 'stationary_purchase_db';
   static const String bookCategories = 'book_categories_db';
   static const String sale = 'sale_db';

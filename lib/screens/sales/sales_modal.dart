@@ -30,7 +30,8 @@ class _SaleModalState extends State<SaleModalWidget> {
   String _selectedUserID = '';
   List<UserModelForSales> users = [];
 
-  List<SaleItemBookModel> booksToCheckout = [];
+  List<SaleItemModel> booksToCheckout = [];
+  List<SaleItemModel> staionaryItemsToCheckout = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
   String _paymentMode = PaymentModes.cash;
@@ -72,7 +73,7 @@ class _SaleModalState extends State<SaleModalWidget> {
 
         for (var pv in bk.purchaseVariants) {
           if (pv.soldPrice == 0) {
-            pv.soldPrice = allBooksWithPurchases[bk.bookID]?[pv.purchaseID]
+            pv.soldPrice = allBooksWithPurchases[bk.itemID]?[pv.purchaseID]
                 ?['price'] as double;
           }
 
@@ -135,13 +136,13 @@ class _SaleModalState extends State<SaleModalWidget> {
   void _updateGrandTotal() {
     double tempTotal = 0;
 
-    for (SaleItemBookModel i in booksToCheckout) {
-      if (i.bookID != '') {
+    for (SaleItemModel i in booksToCheckout) {
+      if (i.itemID != '') {
         for (var pv in i.purchaseVariants) {
           tempTotal = tempTotal +
               (pv.soldPrice != 0
                       ? pv.soldPrice
-                      : allBooksWithPurchases[i.bookID]?[pv.purchaseID]
+                      : allBooksWithPurchases[i.itemID]?[pv.purchaseID]
                           ?['price'] as double) *
                   pv.quantity;
         }
@@ -157,9 +158,9 @@ class _SaleModalState extends State<SaleModalWidget> {
   void _updateSelectedBookIDs() {
     final List<String> tempArr = [];
 
-    for (SaleItemBookModel i in booksToCheckout) {
-      if (i.bookID != '') {
-        tempArr.add(i.bookID);
+    for (SaleItemModel i in booksToCheckout) {
+      if (i.itemID != '') {
+        tempArr.add(i.itemID);
       }
     }
 
@@ -170,7 +171,7 @@ class _SaleModalState extends State<SaleModalWidget> {
 
   void setData() async {
     List<String> savedPurchaseIDs = [];
-    List<SaleItemBookModel> tempBooksCheckout = [];
+    List<SaleItemModel> tempBooksCheckout = [];
     String tempPaymentMode = PaymentModes.cash;
     double tempGrandTotal = 0;
     String tempCustomerID = '';
@@ -183,7 +184,7 @@ class _SaleModalState extends State<SaleModalWidget> {
         tempGrandTotal = temp.grandTotal;
         tempCustomerID = temp.customerID;
 
-        for (SaleItemBookModel b in temp.books) {
+        for (SaleItemModel b in temp.books) {
           for (SaleItemBookPurchaseVariantModel p in b.purchaseVariants) {
             savedPurchaseIDs.add(p.purchaseID);
           }
@@ -267,7 +268,95 @@ class _SaleModalState extends State<SaleModalWidget> {
                       double? dsPr,
                       int? qty}) {
                     if (bkId != null) {
-                      booksToCheckout[index].bookID = bkId;
+                      booksToCheckout[index].itemID = bkId;
+                      booksToCheckout[index].purchaseVariants = [];
+                      _updateSelectedBookIDs();
+                    }
+
+                    if (prchID != null) {
+                      if (selected != null) {
+                        if (selected) {
+                          booksToCheckout[index].purchaseVariants.add(
+                              SaleItemBookPurchaseVariantModel(
+                                  purchaseID: prchID,
+                                  soldPrice: 0,
+                                  quantity: 0));
+                        } else {
+                          booksToCheckout[index]
+                              .purchaseVariants
+                              .removeWhere((pv) => pv.purchaseID == prchID);
+                        }
+                      } else {
+                        var pvItm = booksToCheckout[index]
+                            .purchaseVariants
+                            .firstWhere((pv) => pv.purchaseID == prchID,
+                                orElse: emptySaleItemBookPurchaseVariant);
+                        if (dsPr != null) {
+                          pvItm.soldPrice = dsPr;
+                        }
+                        if (qty != null) {
+                          pvItm.quantity = qty;
+                        }
+                      }
+                    }
+
+                    _updateGrandTotal();
+                  },
+                  onClickDelete: () {
+                    setState(() {
+                      booksToCheckout.removeAt(index);
+                    });
+
+                    _updateGrandTotal();
+                    _updateSelectedBookIDs();
+                  });
+            })),
+            const SizedBox(height: 20),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              CustomButton(
+                  label: 'Add book',
+                  backgroundColor: Colors.white,
+                  textColor: Colors.blueGrey,
+                  onPressed: () {
+                    setState(() {
+                      booksToCheckout.add(emptyBookSaleItem());
+                    });
+                  })
+            ])
+          ])),
+      const SizedBox(height: 20.0),
+      Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              color: Colors.blueGrey,
+              border: Border.all(
+                  width: 1, color: const Color.fromARGB(255, 208, 204, 204)),
+              borderRadius: const BorderRadius.all(Radius.circular(10))),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Stationary Items',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white)),
+            Column(
+                children: List.generate(booksToCheckout.length, (index) {
+              return SaleItemBookWidget(
+                  key: Key(index.toString()),
+                  allBooksWithPurchases: allBooksWithPurchases,
+                  allBooks: allBooks,
+                  savedData: booksToCheckout[index],
+                  selectedBookIDs: selectedBookIDs,
+                  updateData: (
+                      {String? bkId,
+                      String? prchID,
+                      bool? selected,
+                      double? prc,
+                      double? dsPr,
+                      int? qty}) {
+                    if (bkId != null) {
+                      booksToCheckout[index].itemID = bkId;
                       booksToCheckout[index].purchaseVariants = [];
                       _updateSelectedBookIDs();
                     }
