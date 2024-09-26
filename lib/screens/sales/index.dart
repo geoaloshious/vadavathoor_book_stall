@@ -90,7 +90,11 @@ class _SalesState extends State<SalesWidget> {
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(
-                  child: Text('Book (Qty)',
+                  child: Text('Books (Qty)',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600))),
+              const Expanded(
+                  child: Text('Stationaries (Qty)',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600))),
               const Expanded(

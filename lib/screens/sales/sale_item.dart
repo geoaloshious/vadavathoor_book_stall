@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
-import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/purchase_variant.dart';
 
-class SaleItemBookWidget extends StatefulWidget {
-  final Map<String, Map<String, Map<String, Object>>> allBooksWithPurchases;
-  final List<BookModel> allBooks;
+class SaleItemWidget extends StatefulWidget {
+  final Map<String, Map<String, Map<String, Object>>> allPurchases;
+  final List<Map<String, String>> dropdownData;
   final SaleItemModel savedData;
   final List<String> selectedBookIDs;
   final VoidCallback onClickDelete;
@@ -19,29 +18,28 @@ class SaleItemBookWidget extends StatefulWidget {
       double? dsPr,
       int? qty}) updateData;
 
-  const SaleItemBookWidget(
+  const SaleItemWidget(
       {super.key,
-      required this.allBooksWithPurchases,
-      required this.allBooks,
+      required this.allPurchases,
+      required this.dropdownData,
       required this.savedData,
       required this.selectedBookIDs,
       required this.onClickDelete,
       required this.updateData});
 
   @override
-  State<SaleItemBookWidget> createState() => _SaleItemBookState();
+  State<SaleItemWidget> createState() => _SaleItemState();
 }
 
-class _SaleItemBookState extends State<SaleItemBookWidget> {
-  ForNewSaleBookItem selectedBook = emptyForNewSaleBookItem();
+class _SaleItemState extends State<SaleItemWidget> {
+  ForNewSaleItem selectedItem = emptyForNewSaleItem();
   bool didSetData = false;
 
-  void onChangeBook(String bookID) {
-    final tempPurchases =
-        widget.allBooksWithPurchases[bookID]?.keys.map((purchaseID) {
-      final p = widget.allBooksWithPurchases[bookID]?[purchaseID];
+  void onChangeBook(String itemID) {
+    final tempPurchases = widget.allPurchases[itemID]?.keys.map((purchaseID) {
+      final p = widget.allPurchases[itemID]?[purchaseID];
 
-      return ForNewSaleBookPurchaseVariant(
+      return ForNewSalePurchaseVariant(
           purchaseID: purchaseID,
           purchaseDate: p?['date'] as String,
           balanceStock: p?['balanceStock'] as int,
@@ -52,9 +50,9 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
     }).toList();
 
     setState(() {
-      selectedBook.bookID = bookID;
+      selectedItem.itemID = itemID;
       if (tempPurchases != null) {
-        selectedBook.purchases = tempPurchases;
+        selectedItem.purchases = tempPurchases;
       }
     });
   }
@@ -65,11 +63,10 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
 
     if (!didSetData &&
         widget.savedData.itemID != '' &&
-        widget.allBooksWithPurchases.keys.isNotEmpty) {
-      final List<ForNewSaleBookPurchaseVariant> tempPurchases = [];
+        widget.allPurchases.keys.isNotEmpty) {
+      final List<ForNewSalePurchaseVariant> tempPurchases = [];
 
-      final bookPurchases =
-          widget.allBooksWithPurchases[widget.savedData.itemID];
+      final bookPurchases = widget.allPurchases[widget.savedData.itemID];
 
       if (bookPurchases != null) {
         for (String purchaseID in bookPurchases.keys) {
@@ -79,7 +76,7 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
                 .where((i) => i.purchaseID == purchaseID)
                 .firstOrNull;
 
-            tempPurchases.add(ForNewSaleBookPurchaseVariant(
+            tempPurchases.add(ForNewSalePurchaseVariant(
                 purchaseID: purchaseID,
                 purchaseDate: p['date'] as String,
                 balanceStock:
@@ -93,8 +90,8 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
       }
 
       setState(() {
-        selectedBook.bookID = widget.savedData.itemID;
-        selectedBook.purchases = tempPurchases;
+        selectedItem.itemID = widget.savedData.itemID;
+        selectedItem.purchases = tempPurchases;
 
         didSetData = true;
       });
@@ -111,18 +108,16 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
                 Expanded(
                     flex: 5,
                     child: CustomDropdown(
-                        items: widget.allBooks
-                            .map((i) => i.toDropdownData())
-                            .toList(),
-                        selectedValue: selectedBook.bookID,
-                        label: 'Select Book',
+                        items: widget.dropdownData,
+                        selectedValue: selectedItem.itemID,
+                        label: 'Select Item',
                         hasError: false,
                         excludeIDs: widget.selectedBookIDs,
                         onValueChanged: (value) {
                           setState(() {
-                            if (value != selectedBook.bookID) {
+                            if (value != selectedItem.itemID) {
                               onChangeBook(value);
-                              widget.updateData(bkId: selectedBook.bookID);
+                              widget.updateData(bkId: selectedItem.itemID);
                             }
                           });
                         })),
@@ -132,25 +127,25 @@ class _SaleItemBookState extends State<SaleItemBookWidget> {
                     tooltip: 'Delete',
                     onPressed: widget.onClickDelete)
               ]),
-              if (selectedBook.purchases.isNotEmpty) const SizedBox(height: 10),
+              if (selectedItem.purchases.isNotEmpty) const SizedBox(height: 10),
               Column(
                   children:
-                      List.generate(selectedBook.purchases.length, (index) {
+                      List.generate(selectedItem.purchases.length, (index) {
                 return PurchaseVariantWidget(
                     key: Key(index.toString()),
-                    data: selectedBook.purchases[index],
+                    data: selectedItem.purchases[index],
                     updateData: ({bool? selected, double? dsPr, int? qty}) {
                       if (selected != null) {
                         setState(() {
-                          selectedBook.purchases[index].selected = selected;
+                          selectedItem.purchases[index].selected = selected;
                         });
                       }
 
                       widget.updateData(
-                          prchID: selectedBook.purchases[index].purchaseID,
+                          prchID: selectedItem.purchases[index].purchaseID,
                           selected: selected,
                           prc: selected == true
-                              ? selectedBook.purchases[index].originalPrice
+                              ? selectedItem.purchases[index].originalPrice
                               : null,
                           dsPr: dsPr,
                           qty: qty);

@@ -23,6 +23,7 @@ class SaleListItemModel {
   final String saleID;
   final String customerName;
   final String books;
+  final String stationaryItems;
   final String createdDate;
   final String modifiedDate;
   final double grandTotal;
@@ -32,6 +33,7 @@ class SaleListItemModel {
       {required this.saleID,
       required this.customerName,
       required this.books,
+      required this.stationaryItems,
       required this.createdDate,
       required this.modifiedDate,
       required this.grandTotal,

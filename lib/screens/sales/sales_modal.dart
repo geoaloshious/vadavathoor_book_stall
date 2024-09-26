@@ -5,10 +5,12 @@ import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart'
 import 'package:vadavathoor_book_stall/components/button.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
-import 'package:vadavathoor_book_stall/screens/sales/sale_item_book.dart';
+import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
+import 'package:vadavathoor_book_stall/screens/sales/sale_item.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 class SaleModalWidget extends StatefulWidget {
@@ -31,12 +33,16 @@ class _SaleModalState extends State<SaleModalWidget> {
   List<UserModelForSales> users = [];
 
   List<SaleItemModel> booksToCheckout = [];
-  List<SaleItemModel> staionaryItemsToCheckout = [];
+  List<SaleItemModel> stationaryItemsToCheckout = [];
   double grandTotal = 0;
   List<String> selectedBookIDs = [];
+  List<String> selectedStationaryIDs = [];
   String _paymentMode = PaymentModes.cash;
   Map<String, Map<String, Map<String, Object>>> allBooksWithPurchases = {};
+  Map<String, Map<String, Map<String, Object>>>
+      allStationaryItemsWithPurchases = {};
   List<BookModel> allBooks = [];
+  List<StationaryItemModel> allStationaryItems = [];
 
   Map<String, bool> inputErrors = {};
 
@@ -69,7 +75,7 @@ class _SaleModalState extends State<SaleModalWidget> {
        * Copy original price to sold price if not specified.
        */
       final validBooks = booksToCheckout.where((bk) {
-        final List<SaleItemBookPurchaseVariantModel> validPVs = [];
+        final List<SaleItemPurchaseVariantModel> validPVs = [];
 
         for (var pv in bk.purchaseVariants) {
           if (pv.soldPrice == 0) {
@@ -87,10 +93,30 @@ class _SaleModalState extends State<SaleModalWidget> {
         return validPVs.isNotEmpty;
       }).toList();
 
-      if (validBooks.isNotEmpty) {
+      final validStationaryItems = stationaryItemsToCheckout.where((itm) {
+        final List<SaleItemPurchaseVariantModel> validPVs = [];
+
+        for (var pv in itm.purchaseVariants) {
+          if (pv.soldPrice == 0) {
+            pv.soldPrice = allStationaryItemsWithPurchases[itm.itemID]
+                ?[pv.purchaseID]?['price'] as double;
+          }
+
+          if (pv.quantity > 0) {
+            validPVs.add(pv);
+          }
+        }
+
+        itm.purchaseVariants = validPVs;
+
+        return validPVs.isNotEmpty;
+      }).toList();
+
+      if (validBooks.isNotEmpty || validStationaryItems.isNotEmpty) {
         if (widget.saleID == '') {
           await addSale(
               validBooks,
+              validStationaryItems,
               grandTotal,
               _selectedUserID,
               _customerNameController.text.trim(),
@@ -100,6 +126,7 @@ class _SaleModalState extends State<SaleModalWidget> {
           await editSale(
               widget.saleID,
               validBooks,
+              validStationaryItems,
               grandTotal,
               _selectedUserID,
               _customerNameController.text.trim(),
@@ -149,6 +176,19 @@ class _SaleModalState extends State<SaleModalWidget> {
       }
     }
 
+    for (SaleItemModel i in stationaryItemsToCheckout) {
+      if (i.itemID != '') {
+        for (var pv in i.purchaseVariants) {
+          tempTotal = tempTotal +
+              (pv.soldPrice != 0
+                      ? pv.soldPrice
+                      : allStationaryItemsWithPurchases[i.itemID]
+                          ?[pv.purchaseID]?['price'] as double) *
+                  pv.quantity;
+        }
+      }
+    }
+
     setState(() {
       grandTotal = tempTotal;
     });
@@ -169,9 +209,24 @@ class _SaleModalState extends State<SaleModalWidget> {
     });
   }
 
+  void _updateSelectedStationaryIDs() {
+    final List<String> tempArr = [];
+
+    for (SaleItemModel i in stationaryItemsToCheckout) {
+      if (i.itemID != '') {
+        tempArr.add(i.itemID);
+      }
+    }
+
+    setState(() {
+      selectedStationaryIDs = tempArr;
+    });
+  }
+
   void setData() async {
     List<String> savedPurchaseIDs = [];
     List<SaleItemModel> tempBooksCheckout = [];
+    List<SaleItemModel> tempSIsCheckout = [];
     String tempPaymentMode = PaymentModes.cash;
     double tempGrandTotal = 0;
     String tempCustomerID = '';
@@ -180,12 +235,13 @@ class _SaleModalState extends State<SaleModalWidget> {
       final temp = await getSaleData(widget.saleID);
       if (temp != null) {
         tempBooksCheckout = temp.books;
+        tempSIsCheckout = temp.stationaryItems;
         tempPaymentMode = temp.paymentMode;
         tempGrandTotal = temp.grandTotal;
         tempCustomerID = temp.customerID;
 
         for (SaleItemModel b in temp.books) {
-          for (SaleItemBookPurchaseVariantModel p in b.purchaseVariants) {
+          for (SaleItemPurchaseVariantModel p in b.purchaseVariants) {
             savedPurchaseIDs.add(p.purchaseID);
           }
         }
@@ -193,16 +249,22 @@ class _SaleModalState extends State<SaleModalWidget> {
     }
 
     final tempBookPurchases = await getBookWithPurchases(savedPurchaseIDs);
+    final tempSIPurchases =
+        await getStationaryItemsWithPurchases(savedPurchaseIDs);
     final tempBooks = await getBooks();
+    final tempSIs = await getStationaryItems();
     final tempUsers = await getUsersForSales();
 
     setState(() {
       allBooksWithPurchases = tempBookPurchases;
+      allStationaryItemsWithPurchases = tempSIPurchases;
       allBooks = tempBooks;
+      allStationaryItems = tempSIs;
       users = tempUsers;
       _selectedUserID = tempCustomerID;
 
       booksToCheckout = tempBooksCheckout;
+      stationaryItemsToCheckout = tempSIsCheckout;
       _paymentMode = tempPaymentMode;
       grandTotal = tempGrandTotal;
 
@@ -210,6 +272,7 @@ class _SaleModalState extends State<SaleModalWidget> {
     });
 
     _updateSelectedBookIDs();
+    _updateSelectedStationaryIDs();
   }
 
   @override
@@ -254,10 +317,11 @@ class _SaleModalState extends State<SaleModalWidget> {
                     color: Colors.white)),
             Column(
                 children: List.generate(booksToCheckout.length, (index) {
-              return SaleItemBookWidget(
+              return SaleItemWidget(
                   key: Key(index.toString()),
-                  allBooksWithPurchases: allBooksWithPurchases,
-                  allBooks: allBooks,
+                  allPurchases: allBooksWithPurchases,
+                  dropdownData:
+                      allBooks.map((i) => i.toDropdownData()).toList(),
                   savedData: booksToCheckout[index],
                   selectedBookIDs: selectedBookIDs,
                   updateData: (
@@ -277,7 +341,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                       if (selected != null) {
                         if (selected) {
                           booksToCheckout[index].purchaseVariants.add(
-                              SaleItemBookPurchaseVariantModel(
+                              SaleItemPurchaseVariantModel(
                                   purchaseID: prchID,
                                   soldPrice: 0,
                                   quantity: 0));
@@ -314,7 +378,7 @@ class _SaleModalState extends State<SaleModalWidget> {
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               CustomButton(
-                  label: 'Add book',
+                  label: '+ Add',
                   backgroundColor: Colors.white,
                   textColor: Colors.blueGrey,
                   onPressed: () {
@@ -341,13 +405,16 @@ class _SaleModalState extends State<SaleModalWidget> {
                     fontWeight: FontWeight.w600,
                     color: Colors.white)),
             Column(
-                children: List.generate(booksToCheckout.length, (index) {
-              return SaleItemBookWidget(
+                children:
+                    List.generate(stationaryItemsToCheckout.length, (index) {
+              return SaleItemWidget(
                   key: Key(index.toString()),
-                  allBooksWithPurchases: allBooksWithPurchases,
-                  allBooks: allBooks,
-                  savedData: booksToCheckout[index],
-                  selectedBookIDs: selectedBookIDs,
+                  allPurchases: allStationaryItemsWithPurchases,
+                  dropdownData: allStationaryItems
+                      .map((i) => i.toDropdownData())
+                      .toList(),
+                  savedData: stationaryItemsToCheckout[index],
+                  selectedBookIDs: selectedStationaryIDs,
                   updateData: (
                       {String? bkId,
                       String? prchID,
@@ -356,26 +423,26 @@ class _SaleModalState extends State<SaleModalWidget> {
                       double? dsPr,
                       int? qty}) {
                     if (bkId != null) {
-                      booksToCheckout[index].itemID = bkId;
-                      booksToCheckout[index].purchaseVariants = [];
-                      _updateSelectedBookIDs();
+                      stationaryItemsToCheckout[index].itemID = bkId;
+                      stationaryItemsToCheckout[index].purchaseVariants = [];
+                      _updateSelectedStationaryIDs();
                     }
 
                     if (prchID != null) {
                       if (selected != null) {
                         if (selected) {
-                          booksToCheckout[index].purchaseVariants.add(
-                              SaleItemBookPurchaseVariantModel(
+                          stationaryItemsToCheckout[index].purchaseVariants.add(
+                              SaleItemPurchaseVariantModel(
                                   purchaseID: prchID,
                                   soldPrice: 0,
                                   quantity: 0));
                         } else {
-                          booksToCheckout[index]
+                          stationaryItemsToCheckout[index]
                               .purchaseVariants
                               .removeWhere((pv) => pv.purchaseID == prchID);
                         }
                       } else {
-                        var pvItm = booksToCheckout[index]
+                        var pvItm = stationaryItemsToCheckout[index]
                             .purchaseVariants
                             .firstWhere((pv) => pv.purchaseID == prchID,
                                 orElse: emptySaleItemBookPurchaseVariant);
@@ -392,22 +459,22 @@ class _SaleModalState extends State<SaleModalWidget> {
                   },
                   onClickDelete: () {
                     setState(() {
-                      booksToCheckout.removeAt(index);
+                      stationaryItemsToCheckout.removeAt(index);
                     });
 
                     _updateGrandTotal();
-                    _updateSelectedBookIDs();
+                    _updateSelectedStationaryIDs();
                   });
             })),
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               CustomButton(
-                  label: 'Add book',
+                  label: '+ Add',
                   backgroundColor: Colors.white,
                   textColor: Colors.blueGrey,
                   onPressed: () {
                     setState(() {
-                      booksToCheckout.add(emptyBookSaleItem());
+                      stationaryItemsToCheckout.add(emptyBookSaleItem());
                     });
                   })
             ])

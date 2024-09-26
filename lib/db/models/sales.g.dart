@@ -6,18 +6,18 @@ part of 'sales.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SaleItemBookPurchaseVariantModelAdapter
-    extends TypeAdapter<SaleItemBookPurchaseVariantModel> {
+class SaleItemPurchaseVariantModelAdapter
+    extends TypeAdapter<SaleItemPurchaseVariantModel> {
   @override
   final int typeId = 8;
 
   @override
-  SaleItemBookPurchaseVariantModel read(BinaryReader reader) {
+  SaleItemPurchaseVariantModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SaleItemBookPurchaseVariantModel(
+    return SaleItemPurchaseVariantModel(
       purchaseID: fields[0] as String,
       soldPrice: fields[2] as double,
       quantity: fields[3] as int,
@@ -25,7 +25,7 @@ class SaleItemBookPurchaseVariantModelAdapter
   }
 
   @override
-  void write(BinaryWriter writer, SaleItemBookPurchaseVariantModel obj) {
+  void write(BinaryWriter writer, SaleItemPurchaseVariantModel obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
@@ -42,7 +42,7 @@ class SaleItemBookPurchaseVariantModelAdapter
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SaleItemBookPurchaseVariantModelAdapter &&
+      other is SaleItemPurchaseVariantModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -58,22 +58,19 @@ class SaleItemModelAdapter extends TypeAdapter<SaleItemModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SaleItemModel(
-      itemType: fields[0] as int,
-      itemID: fields[1] as String,
+      itemID: fields[0] as String,
       purchaseVariants:
-          (fields[2] as List).cast<SaleItemBookPurchaseVariantModel>(),
+          (fields[1] as List).cast<SaleItemPurchaseVariantModel>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleItemModel obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.itemType)
-      ..writeByte(1)
-      ..write(obj.itemID)
       ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.itemID)
+      ..writeByte(1)
       ..write(obj.purchaseVariants);
   }
 

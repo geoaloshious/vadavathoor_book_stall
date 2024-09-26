@@ -47,12 +47,11 @@ Future<void> initializeHiveDB() async {
   if (!Hive.isAdapterRegistered(SaleModelAdapter().typeId)) {
     Hive.registerAdapter(SaleModelAdapter());
   }
-  if (!Hive.isAdapterRegistered(SaleItemBookModelAdapter().typeId)) {
-    Hive.registerAdapter(SaleItemBookModelAdapter());
+  if (!Hive.isAdapterRegistered(SaleItemModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemModelAdapter());
   }
-  if (!Hive.isAdapterRegistered(
-      SaleItemBookPurchaseVariantModelAdapter().typeId)) {
-    Hive.registerAdapter(SaleItemBookPurchaseVariantModelAdapter());
+  if (!Hive.isAdapterRegistered(SaleItemPurchaseVariantModelAdapter().typeId)) {
+    Hive.registerAdapter(SaleItemPurchaseVariantModelAdapter());
   }
   if (!Hive.isAdapterRegistered(PublisherModelAdapter().typeId)) {
     Hive.registerAdapter(PublisherModelAdapter());

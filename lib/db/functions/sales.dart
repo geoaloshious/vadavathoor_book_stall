@@ -1,10 +1,13 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
+import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -73,6 +76,7 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
 
 Future<void> addSale(
     List<SaleItemModel> booksToCheckout,
+    List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
     String customerID,
     String customerName,
@@ -90,6 +94,7 @@ Future<void> addSale(
   saleBox.add(SaleModel(
       saleID: '${saleBox.values.length + 1}',
       books: booksToCheckout,
+      stationaryItems: stationaryItemsToCheckout,
       grandTotal: grandTotal,
       customerID: customerID,
       customerBatchID: customerBatchID,
@@ -104,7 +109,7 @@ Future<void> addSale(
   final purchaseKeys = await getPurchaseKeysAndIDs(purchaseBox);
 
   for (SaleItemModel book in booksToCheckout) {
-    for (SaleItemBookPurchaseVariantModel pv in book.purchaseVariants) {
+    for (SaleItemPurchaseVariantModel pv in book.purchaseVariants) {
       BookPurchaseModel? existingData =
           purchaseBox.get(purchaseKeys[pv.purchaseID]);
       if (existingData != null) {
@@ -119,6 +124,7 @@ Future<void> addSale(
 Future<void> editSale(
     String saleID,
     List<SaleItemModel> booksToCheckout,
+    List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
     String customerID,
     String customerName,
@@ -141,7 +147,7 @@ Future<void> editSale(
     if (existingSale != null && existingSale.saleID == saleID) {
       //Prepare the object which contains the exisintg sold quantities
       for (SaleItemModel esb in existingSale.books) {
-        for (SaleItemBookPurchaseVariantModel espv in esb.purchaseVariants) {
+        for (SaleItemPurchaseVariantModel espv in esb.purchaseVariants) {
           final existingPurchase =
               purchaseBox.get(purchaseKeys[espv.purchaseID]);
           if (existingPurchase != null) {
@@ -157,6 +163,7 @@ Future<void> editSale(
       }
 
       existingSale.books = booksToCheckout;
+      existingSale.stationaryItems = stationaryItemsToCheckout;
       existingSale.grandTotal = grandTotal;
       existingSale.customerID = customerID;
       existingSale.customerBatchID = customerBatchID;
@@ -234,6 +241,7 @@ Future<SaleModel?> getSaleData(String saleID) async {
 Future<List<SaleListItemModel>> getSalesList() async {
   final sales = (await getSalesBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
+  final stationaryItems = (await getStationaryItemBox()).values.toList();
   final users = await getUsersBox();
 
   List<SaleListItemModel> joinedData = [];
@@ -241,10 +249,11 @@ Future<List<SaleListItemModel>> getSalesList() async {
   for (SaleModel sale in sales) {
     if (sale.status == DBRowStatus.active) {
       List<String> bookNames = [];
+      List<String> stationaryNames = [];
 
       for (SaleItemModel saleItem in sale.books) {
         final book =
-            books.where((u) => u.bookID == saleItem.bookID).firstOrNull;
+            books.where((u) => u.bookID == saleItem.itemID).firstOrNull;
         int bookQty = 0;
 
         for (var pv in saleItem.purchaseVariants) {
@@ -257,11 +266,28 @@ Future<List<SaleListItemModel>> getSalesList() async {
         }
       }
 
+      for (SaleItemModel saleItem in sale.stationaryItems) {
+        final item = stationaryItems
+            .where((u) => u.itemID == saleItem.itemID)
+            .firstOrNull;
+        int itemQty = 0;
+
+        for (var pv in saleItem.purchaseVariants) {
+          itemQty = itemQty + pv.quantity;
+        }
+
+        if (item != null) {
+          stationaryNames.add(
+              '${item.itemName.length > 10 ? '${item.itemName.substring(0, 10)}...' : item.itemName} ($itemQty)');
+        }
+      }
+
       joinedData.add(SaleListItemModel(
           saleID: sale.saleID,
           customerName:
               users.values.firstWhere((u) => u.userID == sale.customerID).name,
           books: bookNames.join('\n'),
+          stationaryItems: stationaryNames.join('\n'),
           grandTotal: sale.grandTotal,
           paymentMode: getPaymentModeName(sale.paymentMode),
           createdDate: formatTimestamp(timestamp: sale.createdDate),
@@ -304,4 +330,39 @@ Future<Map<String, Map<String, Map<String, Object>>>> getBookWithPurchases(
   }
 
   return bks;
+}
+
+Future<Map<String, Map<String, Map<String, Object>>>>
+    getStationaryItemsWithPurchases(
+  List<String> savedPurchaseIDs,
+) async {
+  final stationaryItems = (await getStationaryItemBox()).values.toList();
+  final purchases = (await getStationaryPurchaseBox()).values.toList();
+
+  Map<String, Map<String, Map<String, Object>>> itemsWithPVs = {};
+
+  for (StationaryItemModel item in stationaryItems) {
+    Map<String, Map<String, Object>> bk = {};
+
+    var validPs = purchases.where((pr) =>
+        pr.itemID == item.itemID &&
+        pr.status == DBRowStatus.active &&
+        (savedPurchaseIDs.contains(pr.purchaseID) || pr.quantityLeft > 0));
+    if (validPs.isNotEmpty) {
+      for (var p in validPs) {
+        Map<String, Object> prs = {};
+
+        prs['date'] = formatTimestamp(
+            timestamp: p.purchaseDate, format: 'dd MMM yyyy hh:mm a');
+        prs['price'] = p.price;
+        prs['balanceStock'] = p.quantityLeft;
+
+        bk[p.purchaseID] = prs;
+      }
+
+      itemsWithPVs[item.itemID] = bk;
+    }
+  }
+
+  return itemsWithPVs;
 }

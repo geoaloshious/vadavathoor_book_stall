@@ -12,6 +12,7 @@ const salesHeadings = [
   'Sale ID',
   'Customer name',
   'Books',
+  'Stationaries',
   'Created Date',
   'Grand Total',
   'Payment Mode'
@@ -46,6 +47,7 @@ void exportExcel(
         TextCellValue(sales[i].saleID),
         TextCellValue(sales[i].customerName),
         TextCellValue(sales[i].books),
+        TextCellValue(sales[i].stationaryItems),
         TextCellValue(sales[i].createdDate),
         TextCellValue(sales[i].grandTotal.toString()),
         TextCellValue(sales[i].paymentMode),

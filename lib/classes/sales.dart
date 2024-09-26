@@ -1,4 +1,4 @@
-class ForNewSaleBookPurchaseVariant {
+class ForNewSalePurchaseVariant {
   final String purchaseID;
   final String purchaseDate;
   final int balanceStock;
@@ -19,8 +19,8 @@ class ForNewSaleBookPurchaseVariant {
     };
   }
 
-  ForNewSaleBookPurchaseVariant clone() {
-    return ForNewSaleBookPurchaseVariant(
+  ForNewSalePurchaseVariant clone() {
+    return ForNewSalePurchaseVariant(
         purchaseID: purchaseID,
         purchaseDate: purchaseDate,
         balanceStock: balanceStock,
@@ -30,7 +30,7 @@ class ForNewSaleBookPurchaseVariant {
         selected: selected);
   }
 
-  ForNewSaleBookPurchaseVariant(
+  ForNewSalePurchaseVariant(
       {required this.purchaseID,
       required this.purchaseDate,
       required this.balanceStock,
@@ -40,28 +40,28 @@ class ForNewSaleBookPurchaseVariant {
       required this.selected});
 }
 
-ForNewSaleBookItem emptyForNewSaleBookItem() =>
-    ForNewSaleBookItem(bookID: '', bookName: '', purchases: []);
+ForNewSaleItem emptyForNewSaleItem() =>
+    ForNewSaleItem(itemID: '', itemName: '', purchases: []);
 
-class ForNewSaleBookItem {
-  String bookID;
-  final String bookName;
-  List<ForNewSaleBookPurchaseVariant> purchases;
+class ForNewSaleItem {
+  String itemID;
+  final String itemName;
+  List<ForNewSalePurchaseVariant> purchases;
 
   Map<String, String> toDropdownData() {
-    return {'id': bookID, 'name': bookName};
+    return {'id': itemID, 'name': itemName};
   }
 
-  ForNewSaleBookItem clone() {
-    return ForNewSaleBookItem(
-        bookID: bookID,
-        bookName: bookName,
+  ForNewSaleItem clone() {
+    return ForNewSaleItem(
+        itemID: itemID,
+        itemName: itemName,
         purchases: purchases.map((p) => p.clone()).toList());
   }
 
-  ForNewSaleBookItem({
-    required this.bookID,
-    required this.bookName,
+  ForNewSaleItem({
+    required this.itemID,
+    required this.itemName,
     required this.purchases,
   });
 }

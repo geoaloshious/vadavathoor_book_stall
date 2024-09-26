@@ -4,13 +4,13 @@ import '../constants.dart';
 part 'sales.g.dart';
 
 SaleItemModel emptyBookSaleItem() =>
-    SaleItemModel(itemType: 0, itemID: '', purchaseVariants: []);
+    SaleItemModel(itemID: '', purchaseVariants: []);
 
-SaleItemBookPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
-    SaleItemBookPurchaseVariantModel(purchaseID: '', soldPrice: 0, quantity: 0);
+SaleItemPurchaseVariantModel emptySaleItemBookPurchaseVariant() =>
+    SaleItemPurchaseVariantModel(purchaseID: '', soldPrice: 0, quantity: 0);
 
 @HiveType(typeId: DBItemHiveType.saleItemBookPurchaseVariant)
-class SaleItemBookPurchaseVariantModel {
+class SaleItemPurchaseVariantModel {
   @HiveField(0)
   String purchaseID;
 
@@ -28,12 +28,12 @@ class SaleItemBookPurchaseVariantModel {
     };
   }
 
-  SaleItemBookPurchaseVariantModel clone() {
-    return SaleItemBookPurchaseVariantModel(
+  SaleItemPurchaseVariantModel clone() {
+    return SaleItemPurchaseVariantModel(
         purchaseID: purchaseID, soldPrice: soldPrice, quantity: quantity);
   }
 
-  SaleItemBookPurchaseVariantModel(
+  SaleItemPurchaseVariantModel(
       {required this.purchaseID,
       required this.soldPrice,
       required this.quantity});
@@ -42,13 +42,10 @@ class SaleItemBookPurchaseVariantModel {
 @HiveType(typeId: DBItemHiveType.saleItemBook)
 class SaleItemModel {
   @HiveField(0)
-  int itemType;
-
-  @HiveField(1)
   String itemID;
 
-  @HiveField(2)
-  List<SaleItemBookPurchaseVariantModel> purchaseVariants;
+  @HiveField(1)
+  List<SaleItemPurchaseVariantModel> purchaseVariants;
 
   Map<String, dynamic> toJson() {
     return {
@@ -59,15 +56,11 @@ class SaleItemModel {
 
   SaleItemModel clone() {
     return SaleItemModel(
-        itemType: itemType,
         itemID: itemID,
         purchaseVariants: purchaseVariants.map((i) => i.clone()).toList());
   }
 
-  SaleItemModel(
-      {required this.itemType,
-      required this.itemID,
-      required this.purchaseVariants});
+  SaleItemModel({required this.itemID, required this.purchaseVariants});
 }
 
 @HiveType(typeId: DBItemHiveType.sale)

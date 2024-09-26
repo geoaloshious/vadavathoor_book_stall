@@ -3,6 +3,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:vadavathoor_book_stall/db/constants.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 import 'package:vadavathoor_book_stall/utils/logger.dart';
@@ -234,22 +236,44 @@ Future<void> openPdfWithDefaultApp(String filePath) async {
 void saveAndOpenPDF(String saleID) async {
   final salesDB = (await getSalesBox()).values.toList();
   final bookDB = (await getBooksBox()).values.toList();
-  final purchaseDB = (await getBookPurchaseBox()).values.toList();
+  final bookPurchaseDB = (await getBookPurchaseBox()).values.toList();
+  final stationaries = (await getStationaryItemBox()).values.toList();
+  final stationaryPurchaseDB =
+      (await getStationaryPurchaseBox()).values.toList();
   final userDB = (await getUsersBox()).values.toList();
   final userBatches = (await getUserBatchBox()).values.toList();
 
   SaleModel sale = salesDB.firstWhere((s) => s.saleID == saleID);
-  List<Map<String, dynamic>> books = [];
+  List<Map<String, dynamic>> items = [];
 
-  for (SaleItemModel b in sale.books) {
-    for (SaleItemBookPurchaseVariantModel pv in b.purchaseVariants) {
-      final op =
-          purchaseDB.firstWhere((p) => p.purchaseID == pv.purchaseID).bookPrice;
+  for (SaleItemModel sb in sale.books) {
+    for (SaleItemPurchaseVariantModel pv in sb.purchaseVariants) {
+      final op = bookPurchaseDB
+          .firstWhere((p) => p.purchaseID == pv.purchaseID)
+          .bookPrice;
 
       final discount = 100 - ((pv.soldPrice / op) * 100);
 
-      books.add({
-        'name': bookDB.firstWhere((b) => b.bookID == b.bookID).bookName,
+      items.add({
+        'name': bookDB.firstWhere((b) => b.bookID == sb.itemID).bookName,
+        'original_price': op,
+        'soldPrice': pv.soldPrice,
+        'quantity': pv.quantity,
+        'discount': discount
+      });
+    }
+  }
+
+  for (SaleItemModel ss in sale.stationaryItems) {
+    for (SaleItemPurchaseVariantModel pv in ss.purchaseVariants) {
+      final op = stationaryPurchaseDB
+          .firstWhere((p) => p.purchaseID == pv.purchaseID)
+          .price;
+
+      final discount = 100 - ((pv.soldPrice / op) * 100);
+
+      items.add({
+        'name': stationaries.firstWhere((b) => b.itemID == ss.itemID).itemName,
         'original_price': op,
         'soldPrice': pv.soldPrice,
         'quantity': pv.quantity,
@@ -261,7 +285,7 @@ void saveAndOpenPDF(String saleID) async {
   UserModel salesPerson = userDB.firstWhere((u) => u.userID == sale.createdBy);
 
   String filePath = await createPDF(
-      books: books,
+      books: items,
       customerName: userDB.firstWhere((u) => u.userID == sale.customerID).name,
       customerBatch: userBatches
           .firstWhere((u) => u.batchID == sale.customerBatchID)
