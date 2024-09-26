@@ -45,96 +45,114 @@ Future<String> createPDF({
             pw.Column(children: [
               pw.Text(stallName,
                   style: pw.TextStyle(
-                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.Text(stallAddress, style: const pw.TextStyle(fontSize: 12)),
+                      fontSize: 12, fontWeight: pw.FontWeight.bold)),
+              pw.Text(stallAddress, style: const pw.TextStyle(fontSize: 6)),
               pw.Text('Phone: $stallPhone',
-                  style: const pw.TextStyle(fontSize: 12)),
-              pw.SizedBox(height: 10),
+                  style: const pw.TextStyle(fontSize: 6)),
+              pw.SizedBox(height: 6),
               pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text('Bill No: $billNo'),
-                    pw.Text('Payment : ${getPaymentModeName(paymentMode)}'),
-                    pw.Text('Date: $date')
+                    pw.Text('Bill No: $billNo',
+                        style: const pw.TextStyle(fontSize: 6)),
+                    pw.Text('Payment : ${getPaymentModeName(paymentMode)}',
+                        style: const pw.TextStyle(fontSize: 6)),
+                    pw.Text('Date: $date',
+                        style: const pw.TextStyle(fontSize: 6))
                   ]),
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 4),
               pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text('To: $customerName'),
+                    pw.Text('To: $customerName',
+                        style: const pw.TextStyle(fontSize: 6)),
                     pw.Container(
                         padding: const pw.EdgeInsets.all(4),
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
-                        child: pw.Text(customerBatch))
+                        child: pw.Text(customerBatch,
+                            style: const pw.TextStyle(fontSize: 6)))
                   ]),
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 4),
               pw.Table(
                   border: pw.TableBorder.all(color: PdfColors.black),
                   children: [
                     pw.TableRow(children: [
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('SlNo',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold))),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 6))),
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('Qty.',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold))),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 6))),
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('Particular',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold))),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 6))),
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('Rate',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold))),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 6))),
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('Discount %',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold))),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 6))),
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('Amount',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold))),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 6))),
                       pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
+                          padding: const pw.EdgeInsets.all(2.0),
                           child: pw.Text('Total',
-                              style:
-                                  pw.TextStyle(fontWeight: pw.FontWeight.bold)))
+                              style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold, fontSize: 6)))
                     ]),
                     for (int i = 0; i < books.length; i++) //
                       pw.TableRow(children: [
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${i + 1}')),
+                            padding: const pw.EdgeInsets.all(2.0),
+                            child: pw.Text('${i + 1}',
+                                style: const pw.TextStyle(fontSize: 6))),
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${books[i]['quantity']}')),
+                            padding: const pw.EdgeInsets.all(2.0),
+                            child: pw.Text('${books[i]['quantity']}',
+                                style: const pw.TextStyle(fontSize: 6))),
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${books[i]['name']}')),
+                            padding: const pw.EdgeInsets.all(2.0),
+                            child: pw.Text('${books[i]['name']}',
+                                style: const pw.TextStyle(fontSize: 6))),
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${books[i]['original_price']}')),
+                            padding: const pw.EdgeInsets.all(2.0),
+                            child: pw.Text('${books[i]['original_price']}',
+                                style: const pw.TextStyle(fontSize: 6))),
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${books[i]['discount']}%')),
+                            padding: const pw.EdgeInsets.all(2.0),
+                            child: pw.Text('${books[i]['discount']}%',
+                                style: const pw.TextStyle(fontSize: 6))),
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('${books[i]['soldPrice']}')),
+                            padding: const pw.EdgeInsets.all(2.0),
+                            child: pw.Text('${books[i]['soldPrice']}',
+                                style: const pw.TextStyle(fontSize: 6))),
                         pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
+                            padding: const pw.EdgeInsets.all(2.0),
                             child: pw.Text(
-                                '${books[i]['soldPrice'] * books[i]['quantity']}'))
+                                '${books[i]['soldPrice'] * books[i]['quantity']}',
+                                style: const pw.TextStyle(fontSize: 6)))
                       ])
                   ]),
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 6),
               pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
@@ -142,48 +160,61 @@ Future<String> createPDF({
                         child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                          pw.Text('Total quantity : ${books.length}'),
-                          pw.SizedBox(height: 10),
+                          pw.Text('Total quantity : ${books.length}',
+                              style: const pw.TextStyle(fontSize: 6)),
+                          pw.SizedBox(height: 6),
                           pw.Text('BANK DETAILS',
-                              style:
-                                  pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                          pw.SizedBox(height: 5),
-                          pw.Text('Bank Name : $bankName, $bankBranch'),
-                          pw.SizedBox(height: 5),
-                          pw.Text('Account No : $bankAccountNo'),
-                          pw.SizedBox(height: 5),
-                          pw.Text('IFSC Code : $bankIFSC'),
-                          pw.SizedBox(height: 10),
-                          pw.Text('In Words :'),
+                              style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold, fontSize: 6)),
+                          pw.SizedBox(height: 2),
+                          pw.Text('Bank Name : $bankName, $bankBranch',
+                              style: const pw.TextStyle(fontSize: 6)),
+                          pw.SizedBox(height: 2),
+                          pw.Text('Account No : $bankAccountNo',
+                              style: const pw.TextStyle(fontSize: 6)),
+                          pw.SizedBox(height: 2),
+                          pw.Text('IFSC Code : $bankIFSC',
+                              style: const pw.TextStyle(fontSize: 6)),
+                          pw.SizedBox(height: 6),
+                          pw.Text('In Words :',
+                              style: const pw.TextStyle(fontSize: 6)),
                           pw.Text(
                               '${numberToWords(grandTotal.toInt())} Rupees Only',
-                              style:
-                                  pw.TextStyle(fontWeight: pw.FontWeight.bold))
+                              style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold, fontSize: 6))
                         ])),
                     pw.Column(children: [
                       pw.Padding(
                           child: pw.Text('Grand Total:   Rs. $grandTotal',
-                              style:
-                                  pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                              style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold, fontSize: 6)),
                           padding:
-                              const pw.EdgeInsets.only(top: 20, bottom: 20)),
+                              const pw.EdgeInsets.only(top: 5, bottom: 10)),
                       pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.end,
                           children: [
                             pw.Column(
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  pw.Row(children: [pw.Text('Name :')]),
-                                  pw.SizedBox(height: 10),
-                                  pw.Row(children: [pw.Text('Sign :')])
+                                  pw.Row(children: [
+                                    pw.Text('Name :',
+                                        style: const pw.TextStyle(fontSize: 6))
+                                  ]),
+                                  pw.SizedBox(height: 8),
+                                  pw.Row(children: [
+                                    pw.Text('Sign :',
+                                        style: const pw.TextStyle(fontSize: 6))
+                                  ])
                                 ]),
                             pw.SizedBox(width: 10),
                             pw.Column(
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  pw.Text(salesPerson),
-                                  pw.SizedBox(height: 10),
-                                  pw.Text('____________')
+                                  pw.Text(salesPerson,
+                                      style: const pw.TextStyle(fontSize: 6)),
+                                  pw.SizedBox(height: 6),
+                                  pw.Text('____________',
+                                      style: const pw.TextStyle(fontSize: 6))
                                 ])
                           ])
                     ])
