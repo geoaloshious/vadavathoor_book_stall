@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
-import 'package:vadavathoor_book_stall/db/models/book_category.dart';
-import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 
 import '../../classes.dart';
 import '../../components/drop_down.dart';
 import '../../db/functions/book.dart';
 import '../../db/functions/book_purchase.dart';
-import '../../db/functions/publisher.dart';
 
 class BookPurchaseModalWidget extends StatefulWidget {
   final PurchaseListItemModel? data;

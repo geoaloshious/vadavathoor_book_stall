@@ -1,9 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 import '../constants.dart';
-import 'utils.dart';
 
 Future<Box<PublisherModel>> getPublishersBox() async {
   Box<PublisherModel> box;
@@ -20,7 +20,7 @@ Future<Box<PublisherModel>> getPublishersBox() async {
 Future<String> addPublisher(String name) async {
   String publisherID = generateID();
   final db = await getPublishersBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   await db.add(PublisherModel(
@@ -29,7 +29,7 @@ Future<String> addPublisher(String name) async {
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       status: DBRowStatus.active));
 
   return publisherID;
@@ -38,7 +38,7 @@ Future<String> addPublisher(String name) async {
 Future<void> editPublisher(
     {required String publisherID, String? publisherName, int? status}) async {
   final box = await getPublishersBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   for (int key in box.keys) {
     PublisherModel? existingData = box.get(key);

@@ -25,9 +25,9 @@ class StationaryPurchaseModelAdapter
       quantityLeft: fields[5] as int,
       price: fields[3] as double,
       createdDate: fields[6] as int,
-      createdBy: fields[7] as String,
+      createdBy: fields[7] as int,
       modifiedDate: fields[8] as int,
-      modifiedBy: fields[9] as String,
+      modifiedBy: fields[9] as int,
       status: fields[10] as int,
     );
   }

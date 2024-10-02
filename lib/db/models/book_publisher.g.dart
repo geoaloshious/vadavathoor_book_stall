@@ -20,9 +20,9 @@ class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
       publisherID: fields[0] as String,
       publisherName: fields[1] as String,
       createdDate: fields[2] as int,
-      createdBy: fields[3] as String,
+      createdBy: fields[3] as int,
       modifiedDate: fields[4] as int,
-      modifiedBy: fields[5] as String,
+      modifiedBy: fields[5] as int,
       status: fields[6] as int,
     );
   }

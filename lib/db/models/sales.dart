@@ -78,10 +78,10 @@ class SaleModel {
   double grandTotal;
 
   @HiveField(4)
-  String customerID;
+  int customerID;
 
   @HiveField(5)
-  String customerBatchID;
+  int customerBatchID;
 
   @HiveField(6)
   String paymentMode;
@@ -90,13 +90,13 @@ class SaleModel {
   final int createdDate;
 
   @HiveField(8)
-  final String createdBy;
+  final int createdBy;
 
   @HiveField(9)
   int modifiedDate;
 
   @HiveField(10)
-  String modifiedBy;
+  int modifiedBy;
 
   @HiveField(11)
   int status;

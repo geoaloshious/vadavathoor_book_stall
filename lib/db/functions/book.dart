@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes/books.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
@@ -9,7 +10,6 @@ import 'package:vadavathoor_book_stall/utils/utils.dart';
 import '../constants.dart';
 import 'book_category.dart';
 import 'publisher.dart';
-import 'utils.dart';
 
 Future<Box<BookModel>> getBooksBox() async {
   Box<BookModel> box;
@@ -34,7 +34,7 @@ Future<void> addBook(
 ) async {
   final bookDB = await getBooksBox();
   String bookID = generateID();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   if (authorID == '') {
@@ -58,7 +58,7 @@ Future<void> addBook(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       status: DBRowStatus.active));
 }
 
@@ -73,7 +73,7 @@ Future<void> editBook(
   String bookCategoryName,
 ) async {
   final bookDB = await getBooksBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   if (authorID == '') {
@@ -108,7 +108,7 @@ Future<void> editBook(
 Future<Map<String, String>> deleteBook(String bookID) async {
   final bookBox = await getBooksBox();
   final purchaseBox = await getBookPurchaseBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final purchases =
       purchaseBox.values.where((p) => p.bookID == bookID && !p.deleted);

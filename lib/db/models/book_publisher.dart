@@ -15,13 +15,13 @@ class PublisherModel {
   final int createdDate;
 
   @HiveField(3)
-  final String createdBy;
+  final int createdBy;
 
   @HiveField(4)
   int modifiedDate;
 
   @HiveField(5)
-  String modifiedBy;
+  int modifiedBy;
 
   @HiveField(6)
   int status;

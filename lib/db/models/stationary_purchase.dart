@@ -27,13 +27,13 @@ class StationaryPurchaseModel {
   final int createdDate;
 
   @HiveField(7)
-  final String createdBy;
+  final int createdBy;
 
   @HiveField(8)
   int modifiedDate;
 
   @HiveField(9)
-  String modifiedBy;
+  int modifiedBy;
 
   @HiveField(10)
   int status;

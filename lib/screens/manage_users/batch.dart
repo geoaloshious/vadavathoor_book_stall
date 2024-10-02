@@ -53,7 +53,7 @@ class _UserBatchState extends State<UserBatchWidget> {
         });
   }
 
-  onPressDelete(String selectedID) {
+  onPressDelete(int selectedID) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -97,7 +97,7 @@ class _UserBatchState extends State<UserBatchWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
-      final loggedIn = user.user.userID != '';
+      final loggedIn = user.user.userID != 0;
 
       return Padding(
           padding: const EdgeInsets.all(16.0),

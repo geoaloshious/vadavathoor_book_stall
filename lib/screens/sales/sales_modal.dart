@@ -29,7 +29,7 @@ class _SaleModalState extends State<SaleModalWidget> {
   final _customerBatchController = TextEditingController();
 
   bool newUser = false;
-  String _selectedUserID = '';
+  int _selectedUserID = 0;
   List<UserModelForSales> users = [];
 
   List<SaleItemModel> booksToCheckout = [];
@@ -62,7 +62,7 @@ class _SaleModalState extends State<SaleModalWidget> {
         tempInputErrors['customerBatch'] = true;
       }
     } else {
-      if (_selectedUserID == '') {
+      if (_selectedUserID == 0) {
         tempInputErrors['customer'] = true;
       }
     }
@@ -229,7 +229,7 @@ class _SaleModalState extends State<SaleModalWidget> {
     List<SaleItemModel> tempSIsCheckout = [];
     String tempPaymentMode = PaymentModes.cash;
     double tempGrandTotal = 0;
-    String tempCustomerID = '';
+    int tempCustomerID = 0;
 
     if (widget.saleID != '') {
       final temp = await getSaleData(widget.saleID);
@@ -494,7 +494,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                 onChanged: (bool? value) {
                   setState(() {
                     newUser = value ?? false;
-                    _selectedUserID = '';
+                    _selectedUserID = 0;
                   });
                 }),
           ),
@@ -569,12 +569,12 @@ class _SaleModalState extends State<SaleModalWidget> {
                                 items: users
                                     .map((i) => i.toDropdownData())
                                     .toList(),
-                                selectedValue: _selectedUserID,
+                                selectedValue: _selectedUserID.toString(),
                                 label: 'Select',
                                 hasError: inputErrors['customer'] == true,
                                 onValueChanged: (value) {
                                   setState(() {
-                                    _selectedUserID = value;
+                                    _selectedUserID = int.tryParse(value) ?? 0;
                                     inputErrors = {
                                       ...inputErrors,
                                       'customer': false

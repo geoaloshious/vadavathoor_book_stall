@@ -3,7 +3,7 @@ import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
-import 'package:vadavathoor_book_stall/db/functions/utils.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -23,7 +23,7 @@ Future<Box<StationaryPurchaseModel>> getStationaryPurchaseBox() async {
 Future<void> addStationaryPurchase(
     String itemID, int purchaseDate, double price, int quantity) async {
   final currentTS = getCurrentTimestamp();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final db = await getStationaryPurchaseBox();
   await db.add(StationaryPurchaseModel(
@@ -36,7 +36,7 @@ Future<void> addStationaryPurchase(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       status: DBRowStatus.active));
 }
 
@@ -44,7 +44,7 @@ Future<Map<String, String>> editStationaryPurchase(String purchaseID,
     String itemID, int quantity, double price, int purchaseDate) async {
   final purchaseBox = await getStationaryPurchaseBox();
   final salesBox = await getSalesBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final relatedSales = salesBox.values.where((i) =>
       i.books
@@ -92,7 +92,7 @@ Future<Map<String, String>> editStationaryPurchase(String purchaseID,
 Future<Map<String, String>> deleteStationaryPurchase(String purchaseID) async {
   final box = await getStationaryPurchaseBox();
   final salesBox = await getSalesBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final relatedSales = salesBox.values.where((i) =>
       i.books

@@ -93,7 +93,7 @@ class _BooksState extends State<BooksWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
-      final loggedIn = user.user.userID != '';
+      final loggedIn = user.user.userID != 0;
 
       return Stack(children: [
         Container(
