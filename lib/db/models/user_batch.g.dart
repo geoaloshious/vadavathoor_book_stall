@@ -17,13 +17,13 @@ class UserBatchModelAdapter extends TypeAdapter<UserBatchModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserBatchModel(
-      batchID: fields[0] as String,
+      batchID: fields[0] as int,
       batchName: fields[1] as String,
       status: fields[2] as int,
       createdDate: fields[3] as int,
-      createdBy: fields[4] as String,
+      createdBy: fields[4] as int,
       modifiedDate: fields[5] as int,
-      modifiedBy: fields[6] as String,
+      modifiedBy: fields[6] as int,
     );
   }
 

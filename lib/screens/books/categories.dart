@@ -98,7 +98,7 @@ class _BookCategoriesState extends State<BookCategoriesWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
-      final loggedIn = user.user.userID != '';
+      final loggedIn = user.user.userID != 0;
 
       return Padding(
           padding: const EdgeInsets.all(16.0),

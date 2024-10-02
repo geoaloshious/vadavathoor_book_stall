@@ -4,22 +4,22 @@ import '../constants.dart';
 part 'users.g.dart';
 
 UserModel emptyUserModel() => UserModel(
-    userID: '',
+    userID: 0,
     name: '',
     username: '',
     password: '',
     role: 0,
-    batchID: '',
+    batchID: 0,
     status: 0,
     createdDate: 0,
-    createdBy: '',
+    createdBy: 0,
     modifiedDate: 0,
-    modifiedBy: '');
+    modifiedBy: 0);
 
 @HiveType(typeId: DBItemHiveType.users)
 class UserModel {
   @HiveField(0)
-  final String userID;
+  final int userID;
 
   @HiveField(1)
   String name;
@@ -34,7 +34,7 @@ class UserModel {
   int role;
 
   @HiveField(6)
-  String batchID;
+  int batchID;
 
   @HiveField(7)
   int status;
@@ -43,13 +43,13 @@ class UserModel {
   final int createdDate;
 
   @HiveField(9)
-  final String createdBy;
+  final int createdBy;
 
   @HiveField(10)
   int modifiedDate;
 
   @HiveField(11)
-  String modifiedBy;
+  int modifiedBy;
 
   Map<String, dynamic> toJson() {
     return {
@@ -68,7 +68,7 @@ class UserModel {
   }
 
   Map<String, String> toDropdownData() {
-    return {'id': userID, 'name': name};
+    return {'id': userID.toString(), 'name': name};
   }
 
   UserModel(

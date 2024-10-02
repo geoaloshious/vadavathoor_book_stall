@@ -28,7 +28,7 @@ class _UserModalState extends State<UsermodalWidget> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
-  String _batchID = '';
+  int _batchID = 0;
   String _role = UserRole.normal.toString();
   String _status = UserStatus.enabled.toString();
   Map<String, bool> inputErrors = {};
@@ -57,7 +57,7 @@ class _UserModalState extends State<UsermodalWidget> {
       tempInputErrors['password'] = true;
     }
 
-    if (_batchID == '') {
+    if (_batchID == 0) {
       tempInputErrors['batch'] = true;
     }
 
@@ -65,7 +65,7 @@ class _UserModalState extends State<UsermodalWidget> {
       final fn = widget.mode == UserModalMode.add ? addUser : editUser;
 
       final res = await fn(UserModel(
-          userID: widget.data?.userID ?? '',
+          userID: widget.data?.userID ?? 0,
           name: name,
           username: username,
           password: password,
@@ -73,13 +73,13 @@ class _UserModalState extends State<UsermodalWidget> {
           batchID: _batchID,
           status: int.tryParse(_status) ?? UserStatus.enabled,
           createdDate: 0,
-          createdBy: '',
+          createdBy: 0,
           modifiedDate: 0,
-          modifiedBy: ''));
+          modifiedBy: 0));
 
       if (res['error'] != null) {
         setState(() {
-          submitErrorMessage = res['error']!;
+          submitErrorMessage = ErrorMessages.usernameTaken;
         });
       } else {
         widget.updateUI();
@@ -162,12 +162,12 @@ class _UserModalState extends State<UsermodalWidget> {
           Expanded(
               child: CustomDropdown(
                   items: _batchList.map((i) => i.toDropdownData()).toList(),
-                  selectedValue: _batchID,
+                  selectedValue: _batchID.toString(),
                   label: 'Select Batch',
                   hasError: inputErrors['batch'] == true,
                   onValueChanged: (value) {
                     setState(() {
-                      _batchID = value;
+                      _batchID = int.tryParse(value) ?? 0;
                       inputErrors = {...inputErrors, 'batch': false};
                     });
                   }))

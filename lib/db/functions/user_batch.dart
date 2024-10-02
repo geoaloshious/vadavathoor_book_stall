@@ -1,9 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/user_batch.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 import '../constants.dart';
-import 'utils.dart';
 
 Future<Box<UserBatchModel>> getUserBatchBox() async {
   Box<UserBatchModel> box;
@@ -17,10 +17,10 @@ Future<Box<UserBatchModel>> getUserBatchBox() async {
   return box;
 }
 
-Future<String> addUserBatch(String batchName) async {
+Future<int> addUserBatch(String batchName) async {
   final db = await getUserBatchBox();
-  String batchID = '${db.values.length + 1}';
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  int batchID = db.values.length + 1;
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   await db.add(UserBatchModel(
@@ -29,16 +29,16 @@ Future<String> addUserBatch(String batchName) async {
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       status: DBRowStatus.active));
 
   return batchID;
 }
 
 Future<void> editUserBatch(
-    {required String batchID, String? batchName, int? status}) async {
+    {required int batchID, String? batchName, int? status}) async {
   final box = await getUserBatchBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   for (int key in box.keys) {
     UserBatchModel? existingData = box.get(key);

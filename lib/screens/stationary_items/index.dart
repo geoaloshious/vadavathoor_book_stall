@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vadavathoor_book_stall/classes/books.dart';
-import 'package:vadavathoor_book_stall/db/constants.dart';
-import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/components/edit_modal.dart';
@@ -94,7 +92,7 @@ class _StationaryItemsState extends State<StationaryItemsWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
-      final loggedIn = user.user.userID != '';
+      final loggedIn = user.user.userID != 0;
 
       return Padding(
           padding: const EdgeInsets.all(16.0),

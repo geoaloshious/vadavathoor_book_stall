@@ -6,7 +6,7 @@ part 'user_batch.g.dart';
 @HiveType(typeId: DBItemHiveType.userBatch)
 class UserBatchModel {
   @HiveField(0)
-  final String batchID;
+  final int batchID;
 
   @HiveField(1)
   String batchName;
@@ -18,13 +18,13 @@ class UserBatchModel {
   final int createdDate;
 
   @HiveField(4)
-  final String createdBy;
+  final int createdBy;
 
   @HiveField(5)
   int modifiedDate;
 
   @HiveField(6)
-  String modifiedBy;
+  int modifiedBy;
 
   Map<String, dynamic> toJson() {
     return {
@@ -39,7 +39,7 @@ class UserBatchModel {
   }
 
   Map<String, String> toDropdownData() {
-    return {'id': batchID, 'name': batchName};
+    return {'id': batchID.toString(), 'name': batchName};
   }
 
   UserBatchModel(

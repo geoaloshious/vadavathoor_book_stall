@@ -17,7 +17,6 @@ import 'package:vadavathoor_book_stall/utils/utils.dart';
 import '../constants.dart';
 import 'book.dart';
 import 'book_purchase.dart';
-import 'utils.dart';
 
 Future<Box<SaleModel>> getSalesBox() async {
   Box<SaleModel> box;
@@ -44,19 +43,19 @@ Future<Map<String, int>> getPurchaseKeysAndIDs(Box purchaseBox) async {
   return purchaseKeys;
 }
 
-Future<Map<String, String>> getCustomerIDAndBatchID(
-  String customerID,
+Future<Map<String, int>> getCustomerIDAndBatchID(
+  int customerID,
   String customerName,
-  String customerBatch,
+  String customerBatchName,
 ) async {
   final userDB = await getUsersBox();
 
-  String customerBatchID = '';
+  int customerBatchID = 0;
 
-  if (customerID == '') {
-    customerBatchID = await addUserBatch(customerBatch);
+  if (customerID == 0) {
+    customerBatchID = await addUserBatch(customerBatchName);
     customerID = (await addUser(UserModel(
-            userID: '',
+            userID: 0,
             name: customerName,
             username: '',
             password: '',
@@ -64,10 +63,10 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
             batchID: customerBatchID,
             status: UserStatus.enabled,
             createdDate: 0,
-            createdBy: '',
+            createdBy: 0,
             modifiedDate: 0,
-            modifiedBy: '')))['userID'] ??
-        '';
+            modifiedBy: 0)))['userID'] ??
+        0;
   } else {
     customerBatchID =
         userDB.values.firstWhere((b) => b.userID == customerID).batchID;
@@ -80,18 +79,18 @@ Future<void> addSale(
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
-    String customerID,
+    int customerID,
     String customerName,
-    String customerBatch,
+    String customerBatchName,
     String paymentMode) async {
   final saleBox = await getSalesBox();
   final currentTS = getCurrentTimestamp();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
-  final tempRes =
-      await getCustomerIDAndBatchID(customerID, customerName, customerBatch);
+  final tempRes = await getCustomerIDAndBatchID(
+      customerID, customerName, customerBatchName);
   customerID = tempRes['customerID']!;
-  String customerBatchID = tempRes['customerBatchID']!;
+  int customerBatchID = tempRes['customerBatchID']!;
 
   saleBox.add(SaleModel(
       saleID: '${saleBox.values.length + 1}',
@@ -104,7 +103,7 @@ Future<void> addSale(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       status: DBRowStatus.active));
 
   final bkPurchaseBox = await getBookPurchaseBox();
@@ -143,23 +142,23 @@ Future<void> editSale(
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
-    String customerID,
+    int customerID,
     String customerName,
-    String customerBatch,
+    String customerBatchName,
     String paymentMode) async {
   final salesBox = await getSalesBox();
   final bkPurchaseBox = await getBookPurchaseBox();
   final siPurchaseBox = await getStationaryPurchaseBox();
   final currentTS = getCurrentTimestamp();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final bkPurchaseKeys = await getPurchaseKeysAndIDs(bkPurchaseBox);
   final siPurchaseKeys = await getPurchaseKeysAndIDs(siPurchaseBox);
 
-  final tempRes =
-      await getCustomerIDAndBatchID(customerID, customerName, customerBatch);
+  final tempRes = await getCustomerIDAndBatchID(
+      customerID, customerName, customerBatchName);
   customerID = tempRes['customerID']!;
-  String customerBatchID = tempRes['customerBatchID']!;
+  int customerBatchID = tempRes['customerBatchID']!;
 
   for (int saleKey in salesBox.keys) {
     SaleModel? existingSale = salesBox.get(saleKey);
@@ -229,7 +228,7 @@ Future<void> deleteSale(String saleID) async {
   final salesBox = await getSalesBox();
   final bkPurchaseBox = await getBookPurchaseBox();
   final siPurchaseBox = await getStationaryPurchaseBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   final bkPurchaseKeys = await getPurchaseKeysAndIDs(bkPurchaseBox);

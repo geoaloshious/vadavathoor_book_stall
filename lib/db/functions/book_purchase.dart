@@ -3,7 +3,7 @@ import 'package:vadavathoor_book_stall/classes.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
-import 'package:vadavathoor_book_stall/db/functions/utils.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -22,7 +22,7 @@ Future<Box<BookPurchaseModel>> getBookPurchaseBox() async {
 Future<void> addBookPurchase(
     String bookID, int purchaseDate, double bookPrice, int quantity) async {
   final currentTS = getCurrentTimestamp();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final db = await getBookPurchaseBox();
   await db.add(BookPurchaseModel(
@@ -35,7 +35,7 @@ Future<void> addBookPurchase(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       deleted: false));
 }
 
@@ -43,7 +43,7 @@ Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
     int quantity, double bookPrice, int purchaseDate) async {
   final purchaseBox = await getBookPurchaseBox();
   final salesBox = await getSalesBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final relatedSales = salesBox.values.where((i) =>
       i.books
@@ -91,7 +91,7 @@ Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
 Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
   final box = await getBookPurchaseBox();
   final salesBox = await getSalesBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final relatedSales = salesBox.values.where((i) =>
       i.books

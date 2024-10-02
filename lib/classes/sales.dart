@@ -67,13 +67,13 @@ class ForNewSaleItem {
 }
 
 class UserModelForSales {
-  String userID;
+  int userID;
   String name;
-  String batchID;
+  int batchID;
   String batchName;
 
   Map<String, String> toDropdownData() {
-    return {'id': userID, 'name': '$name  (Batch: $batchName)'};
+    return {'id': userID.toString(), 'name': '$name  (Batch: $batchName)'};
   }
 
   UserModelForSales(

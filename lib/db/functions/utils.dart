@@ -155,7 +155,7 @@ Future<void> updateMiscValue(String itemKey, String itemValue) async {
   }
 }
 
-Future<void> addLoginHistory(String userID) async {
+Future<void> addLoginHistory(int userID) async {
   final box = await getLoginHistoryBox();
   int currentTS = DateTime.now().millisecondsSinceEpoch;
 

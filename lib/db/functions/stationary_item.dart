@@ -1,12 +1,12 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/classes/books.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
+import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
 import 'package:vadavathoor_book_stall/db/models/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
 import '../constants.dart';
-import 'utils.dart';
 
 Future<Box<StationaryItemModel>> getStationaryItemBox() async {
   Box<StationaryItemModel> box;
@@ -23,7 +23,7 @@ Future<Box<StationaryItemModel>> getStationaryItemBox() async {
 Future<void> addStationaryItem(String itemName) async {
   final box = await getStationaryItemBox();
   String itemID = generateID();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   await box.add(StationaryItemModel(
@@ -32,13 +32,13 @@ Future<void> addStationaryItem(String itemName) async {
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: '',
+      modifiedBy: 0,
       status: DBRowStatus.active));
 }
 
 Future<void> editStationaryItem(String itemID, String itemName) async {
   final box = await getStationaryItemBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
   for (int key in box.keys) {
@@ -58,7 +58,7 @@ Future<void> editStationaryItem(String itemID, String itemName) async {
 Future<Map<String, String>> deleteStationaryItem(String itemID) async {
   final itemBox = await getStationaryItemBox();
   final purchaseBox = await getStationaryPurchaseBox();
-  final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
+  final loggedInUser = await getLoggedInUserID();
 
   final purchases = purchaseBox.values
       .where((p) => p.itemID == itemID && p.status == DBRowStatus.active);
