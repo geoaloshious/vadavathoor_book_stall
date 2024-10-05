@@ -17,9 +17,11 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
   TextEditingController _bookStallAddressController = TextEditingController();
   TextEditingController _bookStallPhoneController = TextEditingController();
   TextEditingController _bankName = TextEditingController();
+  TextEditingController _accountName = TextEditingController();
   TextEditingController _accountNo = TextEditingController();
   TextEditingController _bankIFSC = TextEditingController();
   TextEditingController _bankBranch = TextEditingController();
+  TextEditingController _visitAgain = TextEditingController();
 
   Map<String, bool> inputErrors = {};
 
@@ -28,18 +30,22 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
     final tempAddress = await readMiscValue(MiscDBKeys.bookStallAdress);
     final tempPhone = await readMiscValue(MiscDBKeys.bookStallPhoneNumber);
     final tempBankName = await readMiscValue(MiscDBKeys.bankName);
+    final tempAccountName = await readMiscValue(MiscDBKeys.accountName);
     final tempAccNo = await readMiscValue(MiscDBKeys.bankAccountNo);
     final tempIFSC = await readMiscValue(MiscDBKeys.bankIFSC);
     final tempBranch = await readMiscValue(MiscDBKeys.bankBranch);
+    final tempVisitAgain = await readMiscValue(MiscDBKeys.visitAgain);
 
     setState(() {
       _bookStallNameController = TextEditingController(text: tempName);
       _bookStallAddressController = TextEditingController(text: tempAddress);
       _bookStallPhoneController = TextEditingController(text: tempPhone);
       _bankName = TextEditingController(text: tempBankName);
+      _accountName = TextEditingController(text: tempAccountName);
       _accountNo = TextEditingController(text: tempAccNo);
       _bankIFSC = TextEditingController(text: tempIFSC);
       _bankBranch = TextEditingController(text: tempBranch);
+      _visitAgain = TextEditingController(text: tempVisitAgain);
     });
   }
 
@@ -126,6 +132,22 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
             const SizedBox(height: 20),
             TextField(
                 enabled: loggedIn,
+                controller: _accountName,
+                decoration: InputDecoration(
+                    labelText: 'Account name',
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: inputErrors['accountName'] == true
+                            ? const BorderSide(color: Colors.red, width: 1)
+                            : const BorderSide(color: Colors.grey, width: 1))),
+                onChanged: (value) {
+                  setState(() {
+                    inputErrors = {...inputErrors, 'accountName': false};
+                  });
+                }),
+            const SizedBox(height: 20),
+            TextField(
+                enabled: loggedIn,
                 controller: _accountNo,
                 decoration: InputDecoration(
                     labelText: 'Bank account number',
@@ -172,6 +194,22 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
                   });
                 }),
             const SizedBox(height: 20),
+            TextField(
+                enabled: loggedIn,
+                controller: _visitAgain,
+                decoration: InputDecoration(
+                    labelText: 'Visit again message',
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: inputErrors['visitAgain'] == true
+                            ? const BorderSide(color: Colors.red, width: 1)
+                            : const BorderSide(color: Colors.grey, width: 1))),
+                onChanged: (value) {
+                  setState(() {
+                    inputErrors = {...inputErrors, 'visitAgain': false};
+                  });
+                }),
+            const SizedBox(height: 20),
             if (loggedIn)
               TextButton(
                   style: TextButton.styleFrom(backgroundColor: Colors.blueGrey),
@@ -194,6 +232,10 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
                     if (bankName.isNotEmpty) {
                       updateMiscValue(MiscDBKeys.bankName, bankName);
                     }
+                    final accountName = _accountName.text.trim();
+                    if (accountName.isNotEmpty) {
+                      updateMiscValue(MiscDBKeys.accountName, accountName);
+                    }
                     final bankAccNo = _accountNo.text.trim();
                     if (bankAccNo.isNotEmpty) {
                       updateMiscValue(MiscDBKeys.bankAccountNo, bankAccNo);
@@ -206,10 +248,24 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
                     if (branch.isNotEmpty) {
                       updateMiscValue(MiscDBKeys.bankBranch, branch);
                     }
+                    final visitAgain = _visitAgain.text.trim();
+                    if (visitAgain.isNotEmpty) {
+                      updateMiscValue(MiscDBKeys.visitAgain, visitAgain);
+                    }
+
+                    _showSnackbar(context);
                   },
                   child:
                       const Text('Save', style: TextStyle(color: Colors.white)))
           ]));
     });
   }
+}
+
+void _showSnackbar(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Details saved'),
+      behavior: SnackBarBehavior.floating,
+      duration: Duration(seconds: 1),
+      margin: EdgeInsets.all(16)));
 }

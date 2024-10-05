@@ -100,6 +100,13 @@ Future<void> setBookStallDetailsIfEmpty() async {
   if ((await readMiscValue(MiscDBKeys.bankBranch)) == '') {
     await updateMiscValue(MiscDBKeys.bankBranch, 'Kalathippady');
   }
+  if ((await readMiscValue(MiscDBKeys.accountName)) == '') {
+    await updateMiscValue(MiscDBKeys.accountName, 'Secretary book stall');
+  }
+  if ((await readMiscValue(MiscDBKeys.visitAgain)) == '') {
+    await updateMiscValue(
+        MiscDBKeys.visitAgain, 'Thank you and please visit again');
+  }
 }
 
 Future<Box<MiscModel>> getMiscBox() async {
