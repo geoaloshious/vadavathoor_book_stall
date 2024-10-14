@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -81,11 +80,8 @@ Future<String> createPDF({
                   children: [
                     pw.Text('To: $customerName',
                         style: const pw.TextStyle(fontSize: 9)),
-                    pw.Container(
-                        padding: const pw.EdgeInsets.all(4),
-                        decoration: pw.BoxDecoration(border: pw.Border.all()),
-                        child: pw.Text(customerBatch,
-                            style: const pw.TextStyle(fontSize: 9)))
+                    pw.Text(customerBatch,
+                        style: const pw.TextStyle(fontSize: 9))
                   ]),
               pw.SizedBox(height: 4),
               pw.Table(
@@ -377,12 +373,13 @@ void saveAndOpenPDF(String saleID) async {
   }
 
   UserModel salesPerson = userDB.firstWhere((u) => u.userID == sale.createdBy);
+  UserModel customer = userDB.firstWhere((u) => u.userID == sale.customerID);
 
   String filePath = await createPDF(
       items: items,
-      customerName: userDB.firstWhere((u) => u.userID == sale.customerID).name,
+      customerName: customer.name,
       customerBatch: userBatches
-          .firstWhere((u) => u.batchID == sale.customerBatchID)
+          .firstWhere((u) => u.batchID == customer.batchID)
           .batchName,
       salesPerson: salesPerson.name,
       billNo: saleID,

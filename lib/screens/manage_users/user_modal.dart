@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
@@ -217,32 +219,32 @@ class _UserModalState extends State<UsermodalWidget> {
                   }))
         ]),
         const SizedBox(height: 10),
-        Row(children: [
-          Expanded(
-              child: CustomDropdown(
-            items: _roles,
-            selectedValue: _role,
-            label: 'Select Role',
-            hasError: false,
-            onValueChanged: (value) {
-              setState(() {
-                _role = value;
-              });
-            },
-          )),
-          const SizedBox(width: 16.0),
-          Expanded(
-              child: CustomDropdown(
-                  items: _statuses,
-                  selectedValue: _status,
-                  label: 'Select Status',
-                  hasError: false,
-                  onValueChanged: (value) {
-                    setState(() {
-                      _status = value;
-                    });
-                  }))
-        ]),
+        // Row(children: [
+        //   Expanded(
+        //       child: CustomDropdown(
+        //     items: _roles,
+        //     selectedValue: _role,
+        //     label: 'Select Role',
+        //     hasError: false,
+        //     onValueChanged: (value) {
+        //       setState(() {
+        //         _role = value;
+        //       });
+        //     },
+        //   )),
+        //   const SizedBox(width: 16.0),
+        //   Expanded(
+        //       child: CustomDropdown(
+        //           items: _statuses,
+        //           selectedValue: _status,
+        //           label: 'Select Status',
+        //           hasError: false,
+        //           onValueChanged: (value) {
+        //             setState(() {
+        //               _status = value;
+        //             });
+        //           }))
+        // ]),
         const SizedBox(height: 20.0),
         submitErrorMessage != ''
             ? Text('$submitErrorMessage\n',

@@ -81,24 +81,21 @@ class SaleModel {
   int customerID;
 
   @HiveField(5)
-  int customerBatchID;
-
-  @HiveField(6)
   String paymentMode;
 
-  @HiveField(7)
+  @HiveField(6)
   final int createdDate;
 
-  @HiveField(8)
+  @HiveField(7)
   final int createdBy;
 
-  @HiveField(9)
+  @HiveField(8)
   int modifiedDate;
 
-  @HiveField(10)
+  @HiveField(9)
   int modifiedBy;
 
-  @HiveField(11)
+  @HiveField(10)
   int status;
 
   Map<String, dynamic> toJson() {
@@ -106,7 +103,6 @@ class SaleModel {
       'saleID': saleID,
       'grandTotal': grandTotal,
       'customerID': customerID,
-      'customerBatchID': customerBatchID,
       'paymentMode': paymentMode,
       'createdDate': createdDate,
       'createdBy': createdBy,
@@ -124,7 +120,6 @@ class SaleModel {
         stationaryItems: stationaryItems.map((b) => b.clone()).toList(),
         grandTotal: grandTotal,
         customerID: customerID,
-        customerBatchID: customerBatchID,
         paymentMode: paymentMode,
         createdDate: createdDate,
         createdBy: createdBy,
@@ -139,7 +134,6 @@ class SaleModel {
       required this.stationaryItems,
       required this.grandTotal,
       required this.customerID,
-      required this.customerBatchID,
       required this.paymentMode,
       required this.createdDate,
       required this.createdBy,

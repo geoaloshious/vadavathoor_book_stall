@@ -46,21 +46,23 @@ Future<Map<String, int>> getPurchaseKeysAndIDs(Box purchaseBox) async {
 Future<Map<String, int>> getCustomerIDAndBatchID(
   int customerID,
   String customerName,
+  int userBatchID,
   String customerBatchName,
 ) async {
   final userDB = await getUsersBox();
 
-  int customerBatchID = 0;
-
   if (customerID == 0) {
-    customerBatchID = await addUserBatch(customerBatchName);
+    if (userBatchID == 0) {
+      userBatchID = await addUserBatch(customerBatchName);
+    }
+
     customerID = (await addUser(UserModel(
             userID: 0,
             name: customerName,
             username: '',
             password: '',
             role: UserRole.normal,
-            batchID: customerBatchID,
+            batchID: userBatchID,
             status: UserStatus.enabled,
             createdDate: 0,
             createdBy: 0,
@@ -68,11 +70,11 @@ Future<Map<String, int>> getCustomerIDAndBatchID(
             modifiedBy: 0)))['userID'] ??
         0;
   } else {
-    customerBatchID =
+    userBatchID =
         userDB.values.firstWhere((b) => b.userID == customerID).batchID;
   }
 
-  return {'customerID': customerID, 'customerBatchID': customerBatchID};
+  return {'customerID': customerID, 'customerBatchID': userBatchID};
 }
 
 Future<void> addSale(
@@ -81,6 +83,7 @@ Future<void> addSale(
     double grandTotal,
     int customerID,
     String customerName,
+    int userBatchID,
     String customerBatchName,
     String paymentMode) async {
   final saleBox = await getSalesBox();
@@ -88,9 +91,8 @@ Future<void> addSale(
   final loggedInUser = await getLoggedInUserID();
 
   final tempRes = await getCustomerIDAndBatchID(
-      customerID, customerName, customerBatchName);
+      customerID, customerName, userBatchID, customerBatchName);
   customerID = tempRes['customerID']!;
-  int customerBatchID = tempRes['customerBatchID']!;
 
   saleBox.add(SaleModel(
       saleID: '${saleBox.values.length + 1}',
@@ -98,7 +100,6 @@ Future<void> addSale(
       stationaryItems: stationaryItemsToCheckout,
       grandTotal: grandTotal,
       customerID: customerID,
-      customerBatchID: customerBatchID,
       paymentMode: paymentMode,
       createdDate: currentTS,
       createdBy: loggedInUser,
@@ -144,6 +145,7 @@ Future<void> editSale(
     double grandTotal,
     int customerID,
     String customerName,
+    int userBatchID,
     String customerBatchName,
     String paymentMode) async {
   final salesBox = await getSalesBox();
@@ -156,9 +158,8 @@ Future<void> editSale(
   final siPurchaseKeys = await getPurchaseKeysAndIDs(siPurchaseBox);
 
   final tempRes = await getCustomerIDAndBatchID(
-      customerID, customerName, customerBatchName);
+      customerID, customerName, userBatchID, customerBatchName);
   customerID = tempRes['customerID']!;
-  int customerBatchID = tempRes['customerBatchID']!;
 
   for (int saleKey in salesBox.keys) {
     SaleModel? existingSale = salesBox.get(saleKey);
@@ -191,7 +192,6 @@ Future<void> editSale(
       existingSale.stationaryItems = stationaryItemsToCheckout;
       existingSale.grandTotal = grandTotal;
       existingSale.customerID = customerID;
-      existingSale.customerBatchID = customerBatchID;
       existingSale.paymentMode = paymentMode;
 
       existingSale.modifiedDate = currentTS;
