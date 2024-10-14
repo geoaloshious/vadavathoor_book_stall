@@ -17,7 +17,7 @@ import '../db/functions/utils.dart';
 import '../db/models/sales.dart';
 
 Future<String> createPDF({
-  required List<Map<String, dynamic>> books,
+  required List<Map<String, dynamic>> items,
   required String customerName,
   required String customerBatch,
   required String salesPerson,
@@ -29,12 +29,20 @@ Future<String> createPDF({
   final stallAddress = await readMiscValue(MiscDBKeys.bookStallAdress);
   final stallPhone = await readMiscValue(MiscDBKeys.bookStallPhoneNumber);
   final bankName = await readMiscValue(MiscDBKeys.bankName);
+  final accountName = await readMiscValue(MiscDBKeys.accountName);
   final bankAccountNo = await readMiscValue(MiscDBKeys.bankAccountNo);
   final bankBranch = await readMiscValue(MiscDBKeys.bankBranch);
   final bankIFSC = await readMiscValue(MiscDBKeys.bankIFSC);
+  final visitAgain = await readMiscValue(MiscDBKeys.visitAgain);
 
-  final grandTotal = books.fold(
+  final totalOriginalPrice = items.fold(0.0,
+      (total, book) => total + (book['original_price'] * book['quantity']));
+
+  final grandTotal = items.fold(
       0.0, (total, book) => total + (book['soldPrice'] * book['quantity']));
+
+  final savings =
+      double.parse((totalOriginalPrice - grandTotal).toStringAsFixed(2));
 
   final pdf = pw.Document();
 
@@ -53,8 +61,14 @@ Future<String> createPDF({
               pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text('Bill No: $billNo',
-                        style: const pw.TextStyle(fontSize: 9)),
+                    pw.Row(children: [
+                      pw.Text('Bill No:',
+                          style: const pw.TextStyle(fontSize: 9)),
+                      pw.SizedBox(width: 5),
+                      pw.Text(billNo,
+                          style: const pw.TextStyle(
+                              color: PdfColors.red, fontSize: 9)),
+                    ]),
                     pw.Text('Payment : ${getPaymentModeName(paymentMode)}',
                         style: const pw.TextStyle(fontSize: 9)),
                     pw.Text('Date: $date',
@@ -66,60 +80,62 @@ Future<String> createPDF({
                   children: [
                     pw.Text('To: $customerName',
                         style: const pw.TextStyle(fontSize: 9)),
-                    pw.Container(
-                        padding: const pw.EdgeInsets.all(4),
-                        decoration: pw.BoxDecoration(border: pw.Border.all()),
-                        child: pw.Text(customerBatch,
-                            style: const pw.TextStyle(fontSize: 9)))
+                    pw.Text(customerBatch,
+                        style: const pw.TextStyle(fontSize: 9))
                   ]),
               pw.SizedBox(height: 4),
               pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.black),
+                  border:
+                      pw.TableBorder.all(color: PdfColors.black, width: 0.5),
                   children: [
-                    pw.TableRow(children: [
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('SlNo',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 9))),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('Qty.',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 9))),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('Particular',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 9))),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('MRP',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 9))),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('Discount %',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 9))),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('Amount',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
-                                  fontSize: 9))),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(2.0),
-                          child: pw.Text('Total',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold, fontSize: 9)))
-                    ]),
-                    for (int i = 0; i < books.length; i++) //
+                    pw.TableRow(
+                        decoration:
+                            const pw.BoxDecoration(color: PdfColors.grey400),
+                        children: [
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('SlNo',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('Qty.',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('Particular',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('MRP',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('Discount %',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('Rate',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9))),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(2.0),
+                              child: pw.Text('Amount',
+                                  style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 9)))
+                        ]),
+                    for (int i = 0; i < items.length; i++) //
                       pw.TableRow(children: [
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
@@ -127,31 +143,36 @@ Future<String> createPDF({
                                 style: const pw.TextStyle(fontSize: 9))),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
-                            child: pw.Text('${books[i]['quantity']}',
+                            child: pw.Text('${items[i]['quantity']}',
                                 style: const pw.TextStyle(fontSize: 9))),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
-                            child: pw.Text('${books[i]['name']}',
+                            child: pw.Text('${items[i]['name']}',
                                 style: const pw.TextStyle(fontSize: 9))),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
-                            child: pw.Text('${books[i]['original_price']}',
+                            child: pw.Text('${items[i]['original_price']}',
                                 style: const pw.TextStyle(fontSize: 9))),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
-                            child: pw.Text('${books[i]['discount']}%',
+                            child: pw.Text('${items[i]['discount']}%',
                                 style: const pw.TextStyle(fontSize: 9))),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
-                            child: pw.Text('${books[i]['soldPrice']}',
+                            child: pw.Text('${items[i]['soldPrice']}',
                                 style: const pw.TextStyle(fontSize: 9))),
                         pw.Padding(
                             padding: const pw.EdgeInsets.all(2.0),
                             child: pw.Text(
-                                '${books[i]['soldPrice'] * books[i]['quantity']}',
+                                '${items[i]['soldPrice'] * items[i]['quantity']}',
                                 style: const pw.TextStyle(fontSize: 9)))
                       ])
                   ]),
+              if (savings > 0)
+                pw.Padding(
+                    child: pw.Text('You have saved $savings rupees',
+                        style: const pw.TextStyle(fontSize: 8)),
+                    padding: const pw.EdgeInsets.only(top: 5)),
               pw.SizedBox(height: 6),
               pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -160,21 +181,54 @@ Future<String> createPDF({
                         child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                          pw.Text('Total quantity : ${books.length}',
+                          pw.Text('Total quantity : ${items.length}',
                               style: const pw.TextStyle(fontSize: 9)),
                           pw.SizedBox(height: 6),
-                          pw.Text('BANK DETAILS',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold, fontSize: 9)),
-                          pw.SizedBox(height: 2),
-                          pw.Text('Bank Name : $bankName, $bankBranch',
-                              style: const pw.TextStyle(fontSize: 9)),
-                          pw.SizedBox(height: 2),
-                          pw.Text('Account No : $bankAccountNo',
-                              style: const pw.TextStyle(fontSize: 9)),
-                          pw.SizedBox(height: 2),
-                          pw.Text('IFSC Code : $bankIFSC',
-                              style: const pw.TextStyle(fontSize: 9)),
+                          pw.Table(
+                              tableWidth: pw.TableWidth.min,
+                              border: pw.TableBorder.all(
+                                  color: PdfColors.black, width: 0.5),
+                              children: [
+                                pw.TableRow(
+                                    decoration: const pw.BoxDecoration(
+                                        color: PdfColors.grey400),
+                                    children: [
+                                      pw.Padding(
+                                          padding: const pw.EdgeInsets.all(2.0),
+                                          child: pw.Text('Bank Details',
+                                              style: pw.TextStyle(
+                                                  fontWeight:
+                                                      pw.FontWeight.bold,
+                                                  fontSize: 9)))
+                                    ]),
+                                pw.TableRow(children: [
+                                  pw.Padding(
+                                      padding: const pw.EdgeInsets.all(2.0),
+                                      child: pw.Column(
+                                          crossAxisAlignment:
+                                              pw.CrossAxisAlignment.start,
+                                          children: [
+                                            pw.Text(
+                                                'Bank Name : $bankName, $bankBranch',
+                                                style: const pw.TextStyle(
+                                                    fontSize: 9)),
+                                            pw.SizedBox(height: 2),
+                                            pw.Text(
+                                                'Account Name : $accountName',
+                                                style: const pw.TextStyle(
+                                                    fontSize: 9)),
+                                            pw.SizedBox(height: 2),
+                                            pw.Text(
+                                                'Account No : $bankAccountNo',
+                                                style: const pw.TextStyle(
+                                                    fontSize: 9)),
+                                            pw.SizedBox(height: 2),
+                                            pw.Text('IFSC Code : $bankIFSC',
+                                                style: const pw.TextStyle(
+                                                    fontSize: 9)),
+                                          ]))
+                                ])
+                              ]),
                           pw.SizedBox(height: 6),
                           pw.Text('In Words :',
                               style: const pw.TextStyle(fontSize: 9)),
@@ -187,7 +241,8 @@ Future<String> createPDF({
                       pw.Padding(
                           child: pw.Text('Grand Total:   Rs. $grandTotal',
                               style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold, fontSize: 9)),
+                                  fontWeight: pw.FontWeight.bold,
+                                  fontSize: 12)),
                           padding:
                               const pw.EdgeInsets.only(top: 5, bottom: 10)),
                       pw.Row(
@@ -218,7 +273,11 @@ Future<String> createPDF({
                                 ])
                           ])
                     ])
-                  ])
+                  ]),
+              pw.SizedBox(height: 5),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
+                pw.Text(visitAgain, style: const pw.TextStyle(fontSize: 8))
+              ])
             ])
           ]));
 
@@ -314,12 +373,13 @@ void saveAndOpenPDF(String saleID) async {
   }
 
   UserModel salesPerson = userDB.firstWhere((u) => u.userID == sale.createdBy);
+  UserModel customer = userDB.firstWhere((u) => u.userID == sale.customerID);
 
   String filePath = await createPDF(
-      books: items,
-      customerName: userDB.firstWhere((u) => u.userID == sale.customerID).name,
+      items: items,
+      customerName: customer.name,
       customerBatch: userBatches
-          .firstWhere((u) => u.batchID == sale.customerBatchID)
+          .firstWhere((u) => u.batchID == customer.batchID)
           .batchName,
       salesPerson: salesPerson.name,
       billNo: saleID,

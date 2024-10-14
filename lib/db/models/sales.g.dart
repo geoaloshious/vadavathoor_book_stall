@@ -100,13 +100,12 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       stationaryItems: (fields[2] as List).cast<SaleItemModel>(),
       grandTotal: fields[3] as double,
       customerID: fields[4] as int,
-      customerBatchID: fields[5] as int,
-      paymentMode: fields[6] as String,
-      createdDate: fields[7] as int,
-      createdBy: fields[8] as int,
-      modifiedDate: fields[9] as int,
-      modifiedBy: fields[10] as int,
-      status: fields[11] as int,
+      paymentMode: fields[5] as String,
+      createdDate: fields[6] as int,
+      createdBy: fields[7] as int,
+      modifiedDate: fields[8] as int,
+      modifiedBy: fields[9] as int,
+      status: fields[10] as int,
       saleID: fields[0] as String,
     );
   }
@@ -114,7 +113,7 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
   @override
   void write(BinaryWriter writer, SaleModel obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.saleID)
       ..writeByte(1)
@@ -126,18 +125,16 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       ..writeByte(4)
       ..write(obj.customerID)
       ..writeByte(5)
-      ..write(obj.customerBatchID)
-      ..writeByte(6)
       ..write(obj.paymentMode)
-      ..writeByte(7)
+      ..writeByte(6)
       ..write(obj.createdDate)
-      ..writeByte(8)
+      ..writeByte(7)
       ..write(obj.createdBy)
-      ..writeByte(9)
+      ..writeByte(8)
       ..write(obj.modifiedDate)
-      ..writeByte(10)
+      ..writeByte(9)
       ..write(obj.modifiedBy)
-      ..writeByte(11)
+      ..writeByte(10)
       ..write(obj.status);
   }
 

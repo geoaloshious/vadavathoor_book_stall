@@ -54,8 +54,9 @@ Future<Map<String, int>> addUser(UserModel userData) async {
   final loggedInUser = await getLoggedInUserID();
   final userID = box.values.length + 1;
 
-  bool usernameNotTaken =
-      box.values.where((i) => i.username == userData.username).isEmpty;
+  bool usernameNotTaken = box.values
+      .where((i) => i.username.isNotEmpty && i.username == userData.username)
+      .isEmpty;
 
   if (usernameNotTaken) {
     box.add(UserModel(

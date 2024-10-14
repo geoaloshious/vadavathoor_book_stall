@@ -25,13 +25,13 @@ class CustomDropdown extends StatefulWidget {
 
 class CustomPopupDropdownState extends State<CustomDropdown> {
   String getSelectedItemName() {
-    if (widget.selectedValue == '') {
-      return widget.label;
-    } else {
+    if (widget.selectedValue.isNotEmpty && widget.selectedValue != '0') {
       String? itemName = widget.items.firstWhere(
           (i) => i['id'] == widget.selectedValue,
           orElse: () => {'name': ''})['name'];
       return itemName ?? '';
+    } else {
+      return widget.label;
     }
   }
 

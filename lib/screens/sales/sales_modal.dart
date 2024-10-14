@@ -6,10 +6,12 @@ import 'package:vadavathoor_book_stall/components/button.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
+import 'package:vadavathoor_book_stall/db/models/user_batch.dart';
 import 'package:vadavathoor_book_stall/screens/sales/sale_item.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -29,8 +31,11 @@ class _SaleModalState extends State<SaleModalWidget> {
   final _customerBatchController = TextEditingController();
 
   bool newUser = false;
+  bool newBatch = false;
   int _selectedUserID = 0;
+  int _selectedBatchID = 0;
   List<UserModelForSales> users = [];
+  List<UserBatchModel> userBatches = [];
 
   List<SaleItemModel> booksToCheckout = [];
   List<SaleItemModel> stationaryItemsToCheckout = [];
@@ -58,13 +63,16 @@ class _SaleModalState extends State<SaleModalWidget> {
       if (customerName == '') {
         tempInputErrors['customerName'] = true;
       }
-      if (customerBatch == '') {
+
+      if (newBatch) {
+        if (customerBatch == '') {
+          tempInputErrors['customerBatchName'] = true;
+        }
+      } else if (_selectedBatchID == 0) {
         tempInputErrors['customerBatch'] = true;
       }
-    } else {
-      if (_selectedUserID == 0) {
-        tempInputErrors['customer'] = true;
-      }
+    } else if (_selectedUserID == 0) {
+      tempInputErrors['customer'] = true;
     }
 
     if (tempInputErrors.isEmpty) {
@@ -120,6 +128,7 @@ class _SaleModalState extends State<SaleModalWidget> {
               grandTotal,
               _selectedUserID,
               _customerNameController.text.trim(),
+              _selectedBatchID,
               _customerBatchController.text.trim(),
               _paymentMode);
         } else {
@@ -130,6 +139,7 @@ class _SaleModalState extends State<SaleModalWidget> {
               grandTotal,
               _selectedUserID,
               _customerNameController.text.trim(),
+              _selectedBatchID,
               _customerBatchController.text.trim(),
               _paymentMode);
         }
@@ -254,6 +264,7 @@ class _SaleModalState extends State<SaleModalWidget> {
     final tempBooks = await getBooks();
     final tempSIs = await getStationaryItems();
     final tempUsers = await getUsersForSales();
+    final tempUserBatches = await getUserBatchList();
 
     setState(() {
       allBooksWithPurchases = tempBookPurchases;
@@ -261,6 +272,7 @@ class _SaleModalState extends State<SaleModalWidget> {
       allBooks = tempBooks;
       allStationaryItems = tempSIs;
       users = tempUsers;
+      userBatches = tempUserBatches;
       _selectedUserID = tempCustomerID;
 
       booksToCheckout = tempBooksCheckout;
@@ -484,9 +496,9 @@ class _SaleModalState extends State<SaleModalWidget> {
         children: [
           const Text('Customer',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(width: 20),
+          const SizedBox(width: 10),
           SizedBox(
-            width: 150,
+            width: 120,
             child: CheckboxListTile(
                 title: const Text('New'),
                 value: newUser,
@@ -498,8 +510,6 @@ class _SaleModalState extends State<SaleModalWidget> {
                   });
                 }),
           ),
-          const SizedBox(width: 20),
-          const SizedBox(height: 15),
           Expanded(
               child: newUser
                   ? Row(children: [
@@ -530,34 +540,67 @@ class _SaleModalState extends State<SaleModalWidget> {
                                   };
                                 });
                               })),
-                      const SizedBox(width: 10),
+                      SizedBox(
+                        width: 130,
+                        child: CheckboxListTile(
+                            title: const Text('New batch'),
+                            value: newBatch,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                newBatch = value ?? false;
+                                _selectedBatchID = 0;
+                              });
+                            }),
+                      ),
                       Expanded(
-                          child: TextField(
-                              decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          inputErrors['customerBatch'] == true
+                          child: newBatch
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: inputErrors[
+                                                      'customerBatchName'] ==
+                                                  true
                                               ? const BorderSide(
                                                   color: Colors.red, width: 2)
                                               : const BorderSide(
                                                   color: Colors.grey,
                                                   width: 1)),
-                                  focusedBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.blueGrey, width: 2)),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hoverColor: Colors.transparent,
-                                  hintText: 'Customer batch'),
-                              controller: _customerBatchController,
-                              onChanged: (value) {
-                                setState(() {
-                                  inputErrors = {
-                                    ...inputErrors,
-                                    'customerBatch': false
-                                  };
-                                });
-                              }))
+                                      focusedBorder: const OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.blueGrey,
+                                              width: 2)),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      hoverColor: Colors.transparent,
+                                      hintText: 'Customer batch'),
+                                  controller: _customerBatchController,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      inputErrors = {
+                                        ...inputErrors,
+                                        'customerBatchName': false
+                                      };
+                                    });
+                                  })
+                              : CustomDropdown(
+                                  items: userBatches
+                                      .map((i) => i.toDropdownData())
+                                      .toList(),
+                                  selectedValue: _selectedBatchID.toString(),
+                                  label: 'Select batch',
+                                  hasError:
+                                      inputErrors['customerBatch'] == true,
+                                  onValueChanged: (value) {
+                                    setState(() {
+                                      _selectedBatchID =
+                                          int.tryParse(value) ?? 0;
+                                      inputErrors = {
+                                        ...inputErrors,
+                                        'customerBatch': false
+                                      };
+                                    });
+                                  }))
                     ])
                   : Row(
                       children: [
@@ -570,7 +613,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                                     .map((i) => i.toDropdownData())
                                     .toList(),
                                 selectedValue: _selectedUserID.toString(),
-                                label: 'Select',
+                                label: 'Select user',
                                 hasError: inputErrors['customer'] == true,
                                 onValueChanged: (value) {
                                   setState(() {
