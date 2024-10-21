@@ -17,9 +17,9 @@ Future<Box<UserBatchModel>> getUserBatchBox() async {
   return box;
 }
 
-Future<int> addUserBatch(String batchName) async {
+Future<String> addUserBatch(String batchName) async {
   final db = await getUserBatchBox();
-  int batchID = db.values.length + 1;
+  String batchID = generateID();
   final loggedInUser = await getLoggedInUserID();
   final currentTS = getCurrentTimestamp();
 
@@ -29,14 +29,14 @@ Future<int> addUserBatch(String batchName) async {
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedBy: '',
       status: DBRowStatus.active));
 
   return batchID;
 }
 
 Future<void> editUserBatch(
-    {required int batchID, String? batchName, int? status}) async {
+    {required String batchID, String? batchName, int? status}) async {
   final box = await getUserBatchBox();
   final loggedInUser = await getLoggedInUserID();
 

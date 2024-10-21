@@ -27,16 +27,16 @@ class BookPurchaseModel {
   final int createdDate;
 
   @HiveField(7)
-  final int createdBy;
+  final String createdBy;
 
   @HiveField(8)
   int modifiedDate;
 
   @HiveField(9)
-  int modifiedBy;
+  String modifiedBy;
 
   @HiveField(10)
-  bool deleted;
+  int status;
 
   Map<String, dynamic> toJson() {
     return {
@@ -50,7 +50,7 @@ class BookPurchaseModel {
       'createdBy': createdBy,
       'modifiedDate': modifiedDate,
       'modifiedBy': modifiedBy,
-      'deleted': deleted
+      'status': status
     };
   }
 
@@ -65,5 +65,5 @@ class BookPurchaseModel {
       required this.createdBy,
       required this.modifiedDate,
       required this.modifiedBy,
-      required this.deleted});
+      required this.status});
 }

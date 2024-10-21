@@ -9,7 +9,7 @@ class LoginHistoryModel {
   final String id;
 
   @HiveField(1)
-  final int userID;
+  final String userID;
 
   @HiveField(2)
   final int logInTime;

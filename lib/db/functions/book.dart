@@ -58,7 +58,7 @@ Future<void> addBook(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedBy: '',
       status: DBRowStatus.active));
 }
 
@@ -110,8 +110,8 @@ Future<Map<String, String>> deleteBook(String bookID) async {
   final purchaseBox = await getBookPurchaseBox();
   final loggedInUser = await getLoggedInUserID();
 
-  final purchases =
-      purchaseBox.values.where((p) => p.bookID == bookID && !p.deleted);
+  final purchases = purchaseBox.values
+      .where((p) => p.bookID == bookID && p.status == DBRowStatus.active);
 
   if (purchases.isNotEmpty) {
     return {
@@ -158,7 +158,8 @@ Future<List<BookListItemModel>> getBookList() async {
     final bookCategory = bookCategories
         .where((i) => i.categoryID == book.bookCategoryID)
         .firstOrNull;
-    final prcs = purchases.where((p) => p.bookID == book.bookID && !p.deleted);
+    final prcs = purchases.where(
+        (p) => p.bookID == book.bookID && p.status == DBRowStatus.active);
 
     int balanceStock = 0;
     for (BookPurchaseModel p in prcs) {

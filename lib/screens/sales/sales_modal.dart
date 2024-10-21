@@ -32,8 +32,8 @@ class _SaleModalState extends State<SaleModalWidget> {
 
   bool newUser = false;
   bool newBatch = false;
-  int _selectedUserID = 0;
-  int _selectedBatchID = 0;
+  String _selectedUserID = '';
+  String _selectedBatchID = '';
   List<UserModelForSales> users = [];
   List<UserBatchModel> userBatches = [];
 
@@ -68,10 +68,10 @@ class _SaleModalState extends State<SaleModalWidget> {
         if (customerBatch == '') {
           tempInputErrors['customerBatchName'] = true;
         }
-      } else if (_selectedBatchID == 0) {
+      } else if (_selectedBatchID == '') {
         tempInputErrors['customerBatch'] = true;
       }
-    } else if (_selectedUserID == 0) {
+    } else if (_selectedUserID == '') {
       tempInputErrors['customer'] = true;
     }
 
@@ -239,7 +239,7 @@ class _SaleModalState extends State<SaleModalWidget> {
     List<SaleItemModel> tempSIsCheckout = [];
     String tempPaymentMode = PaymentModes.cash;
     double tempGrandTotal = 0;
-    int tempCustomerID = 0;
+    String tempCustomerID = '';
 
     if (widget.saleID != '') {
       final temp = await getSaleData(widget.saleID);
@@ -506,7 +506,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                 onChanged: (bool? value) {
                   setState(() {
                     newUser = value ?? false;
-                    _selectedUserID = 0;
+                    _selectedUserID = '';
                   });
                 }),
           ),
@@ -549,7 +549,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                             onChanged: (bool? value) {
                               setState(() {
                                 newBatch = value ?? false;
-                                _selectedBatchID = 0;
+                                _selectedBatchID = '';
                               });
                             }),
                       ),
@@ -593,8 +593,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                                       inputErrors['customerBatch'] == true,
                                   onValueChanged: (value) {
                                     setState(() {
-                                      _selectedBatchID =
-                                          int.tryParse(value) ?? 0;
+                                      _selectedBatchID = value;
                                       inputErrors = {
                                         ...inputErrors,
                                         'customerBatch': false
@@ -617,7 +616,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                                 hasError: inputErrors['customer'] == true,
                                 onValueChanged: (value) {
                                   setState(() {
-                                    _selectedUserID = int.tryParse(value) ?? 0;
+                                    _selectedUserID = value;
                                     inputErrors = {
                                       ...inputErrors,
                                       'customer': false

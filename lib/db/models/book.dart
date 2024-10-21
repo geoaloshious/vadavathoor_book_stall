@@ -24,13 +24,13 @@ class BookModel {
   final int createdDate;
 
   @HiveField(6)
-  final int createdBy;
+  final String createdBy;
 
   @HiveField(7)
   int modifiedDate;
 
   @HiveField(8)
-  int modifiedBy;
+  String modifiedBy;
 
   @HiveField(9)
   int status;

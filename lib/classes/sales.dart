@@ -67,9 +67,9 @@ class ForNewSaleItem {
 }
 
 class UserModelForSales {
-  int userID;
+  String userID;
   String name;
-  int batchID;
+  String batchID;
   String batchName;
 
   Map<String, String> toDropdownData() {

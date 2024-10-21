@@ -35,8 +35,8 @@ Future<void> addBookPurchase(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: 0,
-      deleted: false));
+      modifiedBy: '',
+      status: DBRowStatus.active));
 }
 
 Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
@@ -111,7 +111,7 @@ Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
   for (int key in box.keys) {
     BookPurchaseModel? existingData = box.get(key);
     if (existingData != null && existingData.purchaseID == purchaseID) {
-      existingData.deleted = true;
+      existingData.status = DBRowStatus.deleted;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
 
@@ -132,7 +132,7 @@ Future<List<PurchaseListItemModel>> getBookPurchaseList() async {
   for (BookPurchaseModel purchase in purchases) {
     final book = books.where((u) => u.bookID == purchase.bookID).firstOrNull;
 
-    if (book != null && !purchase.deleted) {
+    if (book != null && purchase.status == DBRowStatus.active) {
       joinedData.add(PurchaseListItemModel(
           purchaseID: purchase.purchaseID,
           itemID: book.bookID,

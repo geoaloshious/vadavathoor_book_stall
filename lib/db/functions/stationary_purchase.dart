@@ -36,7 +36,7 @@ Future<void> addStationaryPurchase(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedBy: '',
       status: DBRowStatus.active));
 }
 

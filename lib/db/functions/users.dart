@@ -48,11 +48,11 @@ Future<List<UserModelForSales>> getUsersForSales() async {
   return arr;
 }
 
-Future<Map<String, int>> addUser(UserModel userData) async {
+Future<Map<String, String>> addUser(UserModel userData) async {
   final box = await getUsersBox();
   final currentTS = getCurrentTimestamp();
   final loggedInUser = await getLoggedInUserID();
-  final userID = box.values.length + 1;
+  final userID = generateID();
 
   bool usernameNotTaken = box.values
       .where((i) => i.username.isNotEmpty && i.username == userData.username)
@@ -70,9 +70,9 @@ Future<Map<String, int>> addUser(UserModel userData) async {
         createdDate: currentTS,
         createdBy: loggedInUser,
         modifiedDate: 0,
-        modifiedBy: 0));
+        modifiedBy: ''));
   } else {
-    return {'error': 1};
+    return {'error': ''};
   }
 
   return {'userID': userID};
@@ -110,7 +110,7 @@ Future<Map<String, String>> editUser(UserModel userData) async {
   return {};
 }
 
-Future<void> deleteUser(int userID) async {
+Future<void> deleteUser(String userID) async {
   final box = await getUsersBox();
   final loggedInUser = await getLoggedInUserID();
 
@@ -132,17 +132,17 @@ Future<void> addDeveloperUserIfEmpty() async {
   if (box.values.isEmpty) {
     final currentTS = getCurrentTimestamp();
     box.add(UserModel(
-        userID: 1,
+        userID: '1',
         name: 'Developer',
         username: 'dev',
         password: 'dev',
         role: UserRole.developer,
-        batchID: 0,
+        batchID: '',
         status: UserStatus.enabled,
         createdDate: currentTS,
-        createdBy: 0,
+        createdBy: '',
         modifiedDate: 0,
-        modifiedBy: 0));
+        modifiedBy: ''));
   }
 }
 
@@ -156,7 +156,7 @@ Future<Map<String, String>> login(
 
   if (users.isNotEmpty) {
     if (users.first.status == UserStatus.enabled) {
-      int userID = users.first.userID;
+      String userID = users.first.userID;
 
       await updateMiscValue(
           MiscDBKeys.currentlyLoggedInUserID, userID.toString());
@@ -184,9 +184,9 @@ Future<void> logout(BuildContext context) async {
 
 void loadUserProviderValue(BuildContext context) async {
   UserProvider provider = context.read<UserProvider>();
-  int loggedInUserID = await getLoggedInUserID();
+  String loggedInUserID = await getLoggedInUserID();
 
-  if (loggedInUserID != 0) {
+  if (loggedInUserID != '') {
     final box = await getUsersBox();
     final users = box.values.where((u) => u.userID == loggedInUserID);
 
@@ -196,7 +196,7 @@ void loadUserProviderValue(BuildContext context) async {
   }
 }
 
-Future<int> getLoggedInUserID() async {
+Future<String> getLoggedInUserID() async {
   final loggedInUser = await readMiscValue(MiscDBKeys.currentlyLoggedInUserID);
-  return int.tryParse(loggedInUser) ?? 0;
+  return loggedInUser;
 }

@@ -43,21 +43,21 @@ Future<Map<String, int>> getPurchaseKeysAndIDs(Box purchaseBox) async {
   return purchaseKeys;
 }
 
-Future<Map<String, int>> getCustomerIDAndBatchID(
-  int customerID,
+Future<Map<String, String>> getCustomerIDAndBatchID(
+  String customerID,
   String customerName,
-  int userBatchID,
+  String userBatchID,
   String customerBatchName,
 ) async {
   final userDB = await getUsersBox();
 
-  if (customerID == 0) {
-    if (userBatchID == 0) {
+  if (customerID == '') {
+    if (userBatchID == '') {
       userBatchID = await addUserBatch(customerBatchName);
     }
 
     customerID = (await addUser(UserModel(
-            userID: 0,
+            userID: '',
             name: customerName,
             username: '',
             password: '',
@@ -65,10 +65,10 @@ Future<Map<String, int>> getCustomerIDAndBatchID(
             batchID: userBatchID,
             status: UserStatus.enabled,
             createdDate: 0,
-            createdBy: 0,
+            createdBy: '',
             modifiedDate: 0,
-            modifiedBy: 0)))['userID'] ??
-        0;
+            modifiedBy: '')))['userID'] ??
+        '';
   } else {
     userBatchID =
         userDB.values.firstWhere((b) => b.userID == customerID).batchID;
@@ -81,9 +81,9 @@ Future<void> addSale(
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
-    int customerID,
+    String customerID,
     String customerName,
-    int userBatchID,
+    String userBatchID,
     String customerBatchName,
     String paymentMode) async {
   final saleBox = await getSalesBox();
@@ -104,7 +104,7 @@ Future<void> addSale(
       createdDate: currentTS,
       createdBy: loggedInUser,
       modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedBy: '',
       status: DBRowStatus.active));
 
   final bkPurchaseBox = await getBookPurchaseBox();
@@ -143,9 +143,9 @@ Future<void> editSale(
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
-    int customerID,
+    String customerID,
     String customerName,
-    int userBatchID,
+    String userBatchID,
     String customerBatchName,
     String paymentMode) async {
   final salesBox = await getSalesBox();
@@ -350,7 +350,7 @@ Future<Map<String, Map<String, Map<String, Object>>>> getBookWithPurchases(
 
     var validPs = purchases.where((pr) =>
         pr.bookID == book.bookID &&
-        pr.deleted == false &&
+        pr.status == DBRowStatus.active &&
         (savedPurchaseIDs.contains(pr.purchaseID) || pr.quantityLeft > 0));
     if (validPs.isNotEmpty) {
       for (var p in validPs) {
