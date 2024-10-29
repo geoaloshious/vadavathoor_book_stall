@@ -11,6 +11,7 @@ UserModel emptyUserModel() => UserModel(
     role: 0,
     batchID: '',
     status: 0,
+    notes: '',
     createdDate: 0,
     createdBy: '',
     modifiedDate: 0,
@@ -51,6 +52,9 @@ class UserModel {
   @HiveField(11)
   String modifiedBy;
 
+  @HiveField(12)
+  String notes;
+
   Map<String, dynamic> toJson() {
     return {
       'userID': userID,
@@ -79,6 +83,7 @@ class UserModel {
       required this.role,
       required this.batchID,
       required this.status,
+      required this.notes,
       required this.createdDate,
       required this.createdBy,
       required this.modifiedDate,

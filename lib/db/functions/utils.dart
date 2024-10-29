@@ -73,8 +73,8 @@ Future<void> initializeHiveDB() async {
   }
 
   //#pending - might need to add these from TGDB.
-  await addDeveloperUserIfEmpty();
-  await setBookStallDetailsIfEmpty();
+  // await addDeveloperUserIfEmpty();
+  // await setBookStallDetailsIfEmpty();
 }
 
 Future<void> setBookStallDetailsIfEmpty() async {
@@ -144,17 +144,29 @@ Future<String> readMiscValue(String itemKey) async {
 }
 
 Future<void> updateMiscValue(String itemKey, String itemValue) async {
+  int currentTS = getCurrentTimestamp();
+  final loggedInUser = await getLoggedInUserID();
+
   final miscBox = await getMiscBox();
 
   final items = miscBox.values.where((i) => i.itemKey == itemKey);
 
   if (items.isEmpty) {
-    miscBox.add(MiscModel(itemKey: itemKey, itemValue: itemValue));
+    miscBox.add(MiscModel(
+      itemKey: itemKey,
+      itemValue: itemValue,
+      createdDate: currentTS,
+      createdBy: loggedInUser,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
+    ));
   } else {
     for (int key in miscBox.keys) {
       MiscModel? existingData = miscBox.get(key);
       if (existingData != null && existingData.itemKey == itemKey) {
         existingData.itemValue = itemValue;
+        existingData.modifiedDate = currentTS;
+        existingData.modifiedBy = loggedInUser;
         await miscBox.put(key, existingData);
         break;
       }
@@ -164,7 +176,7 @@ Future<void> updateMiscValue(String itemKey, String itemValue) async {
 
 Future<void> addLoginHistory(String userID) async {
   final box = await getLoginHistoryBox();
-  int currentTS = DateTime.now().millisecondsSinceEpoch;
+  int currentTS = getCurrentTimestamp();
 
   box.add(LoginHistoryModel(
       id: generateID(), userID: userID, logInTime: currentTS, logOutTime: 0));
@@ -176,7 +188,7 @@ Future<void> updateLogoutHistory() async {
   for (int key in box.keys) {
     LoginHistoryModel? existingData = box.get(key);
     if (existingData != null && existingData.logOutTime == 0) {
-      existingData.logOutTime = DateTime.now().millisecondsSinceEpoch;
+      existingData.logOutTime = getCurrentTimestamp();
     }
   }
 }

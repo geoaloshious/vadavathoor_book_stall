@@ -75,7 +75,8 @@ class _UserModalState extends State<UsermodalWidget> {
           createdDate: 0,
           createdBy: '',
           modifiedDate: 0,
-          modifiedBy: ''));
+          modifiedBy: '',
+          notes: ''));
 
       if (res['error'] != null) {
         setState(() {

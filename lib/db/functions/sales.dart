@@ -67,7 +67,8 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
             createdDate: 0,
             createdBy: '',
             modifiedDate: 0,
-            modifiedBy: '')))['userID'] ??
+            modifiedBy: '',
+            notes: '')))['userID'] ??
         '';
   } else {
     userBatchID =
@@ -103,8 +104,8 @@ Future<void> addSale(
       paymentMode: paymentMode,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: '',
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 
   final bkPurchaseBox = await getBookPurchaseBox();

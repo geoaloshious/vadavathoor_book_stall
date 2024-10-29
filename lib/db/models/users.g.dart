@@ -24,6 +24,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       role: fields[5] as int,
       batchID: fields[6] as String,
       status: fields[7] as int,
+      notes: fields[12] as String,
       createdDate: fields[8] as int,
       createdBy: fields[9] as String,
       modifiedDate: fields[10] as int,
@@ -34,7 +35,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.userID)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(10)
       ..write(obj.modifiedDate)
       ..writeByte(11)
-      ..write(obj.modifiedBy);
+      ..write(obj.modifiedBy)
+      ..writeByte(12)
+      ..write(obj.notes);
   }
 
   @override

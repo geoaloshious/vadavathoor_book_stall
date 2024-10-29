@@ -28,8 +28,8 @@ Future<String> addPublisher(String name) async {
       publisherName: name,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: '',
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 
   return publisherID;

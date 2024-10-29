@@ -28,8 +28,8 @@ Future<String> addUserBatch(String batchName) async {
       batchName: batchName,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: '',
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 
   return batchID;
