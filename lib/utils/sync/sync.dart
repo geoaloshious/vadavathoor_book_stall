@@ -13,6 +13,7 @@ import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/functions/utils.dart';
+import 'package:vadavathoor_book_stall/utils/api_contants.dart';
 import 'package:vadavathoor_book_stall/utils/sync/book_author.dart';
 import 'package:vadavathoor_book_stall/utils/sync/book_categories.dart';
 import 'package:vadavathoor_book_stall/utils/sync/book_publishers.dart';
@@ -27,7 +28,7 @@ import 'package:vadavathoor_book_stall/utils/sync/user_batches.dart';
 import 'package:vadavathoor_book_stall/utils/sync/users.dart';
 
 Future<String> createPost(endpoint, Map<String, dynamic> data) async {
-  String url = 'http://localhost:3000/$endpoint';
+  String url = '$baseURL$endpoint';
   const headers = {'Content-Type': 'application/json'};
 
   try {
@@ -120,13 +121,13 @@ void syncData(BuildContext context) async {
         users.values.where((i) => i.modifiedDate > lastUpSyncTime).toList()
   };
 
-  await createPost('upsync', apiInput);
+  await createPost(EndPoints.upSync, apiInput);
 
   await updateMiscValue(MiscDBKeys.lastUpSyncTime,
       DateTime.now().millisecondsSinceEpoch.toString());
 
-  final downResult =
-      await createPost('downsync', {'lastDownSyncTime': lastDownSyncTime});
+  final downResult = await createPost(
+      EndPoints.downSync, {'lastDownSyncTime': lastDownSyncTime});
 
   Map<String, dynamic> jsonResult = jsonDecode(downResult);
 
