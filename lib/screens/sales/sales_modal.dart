@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
-import 'package:vadavathoor_book_stall/components/drop_down.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
 import 'package:vadavathoor_book_stall/components/button.dart';
+import 'package:vadavathoor_book_stall/components/search_popup.dart';
 import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/db/functions/sales.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
@@ -628,7 +627,7 @@ class _SaleModalState extends State<SaleModalWidget> {
                                       };
                                     });
                                   })
-                              : CustomDropdown(
+                              : SearchablePopup(
                                   items: userBatches
                                       .map((i) => i.toDropdownData())
                                       .toList(),
@@ -650,25 +649,24 @@ class _SaleModalState extends State<SaleModalWidget> {
                       children: [
                         Expanded(
                           child: FractionallySizedBox(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: 0.5,
-                            child: CustomDropdown(
-                                items: users
-                                    .map((i) => i.toDropdownData())
-                                    .toList(),
-                                selectedValue: _selectedUserID.toString(),
-                                label: 'Select user',
-                                hasError: inputErrors['customer'] == true,
-                                onValueChanged: (value) {
-                                  setState(() {
-                                    _selectedUserID = value;
-                                    inputErrors = {
-                                      ...inputErrors,
-                                      'customer': false
-                                    };
-                                  });
-                                }),
-                          ),
+                              alignment: Alignment.centerLeft,
+                              widthFactor: 0.5,
+                              child: SearchablePopup(
+                                  items: users
+                                      .map((i) => i.toDropdownData())
+                                      .toList(),
+                                  selectedValue: _selectedUserID.toString(),
+                                  label: 'Select user',
+                                  hasError: inputErrors['customer'] == true,
+                                  onValueChanged: (value) {
+                                    setState(() {
+                                      _selectedUserID = value;
+                                      inputErrors = {
+                                        ...inputErrors,
+                                        'customer': false
+                                      };
+                                    });
+                                  })),
                         )
                       ],
                     ))

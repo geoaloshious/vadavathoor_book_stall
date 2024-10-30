@@ -16,6 +16,40 @@ class UsersWidget extends StatefulWidget {
 
 class _UsersState extends State<UsersWidget> {
   List<UserModel> users = [];
+  List<UserModel> filteredUsers = [];
+
+  int currentPage = 0;
+  final int itemsPerPage = 50;
+  String searchQuery = '';
+  int sortColumnIndex = 0;
+  Map<int, bool> sortOrder = {0: true};
+
+  void updateSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredUsers = users.where((u) {
+        return u.name.toLowerCase().contains(query.toLowerCase()) ||
+            u.username.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+      currentPage = 0;
+    });
+  }
+
+  void sortItems(int column) {
+    setState(() {
+      sortOrder[column] = !sortOrder[column]!;
+      bool ascending = sortOrder[column]!;
+
+      switch (column) {
+        case 0:
+          filteredUsers.sort((a, b) =>
+              ascending ? a.name.compareTo(b.name) : b.name.compareTo(a.name));
+          break;
+      }
+
+      sortColumnIndex = column;
+    });
+  }
 
   onPressNewUser() {
     showDialog(
@@ -124,6 +158,7 @@ class _UsersState extends State<UsersWidget> {
 
     setState(() {
       users = tempData;
+      filteredUsers = users;
     });
   }
 
@@ -136,81 +171,113 @@ class _UsersState extends State<UsersWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, loggedInUser, _) {
+      final totalPages = (filteredUsers.length / itemsPerPage).ceil();
+      final startIndex = currentPage * itemsPerPage;
+      final endIndex = startIndex + itemsPerPage < filteredUsers.length
+          ? startIndex + itemsPerPage
+          : filteredUsers.length;
+
       return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              if (loggedInUser.user.userID != '')
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey),
-                    onPressed: onPressNewUser,
-                    child: const Text('Add User',
-                        style: TextStyle(color: Colors.white)))
-            ]),
-            const SizedBox(height: 20),
-            const Row(children: [
-              Expanded(
-                  child: Text('Name',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              Expanded(
-                  child: Text('Username',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              Expanded(
-                  child: Text('Role',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              Expanded(
-                  child: Text('Status',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              Expanded(
-                  child: Text('Created Date',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              SizedBox(width: 80)
-            ]),
-            Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 0.2, color: Colors.blueGrey)))),
-            Expanded(
-                child: users.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: users.length,
-                        itemBuilder: (context, index) => Row(children: [
-                              Expanded(child: Text(users[index].name)),
-                              Expanded(child: Text(users[index].username)),
-                              Expanded(
-                                  child: Text(getRoleName(users[index].role))),
-                              Expanded(
-                                  child:
-                                      Text(getStatusName(users[index].status))),
-                              Expanded(
-                                  child: Text(formatTimestamp(
-                                      timestamp: users[index].createdDate))),
-                              IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  tooltip: 'Edit',
-                                  onPressed: () {
-                                    onPressEdit(users[index]);
-                                  }),
-                              //Logged user cannot delete himself
-                              users[index].userID == loggedInUser.user.userID
-                                  ? const SizedBox(width: 40)
-                                  : IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      tooltip: 'Delete',
-                                      onPressed: () {
-                                        onPressDelete(users[index].userID);
-                                      })
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(mainAxisSize: MainAxisSize.max, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                SizedBox(
+                    width: 300,
+                    child: TextField(
+                        onChanged: updateSearchQuery,
+                        decoration: const InputDecoration(
+                            labelText: 'Search name or usenname',
+                            border: OutlineInputBorder()))),
+                const SizedBox(width: 10),
+                Row(children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: currentPage > 0
+                        ? () {
+                            setState(() {
+                              currentPage--;
+                            });
+                          }
+                        : null,
+                  ),
+                  Text('Page ${currentPage + 1} of ${totalPages}',
+                      style: const TextStyle(fontSize: 14)),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward),
+                    onPressed: currentPage < totalPages - 1
+                        ? () {
+                            setState(() {
+                              currentPage++;
+                            });
+                          }
+                        : null,
+                  ),
+                ]),
+                const SizedBox(width: 10),
+                if (loggedInUser.user.userID != '')
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueGrey),
+                      onPressed: onPressNewUser,
+                      child: const Text('Add User',
+                          style: TextStyle(color: Colors.white)))
+              ]),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: DataTable(
+                    sortColumnIndex: sortColumnIndex,
+                    sortAscending: sortOrder[sortColumnIndex]!,
+                    columns: [
+                      DataColumn(
+                        label: const Text('Name'),
+                        onSort: (columnIndex, _) => sortItems(0),
+                      ),
+                      const DataColumn(label: Text('Username')),
+                      const DataColumn(label: Text('Role')),
+                      const DataColumn(label: Text('Status')),
+                      const DataColumn(label: Text('Created Date')),
+                      const DataColumn(label: Text('')),
+                    ],
+                    rows: filteredUsers
+                        .sublist(startIndex, endIndex)
+                        .map((user) => DataRow(cells: [
+                              DataCell(Text(user.name)),
+                              DataCell(Text(user.username)),
+                              DataCell(Text(getRoleName(user.role))),
+                              DataCell(Text(getStatusName(user.status))),
+                              DataCell(Text(formatTimestamp(
+                                  timestamp: user.createdDate))),
+                              DataCell(Row(children: [
+                                IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    tooltip: 'Edit',
+                                    onPressed: () {
+                                      onPressEdit(user);
+                                    }),
+                                //Logged user cannot delete himself
+                                user.userID == loggedInUser.user.userID
+                                    ? const SizedBox(width: 40)
+                                    : IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        tooltip: 'Delete',
+                                        onPressed: () {
+                                          onPressDelete(user.userID);
+                                        })
+                              ]))
                             ]))
-                    : const Text("No records found"))
-          ]));
+                        .toList()),
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: Container(
+                      decoration: BoxDecoration(
+                          border:
+                              Border.all(width: 0.2, color: Colors.blueGrey)))),
+            ]),
+          ));
     });
   }
 }

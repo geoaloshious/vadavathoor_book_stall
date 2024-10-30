@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
+import 'package:vadavathoor_book_stall/components/search_popup.dart';
 import 'package:vadavathoor_book_stall/db/constants.dart';
 import 'package:vadavathoor_book_stall/db/functions/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/user_batch.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
-
-import '../../components/drop_down.dart';
 
 enum UserModalMode { add, edit }
 
@@ -161,7 +160,7 @@ class _UserModalState extends State<UsermodalWidget> {
                   })),
           const SizedBox(width: 16.0),
           Expanded(
-              child: CustomDropdown(
+              child: SearchablePopup(
                   items: _batchList.map((i) => i.toDropdownData()).toList(),
                   selectedValue: _batchID.toString(),
                   label: 'Select Batch',

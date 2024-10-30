@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
+import 'package:vadavathoor_book_stall/components/search_popup.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_item.dart';
 import 'package:vadavathoor_book_stall/db/functions/stationary_purchase.dart';
 import 'package:vadavathoor_book_stall/db/models/stationary_item.dart';
 
 import '../../classes.dart';
-import '../../components/drop_down.dart';
 
 class StationaryPurchaseModalWidget extends StatefulWidget {
   final PurchaseListItemModel? data;
@@ -144,7 +144,7 @@ class _StationaryPurchaseModalState
       const SizedBox(height: 10.0),
       Row(children: [
         Expanded(
-            child: CustomDropdown(
+            child: SearchablePopup(
                 items: items.map((i) => i.toDropdownData()).toList(),
                 selectedValue: _itemID,
                 label: 'Select item',

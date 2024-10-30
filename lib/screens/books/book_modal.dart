@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes/books.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
+import 'package:vadavathoor_book_stall/components/search_popup.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_author.dart';
 import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_publisher.dart';
 
-import '../../components/drop_down.dart';
 import '../../db/functions/book.dart';
 import '../../db/functions/publisher.dart';
 
@@ -206,7 +206,7 @@ class _BookModalState extends State<BookModalWidget> {
         const SizedBox(width: 16.0),
         Expanded(
             child: _isExistingAuthor
-                ? CustomDropdown(
+                ? SearchablePopup(
                     items: authors.map((i) => i.toDropdownData()).toList(),
                     selectedValue: _authorID,
                     label: 'Select Author',
@@ -237,7 +237,7 @@ class _BookModalState extends State<BookModalWidget> {
       Row(children: [
         Expanded(
             child: _isExistingPublisher
-                ? CustomDropdown(
+                ? SearchablePopup(
                     items: publishers.map((i) => i.toDropdownData()).toList(),
                     selectedValue: _publisherID,
                     label: 'Select Publisher',
@@ -266,7 +266,7 @@ class _BookModalState extends State<BookModalWidget> {
         const SizedBox(width: 16.0),
         Expanded(
             child: _isExistingCategory
-                ? CustomDropdown(
+                ? SearchablePopup(
                     items:
                         bookCategories.map((i) => i.toDropdownData()).toList(),
                     selectedValue: _categoryID,

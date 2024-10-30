@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
-import 'package:vadavathoor_book_stall/components/drop_down.dart';
+import 'package:vadavathoor_book_stall/components/search_popup.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 import 'package:vadavathoor_book_stall/screens/sales/purchase_variant.dart';
 
@@ -106,21 +106,22 @@ class _SaleItemState extends State<SaleItemWidget> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                    flex: 5,
-                    child: CustomDropdown(
-                        items: widget.dropdownData,
-                        selectedValue: selectedItem.itemID,
-                        label: 'Select Item',
-                        hasError: false,
-                        excludeIDs: widget.selectedBookIDs,
-                        onValueChanged: (value) {
-                          setState(() {
-                            if (value != selectedItem.itemID) {
-                              onChangeBook(value);
-                              widget.updateData(bkId: selectedItem.itemID);
-                            }
-                          });
-                        })),
+                  flex: 5,
+                  child: SearchablePopup(
+                      items: widget.dropdownData,
+                      selectedValue: selectedItem.itemID,
+                      label: 'Select Item',
+                      hasError: false,
+                      excludeIDs: widget.selectedBookIDs,
+                      onValueChanged: (value) {
+                        setState(() {
+                          if (value != selectedItem.itemID) {
+                            onChangeBook(value);
+                            widget.updateData(bkId: selectedItem.itemID);
+                          }
+                        });
+                      }),
+                ),
                 const SizedBox(width: 8),
                 IconButton(
                     icon: const Icon(Icons.delete),

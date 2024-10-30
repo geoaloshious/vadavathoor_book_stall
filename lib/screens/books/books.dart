@@ -18,7 +18,7 @@ class _BooksState extends State<BooksWidget> {
 
   int currentPage = 0;
   final int itemsPerPage = 50;
-
+  String searchQuery = '';
   int sortColumnIndex = 0;
   Map<int, bool> sortOrder = {
     0: true,
@@ -88,6 +88,19 @@ class _BooksState extends State<BooksWidget> {
                     child: const Text('Delete'))
               ]);
         });
+  }
+
+  void updateSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredBooks = books.where((book) {
+        return book.bookName.toLowerCase().contains(query.toLowerCase()) ||
+            book.authorName.toLowerCase().contains(query.toLowerCase()) ||
+            book.publisherName.toLowerCase().contains(query.toLowerCase()) ||
+            book.categoryName.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+      currentPage = 0;
+    });
   }
 
   void sortBooks(int columnName) {
@@ -160,85 +173,97 @@ class _BooksState extends State<BooksWidget> {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
-                  // Pagination controls
+                  const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: currentPage > 0
-                            ? () {
-                                setState(() {
-                                  currentPage--;
-                                });
-                              }
-                            : null,
-                      ),
-                      Text('Page ${currentPage + 1} of ${totalPages}',
-                          style: const TextStyle(fontSize: 14)),
-                      IconButton(
-                        icon: const Icon(Icons.arrow_forward),
-                        onPressed: currentPage < totalPages - 1
-                            ? () {
-                                setState(() {
-                                  currentPage++;
-                                });
-                              }
-                            : null,
-                      ),
+                      SizedBox(
+                          width: 300,
+                          child: TextField(
+                              onChanged: updateSearchQuery,
+                              decoration: const InputDecoration(
+                                  labelText: 'Search',
+                                  border: OutlineInputBorder()))),
+                      Row(children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: currentPage > 0
+                              ? () {
+                                  setState(() {
+                                    currentPage--;
+                                  });
+                                }
+                              : null,
+                        ),
+                        Text('Page ${currentPage + 1} of ${totalPages}',
+                            style: const TextStyle(fontSize: 14)),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward),
+                          onPressed: currentPage < totalPages - 1
+                              ? () {
+                                  setState(() {
+                                    currentPage++;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ]),
                     ],
                   ),
-                  DataTable(
-                      sortColumnIndex: sortColumnIndex,
-                      sortAscending: sortOrder[sortColumnIndex]!,
-                      columns: [
-                        DataColumn(
-                          label: const Text('Book'),
-                          onSort: (columnIndex, _) => sortBooks(0),
-                        ),
-                        DataColumn(
-                          label: const Text('Author'),
-                          onSort: (columnIndex, _) => sortBooks(1),
-                        ),
-                        DataColumn(
-                          label: const Text('Publisher'),
-                          onSort: (columnIndex, _) => sortBooks(2),
-                        ),
-                        DataColumn(
-                          label: const Text('Category'),
-                          onSort: (columnIndex, _) => sortBooks(3),
-                        ),
-                        DataColumn(
-                          label: const Text('Balance Stock'),
-                          onSort: (columnIndex, _) => sortBooks(4),
-                        ),
-                        if (loggedIn) const DataColumn(label: Text(''))
-                      ],
-                      rows: filteredBooks
-                          .sublist(startIndex, endIndex)
-                          .map((book) => DataRow(cells: [
-                                DataCell(Text(book.bookName)),
-                                DataCell(Text(book.authorName)),
-                                DataCell(Text(book.publisherName)),
-                                DataCell(Text(book.categoryName)),
-                                DataCell(Text(book.balanceStock.toString())),
-                                if (loggedIn)
-                                  DataCell(Row(children: [
-                                    IconButton(
-                                        icon: const Icon(Icons.edit),
-                                        tooltip: 'Edit',
-                                        onPressed: () {
-                                          onPressAddOrEdit(data: book);
-                                        }),
-                                    IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        tooltip: 'Delete',
-                                        onPressed: () {
-                                          onPressDelete(book.bookID);
-                                        })
-                                  ]))
-                              ]))
-                          .toList()),
+                  SizedBox(
+                    width: double.infinity,
+                    child: DataTable(
+                        sortColumnIndex: sortColumnIndex,
+                        sortAscending: sortOrder[sortColumnIndex]!,
+                        columns: [
+                          DataColumn(
+                            label: const Text('Book'),
+                            onSort: (columnIndex, _) => sortBooks(0),
+                          ),
+                          DataColumn(
+                            label: const Text('Author'),
+                            onSort: (columnIndex, _) => sortBooks(1),
+                          ),
+                          DataColumn(
+                            label: const Text('Publisher'),
+                            onSort: (columnIndex, _) => sortBooks(2),
+                          ),
+                          DataColumn(
+                            label: const Text('Category'),
+                            onSort: (columnIndex, _) => sortBooks(3),
+                          ),
+                          DataColumn(
+                            label: const Text('Balance Stock'),
+                            onSort: (columnIndex, _) => sortBooks(4),
+                          ),
+                          if (loggedIn) const DataColumn(label: Text(''))
+                        ],
+                        rows: filteredBooks
+                            .sublist(startIndex, endIndex)
+                            .map((book) => DataRow(cells: [
+                                  DataCell(Text(book.bookName)),
+                                  DataCell(Text(book.authorName)),
+                                  DataCell(Text(book.publisherName)),
+                                  DataCell(Text(book.categoryName)),
+                                  DataCell(Text(book.balanceStock.toString())),
+                                  if (loggedIn)
+                                    DataCell(Row(children: [
+                                      IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          tooltip: 'Edit',
+                                          onPressed: () {
+                                            onPressAddOrEdit(data: book);
+                                          }),
+                                      IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          tooltip: 'Delete',
+                                          onPressed: () {
+                                            onPressDelete(book.bookID);
+                                          })
+                                    ]))
+                                ]))
+                            .toList()),
+                  ),
                 ],
               )),
         ),
