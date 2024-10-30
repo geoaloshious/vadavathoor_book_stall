@@ -43,21 +43,21 @@ Future<Map<String, int>> getPurchaseKeysAndIDs(Box purchaseBox) async {
   return purchaseKeys;
 }
 
-Future<Map<String, int>> getCustomerIDAndBatchID(
-  int customerID,
+Future<Map<String, String>> getCustomerIDAndBatchID(
+  String customerID,
   String customerName,
-  int userBatchID,
+  String userBatchID,
   String customerBatchName,
 ) async {
   final userDB = await getUsersBox();
 
-  if (customerID == 0) {
-    if (userBatchID == 0) {
+  if (customerID == '') {
+    if (userBatchID == '') {
       userBatchID = await addUserBatch(customerBatchName);
     }
 
     customerID = (await addUser(UserModel(
-            userID: 0,
+            userID: '',
             name: customerName,
             username: '',
             password: '',
@@ -65,10 +65,11 @@ Future<Map<String, int>> getCustomerIDAndBatchID(
             batchID: userBatchID,
             status: UserStatus.enabled,
             createdDate: 0,
-            createdBy: 0,
+            createdBy: '',
             modifiedDate: 0,
-            modifiedBy: 0)))['userID'] ??
-        0;
+            modifiedBy: '',
+            notes: '')))['userID'] ??
+        '';
   } else {
     userBatchID =
         userDB.values.firstWhere((b) => b.userID == customerID).batchID;
@@ -78,12 +79,13 @@ Future<Map<String, int>> getCustomerIDAndBatchID(
 }
 
 Future<void> addSale(
+    String billNo,
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
-    int customerID,
+    String customerID,
     String customerName,
-    int userBatchID,
+    String userBatchID,
     String customerBatchName,
     String paymentMode) async {
   final saleBox = await getSalesBox();
@@ -95,7 +97,8 @@ Future<void> addSale(
   customerID = tempRes['customerID']!;
 
   saleBox.add(SaleModel(
-      saleID: '${saleBox.values.length + 1}',
+      saleID: generateID(),
+      billNo: billNo,
       books: booksToCheckout,
       stationaryItems: stationaryItemsToCheckout,
       grandTotal: grandTotal,
@@ -103,8 +106,8 @@ Future<void> addSale(
       paymentMode: paymentMode,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 
   final bkPurchaseBox = await getBookPurchaseBox();
@@ -140,12 +143,13 @@ Future<void> addSale(
 
 Future<void> editSale(
     String saleID,
+    String billNo,
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
-    int customerID,
+    String customerID,
     String customerName,
-    int userBatchID,
+    String userBatchID,
     String customerBatchName,
     String paymentMode) async {
   final salesBox = await getSalesBox();
@@ -188,6 +192,7 @@ Future<void> editSale(
       await updateQty(
           existingSale.stationaryItems, siPurchaseBox, siPurchaseKeys);
 
+      existingSale.billNo = billNo;
       existingSale.books = booksToCheckout;
       existingSale.stationaryItems = stationaryItemsToCheckout;
       existingSale.grandTotal = grandTotal;
@@ -277,6 +282,16 @@ Future<SaleModel?> getSaleData(String saleID) async {
   return data?.clone();
 }
 
+Future<String> getNewSaleBillNo() async {
+  final sales = (await getSalesBox()).values;
+  if (sales.isEmpty) {
+    return '1';
+  }
+
+  int lastBillNo = int.tryParse(sales.last.billNo) ?? 0;
+  return (lastBillNo + 1).toString();
+}
+
 Future<List<SaleListItemModel>> getSalesList() async {
   final sales = (await getSalesBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
@@ -323,6 +338,7 @@ Future<List<SaleListItemModel>> getSalesList() async {
 
       joinedData.add(SaleListItemModel(
           saleID: sale.saleID,
+          billNo: sale.billNo,
           customerName:
               users.values.firstWhere((u) => u.userID == sale.customerID).name,
           books: bookNames.join('\n'),
@@ -350,7 +366,7 @@ Future<Map<String, Map<String, Map<String, Object>>>> getBookWithPurchases(
 
     var validPs = purchases.where((pr) =>
         pr.bookID == book.bookID &&
-        pr.deleted == false &&
+        pr.status == DBRowStatus.active &&
         (savedPurchaseIDs.contains(pr.purchaseID) || pr.quantityLeft > 0));
     if (validPs.isNotEmpty) {
       for (var p in validPs) {

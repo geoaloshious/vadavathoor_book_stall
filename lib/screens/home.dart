@@ -12,6 +12,8 @@ import 'package:vadavathoor_book_stall/screens/sales/index.dart';
 import 'package:vadavathoor_book_stall/screens/stationary_items/index.dart';
 import 'package:vadavathoor_book_stall/screens/stationary_purchase/index.dart';
 import 'package:vadavathoor_book_stall/screens/manage_users/index.dart';
+import 'package:vadavathoor_book_stall/utils/clear_data.dart';
+import 'package:vadavathoor_book_stall/utils/sync/sync.dart';
 
 import '../providers/user.dart';
 
@@ -103,6 +105,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    Future.delayed(const Duration(seconds: 1), () {
+      // syncData(context);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -115,17 +126,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.sync),
+                onPressed: () {
+                  syncData(context);
+                },
+              ),
               PopupMenuButton<int>(
                   icon: const Icon(Icons.settings, size: 25),
                   onSelected: (int value) {
                     switch (value) {
                       case 1:
                         openAppUpdate();
+                      case 2:
+                        clearData();
                     }
                   },
                   itemBuilder: (context) => [
                         const PopupMenuItem(
-                            value: 1, child: Text('Check for updates'))
+                            value: 1, child: Text('Check for updates')),
+                        const PopupMenuItem(value: 2, child: Text('Clear data'))
                       ]),
               Consumer<UserProvider>(builder: (cntx, user, _) {
                 if (user.user.role == UserRole.developer) {

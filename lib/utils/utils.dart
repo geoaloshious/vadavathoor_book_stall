@@ -46,7 +46,7 @@ String getStatusName(int status) {
 }
 
 String generateID() {
-  int timestamp = DateTime.now().millisecondsSinceEpoch;
+  int timestamp = getCurrentTimestamp();
   return timestamp.toString();
 }
 

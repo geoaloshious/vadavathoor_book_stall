@@ -28,8 +28,8 @@ Future<String> addBookAuthor(String authorName) async {
       authorName: authorName,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 
   return authorID;

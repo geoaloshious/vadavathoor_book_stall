@@ -21,16 +21,16 @@ class BookModel {
   String bookCategoryID;
 
   @HiveField(5)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(6)
-  final int createdBy;
+  String createdBy;
 
   @HiveField(7)
   int modifiedDate;
 
   @HiveField(8)
-  int modifiedBy;
+  String modifiedBy;
 
   @HiveField(9)
   int status;

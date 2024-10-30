@@ -11,9 +11,34 @@ class MiscModel {
   @HiveField(1)
   String itemValue;
 
+  @HiveField(2)
+  int createdDate;
+
+  @HiveField(3)
+  String createdBy;
+
+  @HiveField(4)
+  int modifiedDate;
+
+  @HiveField(5)
+  String modifiedBy;
+
   Map<String, dynamic> toJson() {
-    return {'itemKey': itemKey, 'itemValue': itemValue};
+    return {
+      'itemKey': itemKey,
+      'itemValue': itemValue,
+      'createdDate': createdDate,
+      'createdBy': createdBy,
+      'modifiedDate': modifiedDate,
+      'modifiedBy': modifiedBy,
+    };
   }
 
-  MiscModel({required this.itemKey, required this.itemValue});
+  MiscModel(
+      {required this.itemKey,
+      required this.itemValue,
+      required this.createdDate,
+      required this.createdBy,
+      required this.modifiedDate,
+      required this.modifiedBy});
 }

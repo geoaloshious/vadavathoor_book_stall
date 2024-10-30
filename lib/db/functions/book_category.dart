@@ -28,8 +28,8 @@ Future<String> addBookCategory(String name) async {
       categoryName: name,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 
   return categoryID;

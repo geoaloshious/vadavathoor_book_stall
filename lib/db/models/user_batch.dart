@@ -6,7 +6,7 @@ part 'user_batch.g.dart';
 @HiveType(typeId: DBItemHiveType.userBatch)
 class UserBatchModel {
   @HiveField(0)
-  final int batchID;
+  final String batchID;
 
   @HiveField(1)
   String batchName;
@@ -15,16 +15,16 @@ class UserBatchModel {
   int status;
 
   @HiveField(3)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(4)
-  final int createdBy;
+  String createdBy;
 
   @HiveField(5)
   int modifiedDate;
 
   @HiveField(6)
-  int modifiedBy;
+  String modifiedBy;
 
   Map<String, dynamic> toJson() {
     return {

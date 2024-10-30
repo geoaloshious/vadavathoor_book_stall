@@ -12,16 +12,16 @@ class StationaryItemModel {
   String itemName;
 
   @HiveField(2)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(3)
-  final int createdBy;
+  String createdBy;
 
   @HiveField(4)
   int modifiedDate;
 
   @HiveField(5)
-  int modifiedBy;
+  String modifiedBy;
 
   @HiveField(6)
   int status;

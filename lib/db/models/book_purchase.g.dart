@@ -24,10 +24,10 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       quantityLeft: fields[5] as int,
       bookPrice: fields[3] as double,
       createdDate: fields[6] as int,
-      createdBy: fields[7] as int,
+      createdBy: fields[7] as String,
       modifiedDate: fields[8] as int,
-      modifiedBy: fields[9] as int,
-      deleted: fields[10] as bool,
+      modifiedBy: fields[9] as String,
+      status: fields[10] as int,
     );
   }
 
@@ -56,7 +56,7 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       ..writeByte(9)
       ..write(obj.modifiedBy)
       ..writeByte(10)
-      ..write(obj.deleted);
+      ..write(obj.status);
   }
 
   @override

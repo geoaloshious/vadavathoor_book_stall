@@ -77,7 +77,7 @@ class _UserProfileState extends State<UserProfileWidget> {
     return Consumer<UserProvider>(builder: (cntx, user, child) {
       return PopupMenuButton<int>(
           padding: const EdgeInsets.all(5),
-          icon: user.user.userID == 0
+          icon: user.user.userID == ''
               ? const Icon(Icons.account_circle, size: 35)
               : Container(
                   width: 35,
@@ -88,10 +88,10 @@ class _UserProfileState extends State<UserProfileWidget> {
                   child: Text(user.user.name[0],
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white))),
-          tooltip: user.user.userID == 0 ? 'Guest user' : user.user.name,
+          tooltip: user.user.userID == '' ? 'Guest user' : user.user.name,
           onSelected: onSelected,
           itemBuilder: (context) => [
-                if (user.user.userID == 0)
+                if (user.user.userID == '')
                   const PopupMenuItem(value: 1, child: Text('Log In'))
                 else
                   const PopupMenuItem(value: 2, child: Text('Log Out'))

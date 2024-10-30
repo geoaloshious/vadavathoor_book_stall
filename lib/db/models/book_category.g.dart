@@ -20,9 +20,9 @@ class BookCategoryModelAdapter extends TypeAdapter<BookCategoryModel> {
       categoryID: fields[0] as String,
       categoryName: fields[1] as String,
       createdDate: fields[2] as int,
-      createdBy: fields[3] as int,
+      createdBy: fields[3] as String,
       modifiedDate: fields[4] as int,
-      modifiedBy: fields[5] as int,
+      modifiedBy: fields[5] as String,
       status: fields[6] as int,
     );
   }

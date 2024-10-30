@@ -24,16 +24,16 @@ class StationaryPurchaseModel {
   int quantityLeft;
 
   @HiveField(6)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(7)
-  final int createdBy;
+  String createdBy;
 
   @HiveField(8)
   int modifiedDate;
 
   @HiveField(9)
-  int modifiedBy;
+  String modifiedBy;
 
   @HiveField(10)
   int status;

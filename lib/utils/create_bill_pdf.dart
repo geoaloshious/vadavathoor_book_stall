@@ -382,7 +382,7 @@ void saveAndOpenPDF(String saleID) async {
           .firstWhere((u) => u.batchID == customer.batchID)
           .batchName,
       salesPerson: salesPerson.name,
-      billNo: saleID,
+      billNo: sale.billNo,
       paymentMode: sale.paymentMode,
       date: formatTimestamp(timestamp: sale.createdDate));
 

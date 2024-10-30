@@ -84,7 +84,7 @@ class _UsersState extends State<UsersWidget> {
     );
   }
 
-  onPressDelete(int selectedUserID) {
+  onPressDelete(String selectedUserID) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -140,7 +140,7 @@ class _UsersState extends State<UsersWidget> {
           padding: const EdgeInsets.all(16.0),
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              if (loggedInUser.user.userID != 0)
+              if (loggedInUser.user.userID != '')
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueGrey),

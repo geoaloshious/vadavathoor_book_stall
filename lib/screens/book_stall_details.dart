@@ -58,7 +58,7 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
-      final loggedIn = user.user.userID != 0;
+      final loggedIn = user.user.userID != '';
 
       return Padding(
           padding: const EdgeInsets.all(16.0),

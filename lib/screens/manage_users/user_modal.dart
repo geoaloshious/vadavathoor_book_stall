@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
@@ -30,7 +28,7 @@ class _UserModalState extends State<UsermodalWidget> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
-  int _batchID = 0;
+  String _batchID = '';
   String _role = UserRole.normal.toString();
   String _status = UserStatus.enabled.toString();
   Map<String, bool> inputErrors = {};
@@ -59,7 +57,7 @@ class _UserModalState extends State<UsermodalWidget> {
       tempInputErrors['password'] = true;
     }
 
-    if (_batchID == 0) {
+    if (_batchID == '') {
       tempInputErrors['batch'] = true;
     }
 
@@ -67,7 +65,7 @@ class _UserModalState extends State<UsermodalWidget> {
       final fn = widget.mode == UserModalMode.add ? addUser : editUser;
 
       final res = await fn(UserModel(
-          userID: widget.data?.userID ?? 0,
+          userID: widget.data?.userID ?? '',
           name: name,
           username: username,
           password: password,
@@ -75,9 +73,10 @@ class _UserModalState extends State<UsermodalWidget> {
           batchID: _batchID,
           status: int.tryParse(_status) ?? UserStatus.enabled,
           createdDate: 0,
-          createdBy: 0,
+          createdBy: '',
           modifiedDate: 0,
-          modifiedBy: 0));
+          modifiedBy: '',
+          notes: ''));
 
       if (res['error'] != null) {
         setState(() {
@@ -169,7 +168,7 @@ class _UserModalState extends State<UsermodalWidget> {
                   hasError: inputErrors['batch'] == true,
                   onValueChanged: (value) {
                     setState(() {
-                      _batchID = int.tryParse(value) ?? 0;
+                      _batchID = value;
                       inputErrors = {...inputErrors, 'batch': false};
                     });
                   }))

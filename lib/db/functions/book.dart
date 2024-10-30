@@ -4,6 +4,7 @@ import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -57,8 +58,8 @@ Future<void> addBook(
       bookCategoryID: bookCategoryID,
       createdDate: currentTS,
       createdBy: loggedInUser,
-      modifiedDate: 0,
-      modifiedBy: 0,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
       status: DBRowStatus.active));
 }
 
@@ -110,8 +111,8 @@ Future<Map<String, String>> deleteBook(String bookID) async {
   final purchaseBox = await getBookPurchaseBox();
   final loggedInUser = await getLoggedInUserID();
 
-  final purchases =
-      purchaseBox.values.where((p) => p.bookID == bookID && !p.deleted);
+  final purchases = purchaseBox.values
+      .where((p) => p.bookID == bookID && p.status == DBRowStatus.active);
 
   if (purchases.isNotEmpty) {
     return {
@@ -156,9 +157,19 @@ Future<List<BookListItemModel>> getBookList() async {
     final publisher =
         publishers.where((i) => i.publisherID == book.publisherID).firstOrNull;
     final bookCategory = bookCategories
-        .where((i) => i.categoryID == book.bookCategoryID)
-        .firstOrNull;
-    final prcs = purchases.where((p) => p.bookID == book.bookID && !p.deleted);
+            .where((i) => i.categoryID == book.bookCategoryID)
+            .firstOrNull ??
+        BookCategoryModel(
+            categoryID: '',
+            categoryName: '',
+            createdDate: 0,
+            createdBy: '',
+            modifiedDate: 0,
+            modifiedBy: '',
+            status: 1);
+
+    final prcs = purchases.where(
+        (p) => p.bookID == book.bookID && p.status == DBRowStatus.active);
 
     int balanceStock = 0;
     for (BookPurchaseModel p in prcs) {
@@ -167,7 +178,6 @@ Future<List<BookListItemModel>> getBookList() async {
 
     if (author != null &&
         publisher != null &&
-        bookCategory != null &&
         book.status == DBRowStatus.active) {
       joinedData.add(BookListItemModel(
           bookID: book.bookID,

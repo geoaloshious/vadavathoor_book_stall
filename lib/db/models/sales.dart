@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../constants.dart';
@@ -28,6 +30,14 @@ class SaleItemPurchaseVariantModel {
     };
   }
 
+  factory SaleItemPurchaseVariantModel.fromJson(
+      Map<String, dynamic> jsonValue) {
+    return SaleItemPurchaseVariantModel(
+        purchaseID: jsonValue['purchaseID'],
+        soldPrice: jsonValue['soldPrice'],
+        quantity: jsonValue['quantity']);
+  }
+
   SaleItemPurchaseVariantModel clone() {
     return SaleItemPurchaseVariantModel(
         purchaseID: purchaseID, soldPrice: soldPrice, quantity: quantity);
@@ -50,8 +60,17 @@ class SaleItemModel {
   Map<String, dynamic> toJson() {
     return {
       'itemID': itemID,
-      'purchaseVariants': purchaseVariants.map((b) => b.toJson()).toString()
+      'purchaseVariants':
+          jsonEncode(purchaseVariants.map((b) => b.toJson()).toList())
     };
+  }
+
+  factory SaleItemModel.fromJson(Map<String, dynamic> jsonValue) {
+    return SaleItemModel(
+        itemID: jsonValue['itemID'],
+        purchaseVariants: List<SaleItemPurchaseVariantModel>.from(
+            jsonDecode(jsonValue['purchaseVariants'])
+                .map((item) => SaleItemPurchaseVariantModel.fromJson(item))));
   }
 
   SaleItemModel clone() {
@@ -69,38 +88,42 @@ class SaleModel {
   final String saleID;
 
   @HiveField(1)
-  List<SaleItemModel> books;
+  String billNo;
 
   @HiveField(2)
-  List<SaleItemModel> stationaryItems;
+  List<SaleItemModel> books;
 
   @HiveField(3)
-  double grandTotal;
+  List<SaleItemModel> stationaryItems;
 
   @HiveField(4)
-  int customerID;
+  double grandTotal;
 
   @HiveField(5)
-  String paymentMode;
+  String customerID;
 
   @HiveField(6)
-  final int createdDate;
+  String paymentMode;
 
   @HiveField(7)
-  final int createdBy;
+  int createdDate;
 
   @HiveField(8)
-  int modifiedDate;
+  String createdBy;
 
   @HiveField(9)
-  int modifiedBy;
+  int modifiedDate;
 
   @HiveField(10)
+  String modifiedBy;
+
+  @HiveField(11)
   int status;
 
   Map<String, dynamic> toJson() {
     return {
       'saleID': saleID,
+      'billNo': billNo,
       'grandTotal': grandTotal,
       'customerID': customerID,
       'paymentMode': paymentMode,
@@ -109,8 +132,9 @@ class SaleModel {
       'modifiedDate': modifiedDate,
       'modifiedBy': modifiedBy,
       'status': status,
-      'books': books.map((b) => b.toJson()).toString(),
-      'stationaryItems': stationaryItems.map((b) => b.toJson()).toString()
+      'books': jsonEncode(books.map((b) => b.toJson()).toList()),
+      'stationaryItems':
+          jsonEncode(stationaryItems.map((b) => b.toJson()).toList())
     };
   }
 
@@ -126,6 +150,7 @@ class SaleModel {
         modifiedDate: modifiedDate,
         modifiedBy: modifiedBy,
         status: status,
+        billNo: billNo,
         saleID: saleID);
   }
 
@@ -140,5 +165,6 @@ class SaleModel {
       required this.modifiedDate,
       required this.modifiedBy,
       required this.status,
+      required this.billNo,
       required this.saleID});
 }

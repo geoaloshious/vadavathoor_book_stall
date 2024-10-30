@@ -18,7 +18,7 @@ class LoginHistoryModelAdapter extends TypeAdapter<LoginHistoryModel> {
     };
     return LoginHistoryModel(
       id: fields[0] as String,
-      userID: fields[1] as int,
+      userID: fields[1] as String,
       logInTime: fields[2] as int,
       logOutTime: fields[3] as int,
     );

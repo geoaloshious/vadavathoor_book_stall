@@ -23,9 +23,9 @@ class BookModelAdapter extends TypeAdapter<BookModel> {
       publisherID: fields[3] as String,
       bookCategoryID: fields[4] as String,
       createdDate: fields[5] as int,
-      createdBy: fields[6] as int,
+      createdBy: fields[6] as String,
       modifiedDate: fields[7] as int,
-      modifiedBy: fields[8] as int,
+      modifiedBy: fields[8] as String,
       status: fields[9] as int,
     );
   }
