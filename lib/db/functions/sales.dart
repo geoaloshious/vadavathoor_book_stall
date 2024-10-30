@@ -79,6 +79,7 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
 }
 
 Future<void> addSale(
+    String billNo,
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
@@ -96,7 +97,8 @@ Future<void> addSale(
   customerID = tempRes['customerID']!;
 
   saleBox.add(SaleModel(
-      saleID: '${saleBox.values.length + 1}',
+      saleID: generateID(),
+      billNo: billNo,
       books: booksToCheckout,
       stationaryItems: stationaryItemsToCheckout,
       grandTotal: grandTotal,
@@ -141,6 +143,7 @@ Future<void> addSale(
 
 Future<void> editSale(
     String saleID,
+    String billNo,
     List<SaleItemModel> booksToCheckout,
     List<SaleItemModel> stationaryItemsToCheckout,
     double grandTotal,
@@ -189,6 +192,7 @@ Future<void> editSale(
       await updateQty(
           existingSale.stationaryItems, siPurchaseBox, siPurchaseKeys);
 
+      existingSale.billNo = billNo;
       existingSale.books = booksToCheckout;
       existingSale.stationaryItems = stationaryItemsToCheckout;
       existingSale.grandTotal = grandTotal;
@@ -278,6 +282,16 @@ Future<SaleModel?> getSaleData(String saleID) async {
   return data?.clone();
 }
 
+Future<String> getNewSaleBillNo() async {
+  final sales = (await getSalesBox()).values;
+  if (sales.isEmpty) {
+    return '1';
+  }
+
+  int lastBillNo = int.tryParse(sales.last.billNo) ?? 0;
+  return (lastBillNo + 1).toString();
+}
+
 Future<List<SaleListItemModel>> getSalesList() async {
   final sales = (await getSalesBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
@@ -324,6 +338,7 @@ Future<List<SaleListItemModel>> getSalesList() async {
 
       joinedData.add(SaleListItemModel(
           saleID: sale.saleID,
+          billNo: sale.billNo,
           customerName:
               users.values.firstWhere((u) => u.userID == sale.customerID).name,
           books: bookNames.join('\n'),

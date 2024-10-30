@@ -88,38 +88,42 @@ class SaleModel {
   final String saleID;
 
   @HiveField(1)
-  List<SaleItemModel> books;
+  String billNo;
 
   @HiveField(2)
-  List<SaleItemModel> stationaryItems;
+  List<SaleItemModel> books;
 
   @HiveField(3)
-  double grandTotal;
+  List<SaleItemModel> stationaryItems;
 
   @HiveField(4)
-  String customerID;
+  double grandTotal;
 
   @HiveField(5)
-  String paymentMode;
+  String customerID;
 
   @HiveField(6)
-  int createdDate;
+  String paymentMode;
 
   @HiveField(7)
-  String createdBy;
+  int createdDate;
 
   @HiveField(8)
-  int modifiedDate;
+  String createdBy;
 
   @HiveField(9)
-  String modifiedBy;
+  int modifiedDate;
 
   @HiveField(10)
+  String modifiedBy;
+
+  @HiveField(11)
   int status;
 
   Map<String, dynamic> toJson() {
     return {
       'saleID': saleID,
+      'billNo': billNo,
       'grandTotal': grandTotal,
       'customerID': customerID,
       'paymentMode': paymentMode,
@@ -146,6 +150,7 @@ class SaleModel {
         modifiedDate: modifiedDate,
         modifiedBy: modifiedBy,
         status: status,
+        billNo: billNo,
         saleID: saleID);
   }
 
@@ -160,5 +165,6 @@ class SaleModel {
       required this.modifiedDate,
       required this.modifiedBy,
       required this.status,
+      required this.billNo,
       required this.saleID});
 }

@@ -21,6 +21,7 @@ class PurchaseListItemModel {
 
 class SaleListItemModel {
   final String saleID;
+  final String billNo;
   final String customerName;
   final String books;
   final String stationaryItems;
@@ -31,6 +32,7 @@ class SaleListItemModel {
 
   SaleListItemModel(
       {required this.saleID,
+      required this.billNo,
       required this.customerName,
       required this.books,
       required this.stationaryItems,

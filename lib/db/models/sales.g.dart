@@ -96,16 +96,17 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SaleModel(
-      books: (fields[1] as List).cast<SaleItemModel>(),
-      stationaryItems: (fields[2] as List).cast<SaleItemModel>(),
-      grandTotal: fields[3] as double,
-      customerID: fields[4] as String,
-      paymentMode: fields[5] as String,
-      createdDate: fields[6] as int,
-      createdBy: fields[7] as String,
-      modifiedDate: fields[8] as int,
-      modifiedBy: fields[9] as String,
-      status: fields[10] as int,
+      books: (fields[2] as List).cast<SaleItemModel>(),
+      stationaryItems: (fields[3] as List).cast<SaleItemModel>(),
+      grandTotal: fields[4] as double,
+      customerID: fields[5] as String,
+      paymentMode: fields[6] as String,
+      createdDate: fields[7] as int,
+      createdBy: fields[8] as String,
+      modifiedDate: fields[9] as int,
+      modifiedBy: fields[10] as String,
+      status: fields[11] as int,
+      billNo: fields[1] as String,
       saleID: fields[0] as String,
     );
   }
@@ -113,28 +114,30 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
   @override
   void write(BinaryWriter writer, SaleModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.saleID)
       ..writeByte(1)
-      ..write(obj.books)
+      ..write(obj.billNo)
       ..writeByte(2)
-      ..write(obj.stationaryItems)
+      ..write(obj.books)
       ..writeByte(3)
-      ..write(obj.grandTotal)
+      ..write(obj.stationaryItems)
       ..writeByte(4)
-      ..write(obj.customerID)
+      ..write(obj.grandTotal)
       ..writeByte(5)
-      ..write(obj.paymentMode)
+      ..write(obj.customerID)
       ..writeByte(6)
-      ..write(obj.createdDate)
+      ..write(obj.paymentMode)
       ..writeByte(7)
-      ..write(obj.createdBy)
+      ..write(obj.createdDate)
       ..writeByte(8)
-      ..write(obj.modifiedDate)
+      ..write(obj.createdBy)
       ..writeByte(9)
-      ..write(obj.modifiedBy)
+      ..write(obj.modifiedDate)
       ..writeByte(10)
+      ..write(obj.modifiedBy)
+      ..writeByte(11)
       ..write(obj.status);
   }
 

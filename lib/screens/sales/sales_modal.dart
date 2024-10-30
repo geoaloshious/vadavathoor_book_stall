@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:vadavathoor_book_stall/classes/sales.dart';
 import 'package:vadavathoor_book_stall/components/drop_down.dart';
 import 'package:vadavathoor_book_stall/components/modal_close_confirmation.dart';
@@ -27,6 +29,7 @@ class SaleModalWidget extends StatefulWidget {
 }
 
 class _SaleModalState extends State<SaleModalWidget> {
+  TextEditingController _billNoController = TextEditingController();
   final _customerNameController = TextEditingController();
   final _customerBatchController = TextEditingController();
 
@@ -54,10 +57,15 @@ class _SaleModalState extends State<SaleModalWidget> {
   bool didSetData = false;
 
   Future<void> _handleSubmit() async {
+    final billNo = _billNoController.text.trim();
     final customerName = _customerNameController.text.trim();
     final customerBatch = _customerBatchController.text.trim();
 
     Map<String, bool> tempInputErrors = {};
+
+    if (billNo == '') {
+      tempInputErrors['billNo'] = true;
+    }
 
     if (newUser) {
       if (customerName == '') {
@@ -123,6 +131,7 @@ class _SaleModalState extends State<SaleModalWidget> {
       if (validBooks.isNotEmpty || validStationaryItems.isNotEmpty) {
         if (widget.saleID == '') {
           await addSale(
+              billNo,
               validBooks,
               validStationaryItems,
               grandTotal,
@@ -134,6 +143,7 @@ class _SaleModalState extends State<SaleModalWidget> {
         } else {
           await editSale(
               widget.saleID,
+              billNo,
               validBooks,
               validStationaryItems,
               grandTotal,
@@ -240,10 +250,12 @@ class _SaleModalState extends State<SaleModalWidget> {
     String tempPaymentMode = PaymentModes.cash;
     double tempGrandTotal = 0;
     String tempCustomerID = '';
+    String tempBillNo = '';
 
     if (widget.saleID != '') {
       final temp = await getSaleData(widget.saleID);
       if (temp != null) {
+        tempBillNo = temp.billNo;
         tempBooksCheckout = temp.books;
         tempSIsCheckout = temp.stationaryItems;
         tempPaymentMode = temp.paymentMode;
@@ -256,6 +268,8 @@ class _SaleModalState extends State<SaleModalWidget> {
           }
         }
       }
+    } else {
+      tempBillNo = await getNewSaleBillNo();
     }
 
     final tempBookPurchases = await getBookWithPurchases(savedPurchaseIDs);
@@ -279,6 +293,8 @@ class _SaleModalState extends State<SaleModalWidget> {
       stationaryItemsToCheckout = tempSIsCheckout;
       _paymentMode = tempPaymentMode;
       grandTotal = tempGrandTotal;
+
+      _billNoController = TextEditingController(text: tempBillNo);
 
       didSetData = true;
     });
@@ -310,6 +326,35 @@ class _SaleModalState extends State<SaleModalWidget> {
             onPressed: () {
               showModalCloseConfirmation(context);
             })
+      ]),
+      const SizedBox(height: 20.0),
+      Row(children: [
+        const Text('Bill number', style: TextStyle(fontSize: 14)),
+        const SizedBox(width: 10),
+        SizedBox(
+          width: 300,
+          child: TextField(
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                    borderSide: inputErrors['billNo'] == true
+                        ? const BorderSide(color: Colors.red, width: 2)
+                        : const BorderSide(color: Colors.grey, width: 1)),
+                focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blueGrey, width: 2)),
+                filled: true,
+                fillColor: Colors.white,
+                hoverColor: Colors.transparent,
+              ),
+              controller: _billNoController,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: (value) {
+                setState(() {
+                  inputErrors = {...inputErrors, 'billNo': false};
+                });
+              }),
+        )
       ]),
       const SizedBox(height: 20.0),
       Container(

@@ -69,6 +69,7 @@ class _SaleState extends State<SaleWidget> {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
+      Expanded(child: Text(widget.data.billNo)),
       Expanded(child: Text(widget.data.customerName)),
       Expanded(child: Text(widget.data.books)),
       Expanded(child: Text(widget.data.stationaryItems)),

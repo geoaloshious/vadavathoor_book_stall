@@ -11,6 +11,7 @@ downSyncSales(
       for (int key in box.keys) {
         var existingData = box.get(key);
         if (existingData != null && existingData.saleID == itm['saleID']) {
+          existingData.billNo = itm['billNo'];
           existingData.books = List<SaleItemModel>.from(jsonDecode(itm['books'])
               .map((item) => SaleItemModel.fromJson(item)));
           existingData.stationaryItems = List<SaleItemModel>.from(
@@ -32,6 +33,7 @@ downSyncSales(
     } else {
       await box.add(SaleModel(
           saleID: itm['saleID'],
+          billNo: itm['billNo'],
           books: List<SaleItemModel>.from(jsonDecode(itm['books'])
               .map((item) => SaleItemModel.fromJson(item))),
           stationaryItems: List<SaleItemModel>.from(
