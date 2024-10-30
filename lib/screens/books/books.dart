@@ -14,6 +14,19 @@ class BooksWidget extends StatefulWidget {
 
 class _BooksState extends State<BooksWidget> {
   List<BookListItemModel> books = [];
+  List<BookListItemModel> filteredBooks = [];
+
+  int currentPage = 0;
+  final int itemsPerPage = 50;
+
+  int sortColumnIndex = 0;
+  Map<int, bool> sortOrder = {
+    0: true,
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+  };
 
   void onPressAddOrEdit({BookListItemModel? data}) {
     showDialog(
@@ -77,10 +90,48 @@ class _BooksState extends State<BooksWidget> {
         });
   }
 
+  void sortBooks(int columnName) {
+    setState(() {
+      sortOrder[columnName] = !sortOrder[columnName]!;
+      bool ascending = sortOrder[columnName]!;
+
+      switch (columnName) {
+        case 0:
+          filteredBooks.sort((a, b) => ascending
+              ? a.bookName.compareTo(b.bookName)
+              : b.bookName.compareTo(a.bookName));
+          break;
+        case 1:
+          filteredBooks.sort((a, b) => ascending
+              ? a.authorName.compareTo(b.authorName)
+              : b.authorName.compareTo(a.authorName));
+          break;
+        case 2:
+          filteredBooks.sort((a, b) => ascending
+              ? a.publisherName.compareTo(b.publisherName)
+              : b.publisherName.compareTo(a.publisherName));
+          break;
+        case 3:
+          filteredBooks.sort((a, b) => ascending
+              ? a.categoryName.compareTo(b.categoryName)
+              : b.categoryName.compareTo(a.categoryName));
+          break;
+        case 4:
+          filteredBooks.sort((a, b) => ascending
+              ? a.balanceStock.compareTo(b.balanceStock)
+              : b.balanceStock.compareTo(a.balanceStock));
+          break;
+      }
+
+      sortColumnIndex = columnName;
+    });
+  }
+
   void setData() async {
     final temp = await getBookList();
     setState(() {
       books = temp;
+      filteredBooks = books;
     });
   }
 
@@ -95,46 +146,101 @@ class _BooksState extends State<BooksWidget> {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
       final loggedIn = user.user.userID != '';
 
+      final totalPages = (filteredBooks.length / itemsPerPage).ceil();
+      final startIndex = currentPage * itemsPerPage;
+      final endIndex = startIndex + itemsPerPage < filteredBooks.length
+          ? startIndex + itemsPerPage
+          : filteredBooks.length;
+
       return Stack(children: [
         Container(
           padding: const EdgeInsets.only(left: 10, right: 10),
           width: double.infinity,
           child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: DataTable(
-                columns: [
-                  const DataColumn(label: Text('Book')),
-                  const DataColumn(label: Text('Author')),
-                  const DataColumn(label: Text('Publisher')),
-                  const DataColumn(label: Text('Category')),
-                  const DataColumn(label: Text('Balance Stock')),
-                  if (loggedIn) const DataColumn(label: Text(''))
+              scrollDirection: Axis.vertical,
+              child: Column(
+                children: [
+                  // Pagination controls
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: currentPage > 0
+                            ? () {
+                                setState(() {
+                                  currentPage--;
+                                });
+                              }
+                            : null,
+                      ),
+                      Text('Page ${currentPage + 1} of ${totalPages}',
+                          style: const TextStyle(fontSize: 14)),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_forward),
+                        onPressed: currentPage < totalPages - 1
+                            ? () {
+                                setState(() {
+                                  currentPage++;
+                                });
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                  DataTable(
+                      sortColumnIndex: sortColumnIndex,
+                      sortAscending: sortOrder[sortColumnIndex]!,
+                      columns: [
+                        DataColumn(
+                          label: const Text('Book'),
+                          onSort: (columnIndex, _) => sortBooks(0),
+                        ),
+                        DataColumn(
+                          label: const Text('Author'),
+                          onSort: (columnIndex, _) => sortBooks(1),
+                        ),
+                        DataColumn(
+                          label: const Text('Publisher'),
+                          onSort: (columnIndex, _) => sortBooks(2),
+                        ),
+                        DataColumn(
+                          label: const Text('Category'),
+                          onSort: (columnIndex, _) => sortBooks(3),
+                        ),
+                        DataColumn(
+                          label: const Text('Balance Stock'),
+                          onSort: (columnIndex, _) => sortBooks(4),
+                        ),
+                        if (loggedIn) const DataColumn(label: Text(''))
+                      ],
+                      rows: filteredBooks
+                          .sublist(startIndex, endIndex)
+                          .map((book) => DataRow(cells: [
+                                DataCell(Text(book.bookName)),
+                                DataCell(Text(book.authorName)),
+                                DataCell(Text(book.publisherName)),
+                                DataCell(Text(book.categoryName)),
+                                DataCell(Text(book.balanceStock.toString())),
+                                if (loggedIn)
+                                  DataCell(Row(children: [
+                                    IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        tooltip: 'Edit',
+                                        onPressed: () {
+                                          onPressAddOrEdit(data: book);
+                                        }),
+                                    IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        tooltip: 'Delete',
+                                        onPressed: () {
+                                          onPressDelete(book.bookID);
+                                        })
+                                  ]))
+                              ]))
+                          .toList()),
                 ],
-                rows: books
-                    .map((book) => DataRow(cells: [
-                          DataCell(Text(book.bookName)),
-                          DataCell(Text(book.authorName)),
-                          DataCell(Text(book.publisherName)),
-                          DataCell(Text(book.categoryName)),
-                          DataCell(Text(book.balanceStock.toString())),
-                          if (loggedIn)
-                            DataCell(Row(children: [
-                              IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  tooltip: 'Edit',
-                                  onPressed: () {
-                                    onPressAddOrEdit(data: book);
-                                  }),
-                              IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  tooltip: 'Delete',
-                                  onPressed: () {
-                                    onPressDelete(book.bookID);
-                                  })
-                            ]))
-                        ]))
-                    .toList()),
-          ),
+              )),
         ),
         if (loggedIn)
           Positioned(
