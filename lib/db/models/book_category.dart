@@ -12,10 +12,10 @@ class BookCategoryModel {
   String categoryName;
 
   @HiveField(2)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(3)
-  final String createdBy;
+  String createdBy;
 
   @HiveField(4)
   int modifiedDate;

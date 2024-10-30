@@ -15,10 +15,10 @@ class UserBatchModel {
   int status;
 
   @HiveField(3)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(4)
-  final String createdBy;
+  String createdBy;
 
   @HiveField(5)
   int modifiedDate;

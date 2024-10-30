@@ -128,6 +128,7 @@ Future<void> deleteUser(String userID) async {
   }
 }
 
+/*
 Future<void> addDeveloperUserIfEmpty() async {
   final box = await getUsersBox();
   if (box.values.isEmpty) {
@@ -147,6 +148,7 @@ Future<void> addDeveloperUserIfEmpty() async {
         notes: ''));
   }
 }
+*/
 
 Future<Map<String, String>> login(
     BuildContext context, String username, String password) async {

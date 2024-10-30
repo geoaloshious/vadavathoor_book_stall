@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../constants.dart';
@@ -28,6 +30,14 @@ class SaleItemPurchaseVariantModel {
     };
   }
 
+  factory SaleItemPurchaseVariantModel.fromJson(
+      Map<String, dynamic> jsonValue) {
+    return SaleItemPurchaseVariantModel(
+        purchaseID: jsonValue['purchaseID'],
+        soldPrice: jsonValue['soldPrice'],
+        quantity: jsonValue['quantity']);
+  }
+
   SaleItemPurchaseVariantModel clone() {
     return SaleItemPurchaseVariantModel(
         purchaseID: purchaseID, soldPrice: soldPrice, quantity: quantity);
@@ -50,8 +60,17 @@ class SaleItemModel {
   Map<String, dynamic> toJson() {
     return {
       'itemID': itemID,
-      'purchaseVariants': purchaseVariants.map((b) => b.toJson()).toString()
+      'purchaseVariants':
+          jsonEncode(purchaseVariants.map((b) => b.toJson()).toList())
     };
+  }
+
+  factory SaleItemModel.fromJson(Map<String, dynamic> jsonValue) {
+    return SaleItemModel(
+        itemID: jsonValue['itemID'],
+        purchaseVariants: List<SaleItemPurchaseVariantModel>.from(
+            jsonDecode(jsonValue['purchaseVariants'])
+                .map((item) => SaleItemPurchaseVariantModel.fromJson(item))));
   }
 
   SaleItemModel clone() {
@@ -84,10 +103,10 @@ class SaleModel {
   String paymentMode;
 
   @HiveField(6)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(7)
-  final String createdBy;
+  String createdBy;
 
   @HiveField(8)
   int modifiedDate;
@@ -109,8 +128,9 @@ class SaleModel {
       'modifiedDate': modifiedDate,
       'modifiedBy': modifiedBy,
       'status': status,
-      'books': books.map((b) => b.toJson()).toString(),
-      'stationaryItems': stationaryItems.map((b) => b.toJson()).toString()
+      'books': jsonEncode(books.map((b) => b.toJson()).toList()),
+      'stationaryItems':
+          jsonEncode(stationaryItems.map((b) => b.toJson()).toList())
     };
   }
 

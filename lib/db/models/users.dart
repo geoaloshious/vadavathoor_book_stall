@@ -38,13 +38,13 @@ class UserModel {
   String batchID;
 
   @HiveField(7)
-  int status;
+  String notes;
 
   @HiveField(8)
-  final int createdDate;
+  int createdDate;
 
   @HiveField(9)
-  final String createdBy;
+  String createdBy;
 
   @HiveField(10)
   int modifiedDate;
@@ -53,7 +53,7 @@ class UserModel {
   String modifiedBy;
 
   @HiveField(12)
-  String notes;
+  int status;
 
   Map<String, dynamic> toJson() {
     return {

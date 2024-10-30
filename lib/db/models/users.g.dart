@@ -23,8 +23,8 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       password: fields[4] as String,
       role: fields[5] as int,
       batchID: fields[6] as String,
-      status: fields[7] as int,
-      notes: fields[12] as String,
+      status: fields[12] as int,
+      notes: fields[7] as String,
       createdDate: fields[8] as int,
       createdBy: fields[9] as String,
       modifiedDate: fields[10] as int,
@@ -49,7 +49,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(6)
       ..write(obj.batchID)
       ..writeByte(7)
-      ..write(obj.status)
+      ..write(obj.notes)
       ..writeByte(8)
       ..write(obj.createdDate)
       ..writeByte(9)
@@ -59,7 +59,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(11)
       ..write(obj.modifiedBy)
       ..writeByte(12)
-      ..write(obj.notes);
+      ..write(obj.status);
   }
 
   @override

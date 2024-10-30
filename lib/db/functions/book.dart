@@ -4,6 +4,7 @@ import 'package:vadavathoor_book_stall/db/functions/book_author.dart';
 import 'package:vadavathoor_book_stall/db/functions/book_purchase.dart';
 import 'package:vadavathoor_book_stall/db/functions/users.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
+import 'package:vadavathoor_book_stall/db/models/book_category.dart';
 import 'package:vadavathoor_book_stall/db/models/book_purchase.dart';
 import 'package:vadavathoor_book_stall/utils/utils.dart';
 
@@ -156,8 +157,17 @@ Future<List<BookListItemModel>> getBookList() async {
     final publisher =
         publishers.where((i) => i.publisherID == book.publisherID).firstOrNull;
     final bookCategory = bookCategories
-        .where((i) => i.categoryID == book.bookCategoryID)
-        .firstOrNull;
+            .where((i) => i.categoryID == book.bookCategoryID)
+            .firstOrNull ??
+        BookCategoryModel(
+            categoryID: '',
+            categoryName: '',
+            createdDate: 0,
+            createdBy: '',
+            modifiedDate: 0,
+            modifiedBy: '',
+            status: 1);
+
     final prcs = purchases.where(
         (p) => p.bookID == book.bookID && p.status == DBRowStatus.active);
 
@@ -168,7 +178,6 @@ Future<List<BookListItemModel>> getBookList() async {
 
     if (author != null &&
         publisher != null &&
-        bookCategory != null &&
         book.status == DBRowStatus.active) {
       joinedData.add(BookListItemModel(
           bookID: book.bookID,

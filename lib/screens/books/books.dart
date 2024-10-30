@@ -99,39 +99,42 @@ class _BooksState extends State<BooksWidget> {
         Container(
           padding: const EdgeInsets.only(left: 10, right: 10),
           width: double.infinity,
-          child: DataTable(
-              columns: [
-                const DataColumn(label: Text('Book')),
-                const DataColumn(label: Text('Author')),
-                const DataColumn(label: Text('Publisher')),
-                const DataColumn(label: Text('Category')),
-                const DataColumn(label: Text('Balance Stock')),
-                if (loggedIn) const DataColumn(label: Text(''))
-              ],
-              rows: books
-                  .map((book) => DataRow(cells: [
-                        DataCell(Text(book.bookName)),
-                        DataCell(Text(book.authorName)),
-                        DataCell(Text(book.publisherName)),
-                        DataCell(Text(book.categoryName)),
-                        DataCell(Text(book.balanceStock.toString())),
-                        if (loggedIn)
-                          DataCell(Row(children: [
-                            IconButton(
-                                icon: const Icon(Icons.edit),
-                                tooltip: 'Edit',
-                                onPressed: () {
-                                  onPressAddOrEdit(data: book);
-                                }),
-                            IconButton(
-                                icon: const Icon(Icons.delete),
-                                tooltip: 'Delete',
-                                onPressed: () {
-                                  onPressDelete(book.bookID);
-                                })
-                          ]))
-                      ]))
-                  .toList()),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: DataTable(
+                columns: [
+                  const DataColumn(label: Text('Book')),
+                  const DataColumn(label: Text('Author')),
+                  const DataColumn(label: Text('Publisher')),
+                  const DataColumn(label: Text('Category')),
+                  const DataColumn(label: Text('Balance Stock')),
+                  if (loggedIn) const DataColumn(label: Text(''))
+                ],
+                rows: books
+                    .map((book) => DataRow(cells: [
+                          DataCell(Text(book.bookName)),
+                          DataCell(Text(book.authorName)),
+                          DataCell(Text(book.publisherName)),
+                          DataCell(Text(book.categoryName)),
+                          DataCell(Text(book.balanceStock.toString())),
+                          if (loggedIn)
+                            DataCell(Row(children: [
+                              IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  tooltip: 'Edit',
+                                  onPressed: () {
+                                    onPressAddOrEdit(data: book);
+                                  }),
+                              IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  tooltip: 'Delete',
+                                  onPressed: () {
+                                    onPressDelete(book.bookID);
+                                  })
+                            ]))
+                        ]))
+                    .toList()),
+          ),
         ),
         if (loggedIn)
           Positioned(

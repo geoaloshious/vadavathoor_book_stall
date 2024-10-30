@@ -77,6 +77,7 @@ Future<void> initializeHiveDB() async {
   // await setBookStallDetailsIfEmpty();
 }
 
+/*
 Future<void> setBookStallDetailsIfEmpty() async {
   if ((await readMiscValue(MiscDBKeys.bookStallName)) == '') {
     await updateMiscValue(MiscDBKeys.bookStallName, 'St. Thomas Book Stall');
@@ -108,6 +109,7 @@ Future<void> setBookStallDetailsIfEmpty() async {
         MiscDBKeys.visitAgain, 'Thank you and please visit again');
   }
 }
+*/
 
 Future<Box<MiscModel>> getMiscBox() async {
   Box<MiscModel> box;
