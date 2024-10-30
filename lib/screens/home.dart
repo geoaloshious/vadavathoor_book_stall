@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didChangeDependencies();
 
     Future.delayed(const Duration(seconds: 1), () {
-      // syncData(context);
+      syncData(context);
     });
   }
 
