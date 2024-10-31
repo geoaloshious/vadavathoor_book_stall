@@ -57,18 +57,20 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
     }
 
     customerID = (await addUser(UserModel(
-            userID: '',
-            name: customerName,
-            username: '',
-            password: '',
-            role: UserRole.normal,
-            batchID: userBatchID,
-            status: UserStatus.enabled,
-            createdDate: 0,
-            createdBy: '',
-            modifiedDate: 0,
-            modifiedBy: '',
-            notes: '')))['userID'] ??
+          userID: '',
+          name: customerName,
+          username: '',
+          password: '',
+          role: UserRole.normal,
+          batchID: userBatchID,
+          emailID: '',
+          notes: '',
+          createdDate: 0,
+          createdBy: '',
+          modifiedDate: 0,
+          modifiedBy: '',
+          status: UserStatus.enabled,
+        )))['userID'] ??
         '';
   } else {
     userBatchID =

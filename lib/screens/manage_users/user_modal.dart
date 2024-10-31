@@ -26,6 +26,8 @@ class _UserModalState extends State<UsermodalWidget> {
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  TextEditingController _notesController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
 
   String _batchID = '';
   String _role = UserRole.normal.toString();
@@ -41,19 +43,13 @@ class _UserModalState extends State<UsermodalWidget> {
     final name = _firstNameController.text.trim();
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
+    final emailID = _emailController.text.trim();
+    final notes = _notesController.text.trim();
 
     Map<String, bool> tempInputErrors = {};
 
     if (name.isEmpty) {
       tempInputErrors['name'] = true;
-    }
-
-    if (username.isEmpty) {
-      tempInputErrors['username'] = true;
-    }
-
-    if (password.isEmpty) {
-      tempInputErrors['password'] = true;
     }
 
     if (_batchID == '') {
@@ -64,18 +60,20 @@ class _UserModalState extends State<UsermodalWidget> {
       final fn = widget.mode == UserModalMode.add ? addUser : editUser;
 
       final res = await fn(UserModel(
-          userID: widget.data?.userID ?? '',
-          name: name,
-          username: username,
-          password: password,
-          role: int.tryParse(_role) ?? UserRole.normal,
-          batchID: _batchID,
-          status: int.tryParse(_status) ?? UserStatus.enabled,
-          createdDate: 0,
-          createdBy: '',
-          modifiedDate: 0,
-          modifiedBy: '',
-          notes: ''));
+        userID: widget.data?.userID ?? '',
+        name: name,
+        username: username,
+        password: password,
+        role: int.tryParse(_role) ?? UserRole.normal,
+        batchID: _batchID,
+        emailID: emailID,
+        notes: notes,
+        createdDate: 0,
+        createdBy: '',
+        modifiedDate: 0,
+        modifiedBy: '',
+        status: int.tryParse(_status) ?? UserStatus.enabled,
+      ));
 
       if (res['error'] != null) {
         setState(() {
@@ -116,6 +114,8 @@ class _UserModalState extends State<UsermodalWidget> {
       _firstNameController = TextEditingController(text: widget.data!.name);
       _usernameController = TextEditingController(text: widget.data!.username);
       _passwordController = TextEditingController(text: widget.data!.password);
+      _emailController = TextEditingController(text: widget.data!.emailID);
+      _notesController = TextEditingController(text: widget.data!.notes);
     }
   }
 
@@ -180,41 +180,48 @@ class _UserModalState extends State<UsermodalWidget> {
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp(r'\s'))
               ],
-              decoration: InputDecoration(
-                labelText: 'Username',
-                border: const OutlineInputBorder(),
+              decoration: const InputDecoration(
+                labelText: 'Username (Optional)',
+                border: OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
-                    borderSide: inputErrors['username'] == true
-                        ? const BorderSide(color: Colors.red, width: 1)
-                        : const BorderSide(color: Colors.grey, width: 1)),
+                    borderSide: BorderSide(color: Colors.grey, width: 1)),
               ),
-              onChanged: (value) {
-                setState(() {
-                  inputErrors = {...inputErrors, 'username': false};
-                });
-              },
             ),
           ),
           const SizedBox(width: 16.0),
           Expanded(
               child: TextField(
-                  controller: _passwordController,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp(r'\s'))
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: const OutlineInputBorder(),
+            controller: _passwordController,
+            inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+            decoration: const InputDecoration(
+              labelText: 'Password (Optional)',
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 1)),
+            ),
+          ))
+        ]),
+        const SizedBox(height: 10.0),
+        Row(children: [
+          Expanded(
+              child: TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email ID (Optional)',
+                    border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                        borderSide: inputErrors['password'] == true
-                            ? const BorderSide(color: Colors.red, width: 1)
-                            : const BorderSide(color: Colors.grey, width: 1)),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      inputErrors = {...inputErrors, 'password': false};
-                    });
-                  }))
+                        borderSide: BorderSide(color: Colors.grey, width: 1)),
+                  ))),
+          const SizedBox(width: 16.0),
+          Expanded(
+              child: TextField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Notes (Optional)',
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey, width: 1)),
+                  )))
         ]),
         const SizedBox(height: 10),
         // Row(children: [

@@ -4,5 +4,6 @@ const baseURL =
 
 class EndPoints {
   static const upSync = '/upsync';
-  static const downSync = '/downSync';
+  static const downSync = '/downsync';
+  static const reportError = '/report-error';
 }

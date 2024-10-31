@@ -54,24 +54,26 @@ Future<Map<String, String>> addUser(UserModel userData) async {
   final loggedInUser = await getLoggedInUserID();
   final userID = generateID();
 
-  bool usernameNotTaken = box.values
-      .where((i) => i.username.isNotEmpty && i.username == userData.username)
-      .isEmpty;
+  bool usernameNotTaken = userData.username.isEmpty
+      ? true
+      : box.values.where((i) => i.username == userData.username).isEmpty;
 
   if (usernameNotTaken) {
     box.add(UserModel(
-        userID: userID,
-        name: userData.name,
-        username: userData.username,
-        password: userData.password,
-        role: userData.role,
-        batchID: userData.batchID,
-        status: userData.status,
-        createdDate: currentTS,
-        createdBy: loggedInUser,
-        modifiedDate: currentTS,
-        modifiedBy: loggedInUser,
-        notes: ''));
+      userID: userID,
+      name: userData.name,
+      username: userData.username,
+      password: userData.password,
+      role: userData.role,
+      batchID: userData.batchID,
+      emailID: '',
+      notes: '',
+      createdDate: currentTS,
+      createdBy: loggedInUser,
+      modifiedDate: currentTS,
+      modifiedBy: loggedInUser,
+      status: userData.status,
+    ));
   } else {
     return {'error': ''};
   }
@@ -82,10 +84,12 @@ Future<Map<String, String>> addUser(UserModel userData) async {
 Future<Map<String, String>> editUser(UserModel userData) async {
   final box = await getUsersBox();
   final loggedInUser = await getLoggedInUserID();
-  bool usernameNotTaken = box.values
-      .where(
-          (i) => i.username == userData.username && i.userID != userData.userID)
-      .isEmpty;
+  bool usernameNotTaken = userData.username.isEmpty
+      ? true
+      : box.values
+          .where((i) =>
+              i.username == userData.username && i.userID != userData.userID)
+          .isEmpty;
 
   if (usernameNotTaken) {
     for (int key in box.keys) {
@@ -96,9 +100,11 @@ Future<Map<String, String>> editUser(UserModel userData) async {
         existingData.password = userData.password;
         existingData.role = userData.role;
         existingData.batchID = userData.batchID;
-        existingData.status = userData.status;
+        existingData.emailID = userData.emailID;
+        existingData.notes = userData.notes;
         existingData.modifiedDate = getCurrentTimestamp();
         existingData.modifiedBy = loggedInUser;
+        existingData.status = userData.status;
 
         await box.put(key, existingData);
         break;

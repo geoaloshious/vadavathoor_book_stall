@@ -33,6 +33,7 @@ downSyncUsers(
           password: itm['password'],
           role: itm['role'],
           batchID: itm['batchID'],
+          emailID: itm['emailID'],
           notes: itm['notes'],
           createdDate: int.tryParse(itm['createdDate']) ?? 0,
           createdBy: itm['createdBy'],
