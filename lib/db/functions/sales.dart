@@ -295,10 +295,13 @@ Future<String> getNewSaleBillNo() async {
 }
 
 Future<List<SaleListItemModel>> getSalesList() async {
-  final sales = (await getSalesBox()).values.toList();
+  List<SaleModel> salesList = (await getSalesBox()).values.toList();
   final books = (await getBooksBox()).values.toList();
   final stationaryItems = (await getStationaryItemBox()).values.toList();
   final users = await getUsersBox();
+
+  final sales = salesList
+    ..sort((a, b) => b.createdDate.compareTo(a.createdDate));
 
   List<SaleListItemModel> joinedData = [];
 

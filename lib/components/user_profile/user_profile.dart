@@ -91,6 +91,19 @@ class _UserProfileState extends State<UserProfileWidget> {
           tooltip: user.user.userID == '' ? 'Guest user' : user.user.name,
           onSelected: onSelected,
           itemBuilder: (context) => [
+                if (user.user.userID != '')
+                  PopupMenuItem(
+                    enabled: false,
+                    child: Text(
+                      user.user.name,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                if (user.user.userID != '') const PopupMenuDivider(), // O
                 if (user.user.userID == '')
                   const PopupMenuItem(value: 1, child: Text('Log In'))
                 else

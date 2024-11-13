@@ -5,6 +5,8 @@ import 'package:vadavathoor_book_stall/db/functions/book.dart';
 import 'package:vadavathoor_book_stall/providers/user.dart';
 import 'package:vadavathoor_book_stall/screens/books/book_modal.dart';
 
+import '../book_purchase/purchase_modal.dart';
+
 class BooksWidget extends StatefulWidget {
   const BooksWidget({super.key});
 
@@ -27,6 +29,25 @@ class _BooksState extends State<BooksWidget> {
     3: true,
     4: true,
   };
+
+  void purchaseBook(String selectedID) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          Size screenSize = MediaQuery.of(context).size;
+
+          return Dialog(
+              child: Container(
+                  constraints: BoxConstraints(
+                      maxWidth: screenSize.width * 0.5, maxHeight: 280),
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: BookPurchaseModalWidget(
+                          autoPopulateBookID: selectedID,
+                          exitWithoutConfirm: true,
+                          updateUI: () {}))));
+        });
+  }
 
   void onPressAddOrEdit({BookListItemModel? data}) {
     showDialog(
@@ -248,6 +269,12 @@ class _BooksState extends State<BooksWidget> {
                                   DataCell(Text(book.balanceStock.toString())),
                                   if (loggedIn)
                                     DataCell(Row(children: [
+                                      IconButton(
+                                          icon: const Icon(Icons.shopping_cart),
+                                          tooltip: 'Purchase',
+                                          onPressed: () {
+                                            purchaseBook(book.bookID);
+                                          }),
                                       IconButton(
                                           icon: const Icon(Icons.edit),
                                           tooltip: 'Edit',

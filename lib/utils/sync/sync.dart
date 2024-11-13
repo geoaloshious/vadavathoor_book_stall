@@ -28,7 +28,7 @@ import 'package:vadavathoor_book_stall/utils/sync/user_batches.dart';
 import 'package:vadavathoor_book_stall/utils/sync/users.dart';
 
 Future<String> createPost(endpoint, Map<String, dynamic> data) async {
-  String url = '$baseURL$endpoint';
+  String url = '${ApiConstants.baseURL}$endpoint';
   const headers = {'Content-Type': 'application/json'};
 
   try {

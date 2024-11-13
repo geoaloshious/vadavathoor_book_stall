@@ -293,7 +293,14 @@ Future<String> createPDF({
     throw Exception('Could not get Downloads directory');
   }
 
-  final filePath = '${directory.path}/sale_bill_$billNo.pdf';
+  const folderName = 'sales_bills';
+
+  final salesBillsDir = Directory('${directory.path}/$folderName');
+  if (!await salesBillsDir.exists()) {
+    await salesBillsDir.create(recursive: true);
+  }
+
+  final filePath = '${directory.path}/$folderName/sale_bill_$billNo.pdf';
   final file = File(filePath);
   await file.writeAsBytes(await pdf.save());
 

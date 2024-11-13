@@ -10,10 +10,17 @@ import '../../db/functions/book.dart';
 import '../../db/functions/book_purchase.dart';
 
 class BookPurchaseModalWidget extends StatefulWidget {
+  final String? autoPopulateBookID;
   final PurchaseListItemModel? data;
   final void Function() updateUI;
+  final bool? exitWithoutConfirm;
 
-  const BookPurchaseModalWidget({super.key, this.data, required this.updateUI});
+  const BookPurchaseModalWidget(
+      {super.key,
+      this.autoPopulateBookID,
+      this.exitWithoutConfirm,
+      this.data,
+      required this.updateUI});
 
   @override
   State<BookPurchaseModalWidget> createState() => _BookPurchaseModalState();
@@ -116,6 +123,10 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
 
     setState(() {
       books = tempBooks;
+
+      if (widget.autoPopulateBookID != null) {
+        _bookID = widget.autoPopulateBookID!;
+      }
     });
   }
 
@@ -135,7 +146,11 @@ class _BookPurchaseModalState extends State<BookPurchaseModalWidget> {
             icon: const Icon(Icons.close),
             tooltip: 'Close',
             onPressed: () {
-              showModalCloseConfirmation(context);
+              if (widget.exitWithoutConfirm == true) {
+                Navigator.of(context).pop();
+              } else {
+                showModalCloseConfirmation(context);
+              }
             }),
       ]),
       const SizedBox(height: 10.0),

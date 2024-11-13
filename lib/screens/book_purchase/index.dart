@@ -16,6 +16,13 @@ class BookPurchase extends StatefulWidget {
 
 class _BookPurchaseState extends State<BookPurchase> {
   List<PurchaseListItemModel> purchases = [];
+  List<PurchaseListItemModel> filtered = [];
+
+  int currentPage = 0;
+  final int itemsPerPage = 50;
+  String searchQuery = '';
+  int sortColumnIndex = 3;
+  Map<int, bool> sortOrder = {0: true, 1: true, 2: true, 3: true};
 
   void onPressAddOrEdit({PurchaseListItemModel? data}) {
     showDialog(
@@ -80,11 +87,54 @@ class _BookPurchaseState extends State<BookPurchase> {
         });
   }
 
+  void updateSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+      filtered = purchases.where((p) {
+        return p.itemName.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+      currentPage = 0;
+    });
+  }
+
+  void sortBooks({required int columnName, bool? ascending}) {
+    setState(() {
+      if (ascending == null) {
+        sortOrder[columnName] = !sortOrder[columnName]!;
+        ascending = sortOrder[columnName];
+      } else {
+        sortOrder[columnName] = ascending!;
+      }
+
+      switch (columnName) {
+        case 0:
+          filtered.sort((a, b) => ascending!
+              ? a.itemName.compareTo(b.itemName)
+              : b.itemName.compareTo(a.itemName));
+          break;
+        case 2:
+          filtered.sort((a, b) => ascending!
+              ? a.price.compareTo(b.price)
+              : b.price.compareTo(a.price));
+          break;
+        case 3:
+          filtered.sort((a, b) => ascending!
+              ? a.purchaseDate.compareTo(b.purchaseDate)
+              : b.purchaseDate.compareTo(a.purchaseDate));
+          break;
+      }
+
+      sortColumnIndex = columnName;
+    });
+  }
+
   void setData() async {
     final tempData = await getBookPurchaseList();
     setState(() {
       purchases = tempData;
+      filtered = tempData;
     });
+    sortBooks(columnName: sortColumnIndex, ascending: false);
   }
 
   @override
@@ -98,109 +148,141 @@ class _BookPurchaseState extends State<BookPurchase> {
     return Consumer<UserProvider>(builder: (cntx, user, _) {
       final loggedIn = user.user.userID != '';
 
-      return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Purchases',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              Row(children: [
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey),
-                    onPressed: () {
-                      exportExcel(context: context, purchases: purchases);
-                    },
-                    child: const Text('Export Excel',
-                        style: TextStyle(color: Colors.white))),
-                const SizedBox(width: 10),
-                if (loggedIn)
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueGrey),
-                      onPressed: () {
-                        onPressAddOrEdit();
-                      },
-                      child: const Text('New purchase',
-                          style: TextStyle(color: Colors.white)))
-              ])
-            ]),
-            const SizedBox(height: 20),
-            Row(children: [
-              const Expanded(
-                  flex: 1,
-                  child: Text('ID',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  flex: 3,
-                  child: Text('Book',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  flex: 2,
-                  child: Text('Balance Stock/Purchased Quantity',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  flex: 2,
-                  child: Text('Price',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              const Expanded(
-                  flex: 3,
-                  child: Text('Purchase date',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600))),
-              if (loggedIn) const SizedBox(width: 80)
-            ]),
-            Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 0.2, color: Colors.blueGrey)))),
-            Expanded(
-                child: purchases.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: purchases.length,
-                        itemBuilder: (context, index) => Row(children: [
-                              Expanded(
-                                  flex: 1,
-                                  child: Text(purchases[index].purchaseID)),
-                              Expanded(
-                                  flex: 3,
-                                  child: Text(purchases[index].itemName)),
-                              Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                      '${purchases[index].balanceStock} / ${purchases[index].quantityPurchased}')),
-                              Expanded(
-                                  flex: 2,
-                                  child:
-                                      Text(purchases[index].price.toString())),
-                              Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                      purchases[index].formattedPurchaseDate)),
-                              if (loggedIn)
-                                IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    tooltip: 'Edit',
-                                    onPressed: () {
-                                      onPressAddOrEdit(data: purchases[index]);
-                                    }),
-                              if (loggedIn)
-                                IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    tooltip: 'Delete',
-                                    onPressed: () {
-                                      _deletePurchase(
-                                          purchases[index].purchaseID);
-                                    })
-                            ]))
-                    : const Text("No records found"))
-          ]));
+      final totalPages = (filtered.length / itemsPerPage).ceil();
+      final startIndex = currentPage * itemsPerPage;
+      final endIndex = startIndex + itemsPerPage < filtered.length
+          ? startIndex + itemsPerPage
+          : filtered.length;
+
+      return Container(
+          padding: const EdgeInsets.all(16),
+          width: double.infinity,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Purchases',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                      Row(children: [
+                        ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueGrey),
+                            onPressed: () {
+                              exportExcel(
+                                  context: context, purchases: purchases);
+                            },
+                            child: const Text('Export Excel',
+                                style: TextStyle(color: Colors.white))),
+                        const SizedBox(width: 10),
+                        if (loggedIn)
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueGrey),
+                              onPressed: () {
+                                onPressAddOrEdit();
+                              },
+                              child: const Text('New purchase',
+                                  style: TextStyle(color: Colors.white)))
+                      ])
+                    ]),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                        width: 300,
+                        child: TextField(
+                            onChanged: updateSearchQuery,
+                            decoration: const InputDecoration(
+                                labelText: 'Search',
+                                border: OutlineInputBorder()))),
+                    Row(children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: currentPage > 0
+                            ? () {
+                                setState(() {
+                                  currentPage--;
+                                });
+                              }
+                            : null,
+                      ),
+                      Text('Page ${currentPage + 1} of $totalPages',
+                          style: const TextStyle(fontSize: 14)),
+                      IconButton(
+                          icon: const Icon(Icons.arrow_forward),
+                          onPressed: currentPage < totalPages - 1
+                              ? () {
+                                  setState(() {
+                                    currentPage++;
+                                  });
+                                }
+                              : null),
+                    ]),
+                  ],
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: DataTable(
+                      sortColumnIndex: sortColumnIndex,
+                      sortAscending: sortOrder[sortColumnIndex]!,
+                      columns: [
+                        DataColumn(
+                          label: const Text('Book'),
+                          onSort: (columnIndex, _) => sortBooks(columnName: 0),
+                        ),
+                        const DataColumn(
+                            label: SizedBox(
+                          width: 150,
+                          child: Text(
+                            'Balance Stock/Purchased Quantity',
+                            softWrap: true,
+                          ),
+                        )),
+                        DataColumn(
+                          label: const Text('Price'),
+                          onSort: (columnIndex, _) => sortBooks(columnName: 2),
+                        ),
+                        DataColumn(
+                          label: const Text('Purchase date'),
+                          onSort: (columnIndex, _) => sortBooks(columnName: 3),
+                        ),
+                        if (loggedIn) const DataColumn(label: Text(''))
+                      ],
+                      rows: filtered
+                          .sublist(startIndex, endIndex)
+                          .map((book) => DataRow(cells: [
+                                DataCell(Text(book.itemName)),
+                                DataCell(Text(
+                                    '${book.balanceStock} / ${book.quantityPurchased}')),
+                                DataCell(Text(book.price.toString())),
+                                DataCell(Text(book.formattedPurchaseDate)),
+                                if (loggedIn)
+                                  DataCell(Row(children: [
+                                    if (loggedIn)
+                                      IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          tooltip: 'Edit',
+                                          onPressed: () {
+                                            onPressAddOrEdit(data: book);
+                                          }),
+                                    IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        tooltip: 'Delete',
+                                        onPressed: () {
+                                          _deletePurchase(book.purchaseID);
+                                        })
+                                  ]))
+                              ]))
+                          .toList()),
+                ),
+              ],
+            ),
+          ));
     });
   }
 }
