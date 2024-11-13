@@ -379,16 +379,20 @@ void saveAndOpenPDF(String saleID) async {
     }
   }
 
-  UserModel salesPerson = userDB.firstWhere((u) => u.userID == sale.createdBy);
-  UserModel customer = userDB.firstWhere((u) => u.userID == sale.customerID);
+  UserModel? salesPerson =
+      userDB.where((u) => u.userID == sale.createdBy).firstOrNull;
+  UserModel? customer =
+      userDB.where((u) => u.userID == sale.customerID).firstOrNull;
 
   String filePath = await createPDF(
       items: items,
-      customerName: customer.name,
+      customerName: customer?.name ?? '',
       customerBatch: userBatches
-          .firstWhere((u) => u.batchID == customer.batchID)
-          .batchName,
-      salesPerson: salesPerson.name,
+              .where((u) => u.batchID == customer?.batchID)
+              .firstOrNull
+              ?.batchName ??
+          '',
+      salesPerson: salesPerson?.name ?? '',
       billNo: sale.billNo,
       paymentMode: sale.paymentMode,
       date: formatTimestamp(timestamp: sale.createdDate));

@@ -344,8 +344,11 @@ Future<List<SaleListItemModel>> getSalesList() async {
       joinedData.add(SaleListItemModel(
           saleID: sale.saleID,
           billNo: sale.billNo,
-          customerName:
-              users.values.firstWhere((u) => u.userID == sale.customerID).name,
+          customerName: users.values
+                  .where((u) => u.userID == sale.customerID)
+                  .firstOrNull
+                  ?.name ??
+              '',
           books: bookNames.join('\n'),
           stationaryItems: stationaryNames.join('\n'),
           grandTotal: sale.grandTotal,
