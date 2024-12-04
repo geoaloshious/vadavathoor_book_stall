@@ -98,9 +98,6 @@ class _BookStallDetailsState extends State<BookStallDetailsWidget> {
             TextField(
                 enabled: loggedIn,
                 controller: _bookStallPhoneController,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
                 decoration: InputDecoration(
                     labelText: 'Book stall phone number',
                     border: const OutlineInputBorder(),

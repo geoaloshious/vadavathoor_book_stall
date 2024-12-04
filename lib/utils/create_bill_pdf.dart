@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -40,6 +41,9 @@ Future<String> createPDF({
 
   final grandTotal = items.fold(
       0.0, (total, book) => total + (book['soldPrice'] * book['quantity']));
+
+  final totalQty =
+      items.fold(0, (total, book) => total + book['quantity'] as int);
 
   final savings =
       double.parse((totalOriginalPrice - grandTotal).toStringAsFixed(2));
@@ -94,43 +98,50 @@ Future<String> createPDF({
                         children: [
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
-                              child: pw.Text('SlNo',
+                              child: pw.Text('Sl.No',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9))),
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
                               child: pw.Text('Qty.',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9))),
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
                               child: pw.Text('Particular',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9))),
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
                               child: pw.Text('MRP',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9))),
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
                               child: pw.Text('Discount %',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9))),
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
                               child: pw.Text('Rate',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9))),
                           pw.Padding(
                               padding: const pw.EdgeInsets.all(2.0),
                               child: pw.Text('Amount',
+                                  textAlign: pw.TextAlign.center,
                                   style: pw.TextStyle(
                                       fontWeight: pw.FontWeight.bold,
                                       fontSize: 9)))
@@ -181,7 +192,7 @@ Future<String> createPDF({
                         child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                          pw.Text('Total quantity : ${items.length}',
+                          pw.Text('Total quantity : $totalQty',
                               style: const pw.TextStyle(fontSize: 9)),
                           pw.SizedBox(height: 6),
                           pw.Table(
@@ -251,15 +262,21 @@ Future<String> createPDF({
                             pw.Column(
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  pw.Row(children: [
-                                    pw.Text('Name :',
-                                        style: const pw.TextStyle(fontSize: 9))
-                                  ]),
+                                  pw.Text('Name',
+                                      style: const pw.TextStyle(fontSize: 9)),
                                   pw.SizedBox(height: 8),
-                                  pw.Row(children: [
-                                    pw.Text('Sign :',
-                                        style: const pw.TextStyle(fontSize: 9))
-                                  ])
+                                  pw.Text('Sign',
+                                      style: const pw.TextStyle(fontSize: 9))
+                                ]),
+                            pw.SizedBox(width: 4),
+                            pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text(':',
+                                      style: const pw.TextStyle(fontSize: 9)),
+                                  pw.SizedBox(height: 8),
+                                  pw.Text(':',
+                                      style: const pw.TextStyle(fontSize: 9))
                                 ]),
                             pw.SizedBox(width: 10),
                             pw.Column(
@@ -267,9 +284,7 @@ Future<String> createPDF({
                                 children: [
                                   pw.Text(salesPerson,
                                       style: const pw.TextStyle(fontSize: 9)),
-                                  pw.SizedBox(height: 6),
-                                  pw.Text('____________',
-                                      style: const pw.TextStyle(fontSize: 9))
+                                  pw.SizedBox(height: 15),
                                 ])
                           ])
                     ])
