@@ -60,20 +60,20 @@ Future<Map<String, String>> addUser(UserModel userData) async {
 
   if (usernameNotTaken) {
     box.add(UserModel(
-      userID: userID,
-      name: userData.name,
-      username: userData.username,
-      password: userData.password,
-      role: userData.role,
-      batchID: userData.batchID,
-      emailID: '',
-      notes: '',
-      createdDate: currentTS,
-      createdBy: loggedInUser,
-      modifiedDate: currentTS,
-      modifiedBy: loggedInUser,
-      status: userData.status,
-    ));
+        userID: userID,
+        name: userData.name,
+        username: userData.username,
+        password: userData.password,
+        role: userData.role,
+        batchID: userData.batchID,
+        emailID: '',
+        notes: '',
+        createdDate: currentTS,
+        createdBy: loggedInUser,
+        modifiedDate: currentTS,
+        modifiedBy: loggedInUser,
+        status: userData.status,
+        synced: false));
   } else {
     return {'error': ''};
   }
@@ -105,6 +105,7 @@ Future<Map<String, String>> editUser(UserModel userData) async {
         existingData.modifiedDate = getCurrentTimestamp();
         existingData.modifiedBy = loggedInUser;
         existingData.status = userData.status;
+        existingData.synced = false;
 
         await box.put(key, existingData);
         break;
@@ -127,6 +128,7 @@ Future<void> deleteUser(String userID) async {
       existingData.status = UserStatus.deleted;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await box.put(key, existingData);
       break;

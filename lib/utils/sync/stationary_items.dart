@@ -15,6 +15,7 @@ downSyncStationaryItems(Map<String, dynamic> jsonResult, String key,
           existingData.modifiedDate = int.tryParse(itm['modifiedDate']) ?? 0;
           existingData.modifiedBy = itm['modifiedBy'];
           existingData.status = itm['status'];
+          existingData.synced = true;
 
           await box.put(key, existingData);
           break;
@@ -28,7 +29,8 @@ downSyncStationaryItems(Map<String, dynamic> jsonResult, String key,
           createdBy: itm['createdBy'],
           modifiedDate: int.tryParse(itm['modifiedDate']) ?? 0,
           modifiedBy: itm['modifiedBy'],
-          status: itm['status']));
+          status: itm['status'],
+          synced: true));
     }
   }
 }

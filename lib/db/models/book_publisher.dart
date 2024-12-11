@@ -26,6 +26,9 @@ class PublisherModel {
   @HiveField(6)
   int status;
 
+  @HiveField(7)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'publisherID': publisherID,
@@ -49,5 +52,6 @@ class PublisherModel {
       required this.createdBy,
       required this.modifiedDate,
       required this.modifiedBy,
-      required this.status});
+      required this.status,
+      required this.synced});
 }

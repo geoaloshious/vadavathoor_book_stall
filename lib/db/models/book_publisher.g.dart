@@ -24,13 +24,14 @@ class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
       modifiedDate: fields[4] as int,
       modifiedBy: fields[5] as String,
       status: fields[6] as int,
+      synced: fields[7] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, PublisherModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.publisherID)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class PublisherModelAdapter extends TypeAdapter<PublisherModel> {
       ..writeByte(5)
       ..write(obj.modifiedBy)
       ..writeByte(6)
-      ..write(obj.status);
+      ..write(obj.status)
+      ..writeByte(7)
+      ..write(obj.synced);
   }
 
   @override

@@ -30,7 +30,8 @@ Future<String> addBookCategory(String name) async {
       createdBy: loggedInUser,
       modifiedDate: currentTS,
       modifiedBy: loggedInUser,
-      status: DBRowStatus.active));
+      status: DBRowStatus.active,
+      synced: false));
 
   return categoryID;
 }
@@ -51,6 +52,7 @@ Future<void> editBookCategory(
 
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await box.put(key, existingData);
       break;

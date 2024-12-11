@@ -24,13 +24,14 @@ class UserBatchModelAdapter extends TypeAdapter<UserBatchModel> {
       createdBy: fields[4] as String,
       modifiedDate: fields[5] as int,
       modifiedBy: fields[6] as String,
+      synced: fields[7] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserBatchModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.batchID)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class UserBatchModelAdapter extends TypeAdapter<UserBatchModel> {
       ..writeByte(5)
       ..write(obj.modifiedDate)
       ..writeByte(6)
-      ..write(obj.modifiedBy);
+      ..write(obj.modifiedBy)
+      ..writeByte(7)
+      ..write(obj.synced);
   }
 
   @override

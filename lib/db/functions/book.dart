@@ -60,7 +60,8 @@ Future<void> addBook(
       createdBy: loggedInUser,
       modifiedDate: currentTS,
       modifiedBy: loggedInUser,
-      status: DBRowStatus.active));
+      status: DBRowStatus.active,
+      synced: false));
 }
 
 Future<void> editBook(
@@ -99,6 +100,7 @@ Future<void> editBook(
 
       existingData.modifiedDate = currentTS;
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await bookDB.put(key, existingData);
       break;
@@ -125,9 +127,9 @@ Future<Map<String, String>> deleteBook(String bookID) async {
     BookModel? existingData = bookBox.get(key);
     if (existingData != null && existingData.bookID == bookID) {
       existingData.status = DBRowStatus.deleted;
-
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await bookBox.put(key, existingData);
       break;
@@ -166,7 +168,8 @@ Future<List<BookListItemModel>> getBookList() async {
             createdBy: '',
             modifiedDate: 0,
             modifiedBy: '',
-            status: 1);
+            status: 1,
+            synced: false);
 
     final prcs = purchases.where(
         (p) => p.bookID == book.bookID && p.status == DBRowStatus.active);

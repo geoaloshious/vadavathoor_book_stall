@@ -35,6 +35,9 @@ class BookModel {
   @HiveField(9)
   int status;
 
+  @HiveField(10)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'bookID': bookID,
@@ -64,5 +67,6 @@ class BookModel {
       required this.createdBy,
       required this.modifiedDate,
       required this.modifiedBy,
-      required this.status});
+      required this.status,
+      required this.synced});
 }

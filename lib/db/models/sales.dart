@@ -120,6 +120,9 @@ class SaleModel {
   @HiveField(11)
   int status;
 
+  @HiveField(12)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'saleID': saleID,
@@ -151,7 +154,8 @@ class SaleModel {
         modifiedBy: modifiedBy,
         status: status,
         billNo: billNo,
-        saleID: saleID);
+        saleID: saleID,
+        synced: synced);
   }
 
   SaleModel(
@@ -166,5 +170,6 @@ class SaleModel {
       required this.modifiedBy,
       required this.status,
       required this.billNo,
-      required this.saleID});
+      required this.saleID,
+      required this.synced});
 }

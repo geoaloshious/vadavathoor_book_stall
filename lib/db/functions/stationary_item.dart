@@ -33,7 +33,8 @@ Future<void> addStationaryItem(String itemName) async {
       createdBy: loggedInUser,
       modifiedDate: currentTS,
       modifiedBy: loggedInUser,
-      status: DBRowStatus.active));
+      status: DBRowStatus.active,
+      synced: false));
 }
 
 Future<void> editStationaryItem(String itemID, String itemName) async {
@@ -48,6 +49,7 @@ Future<void> editStationaryItem(String itemID, String itemName) async {
 
       existingData.modifiedDate = currentTS;
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await box.put(key, existingData);
       break;
@@ -77,6 +79,7 @@ Future<Map<String, String>> deleteStationaryItem(String itemID) async {
 
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await itemBox.put(key, existingData);
       break;

@@ -28,13 +28,14 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       modifiedDate: fields[8] as int,
       modifiedBy: fields[9] as String,
       status: fields[10] as int,
+      synced: fields[11] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, BookPurchaseModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.purchaseID)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class BookPurchaseModelAdapter extends TypeAdapter<BookPurchaseModel> {
       ..writeByte(9)
       ..write(obj.modifiedBy)
       ..writeByte(10)
-      ..write(obj.status);
+      ..write(obj.status)
+      ..writeByte(11)
+      ..write(obj.synced);
   }
 
   @override
