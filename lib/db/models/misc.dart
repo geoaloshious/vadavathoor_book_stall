@@ -23,6 +23,9 @@ class MiscModel {
   @HiveField(5)
   String modifiedBy;
 
+  @HiveField(6)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'itemKey': itemKey,
@@ -40,5 +43,6 @@ class MiscModel {
       required this.createdDate,
       required this.createdBy,
       required this.modifiedDate,
-      required this.modifiedBy});
+      required this.modifiedBy,
+      required this.synced});
 }

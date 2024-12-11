@@ -155,13 +155,13 @@ Future<void> updateMiscValue(String itemKey, String itemValue) async {
 
   if (items.isEmpty) {
     miscBox.add(MiscModel(
-      itemKey: itemKey,
-      itemValue: itemValue,
-      createdDate: currentTS,
-      createdBy: loggedInUser,
-      modifiedDate: currentTS,
-      modifiedBy: loggedInUser,
-    ));
+        itemKey: itemKey,
+        itemValue: itemValue,
+        createdDate: currentTS,
+        createdBy: loggedInUser,
+        modifiedDate: currentTS,
+        modifiedBy: loggedInUser,
+        synced: false));
   } else {
     for (int key in miscBox.keys) {
       MiscModel? existingData = miscBox.get(key);
@@ -169,6 +169,8 @@ Future<void> updateMiscValue(String itemKey, String itemValue) async {
         existingData.itemValue = itemValue;
         existingData.modifiedDate = currentTS;
         existingData.modifiedBy = loggedInUser;
+        existingData.synced = false;
+
         await miscBox.put(key, existingData);
         break;
       }
@@ -181,7 +183,11 @@ Future<void> addLoginHistory(String userID) async {
   int currentTS = getCurrentTimestamp();
 
   box.add(LoginHistoryModel(
-      id: generateID(), userID: userID, logInTime: currentTS, logOutTime: 0));
+      id: generateID(),
+      userID: userID,
+      logInTime: currentTS,
+      logOutTime: 0,
+      synced: false));
 }
 
 Future<void> updateLogoutHistory() async {
@@ -191,6 +197,7 @@ Future<void> updateLogoutHistory() async {
     LoginHistoryModel? existingData = box.get(key);
     if (existingData != null && existingData.logOutTime == 0) {
       existingData.logOutTime = getCurrentTimestamp();
+      existingData.synced = false;
     }
   }
 }

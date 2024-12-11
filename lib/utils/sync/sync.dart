@@ -65,8 +65,6 @@ void syncData(BuildContext context) async {
       });
 
   try {
-    var lastUpSyncTime =
-        int.tryParse(await readMiscValue(MiscDBKeys.lastUpSyncTime)) ?? 0;
     final lastDownSyncTime =
         int.tryParse(await readMiscValue(MiscDBKeys.lastDownSyncTime)) ?? 0;
 
@@ -84,48 +82,75 @@ void syncData(BuildContext context) async {
     final users = await getUsersBox();
 
     var apiInput = {
-      DBNames.bookAuthor: bookAuthors.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.bookCategories: bookCategories.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.publisher: bookPublisher.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.bookPurchase: bookPurchase.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.book:
-          book.values.where((i) => i.modifiedDate > lastUpSyncTime).toList(),
-      DBNames.loginHistory: loginHistory.values
-          .where((i) =>
-              (i.logInTime > lastUpSyncTime || i.logOutTime > lastUpSyncTime))
-          .toList(),
-      DBNames.misc:
-          misc.values.where((i) => i.modifiedDate > lastUpSyncTime).toList(),
+      DBNames.bookAuthor:
+          bookAuthors.values.where((i) => i.synced == false).toList(),
+      DBNames.bookCategories:
+          bookCategories.values.where((i) => i.synced == false).toList(),
+      DBNames.publisher:
+          bookPublisher.values.where((i) => i.synced == false).toList(),
+      DBNames.bookPurchase:
+          bookPurchase.values.where((i) => i.synced == false).toList(),
+      DBNames.book: book.values.where((i) => i.synced == false).toList(),
+      DBNames.loginHistory:
+          loginHistory.values.where((i) => i.synced == false).toList(),
+      DBNames.misc: misc.values.where((i) => i.synced == false).toList(),
       DBNames.sale: sales.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
+          .where((i) => i.synced == false)
           .toList()
           .map((sale) => sale.toJson())
           .toList(),
-      DBNames.stationaryItem: stationaryItems.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.stationaryPurchase: stationaryPurchases.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.userBatch: userBatches.values
-          .where((i) => i.modifiedDate > lastUpSyncTime)
-          .toList(),
-      DBNames.users:
-          users.values.where((i) => i.modifiedDate > lastUpSyncTime).toList()
+      DBNames.stationaryItem:
+          stationaryItems.values.where((i) => i.synced == false).toList(),
+      DBNames.stationaryPurchase:
+          stationaryPurchases.values.where((i) => i.synced == false).toList(),
+      DBNames.userBatch:
+          userBatches.values.where((i) => i.synced == false).toList(),
+      DBNames.users: users.values.where((i) => i.synced == false).toList()
     };
 
-    await createPost(EndPoints.upSync, apiInput);
+    final upResult = jsonDecode(await createPost(EndPoints.upSync, apiInput));
 
-    await updateMiscValue(MiscDBKeys.lastUpSyncTime,
-        DateTime.now().millisecondsSinceEpoch.toString());
+    for (String key in upResult.keys) {
+      switch (key) {
+        case DBNames.bookAuthor:
+          await updateSyncStatusBookAuthor(upResult[key], bookAuthors);
+          break;
+        case DBNames.bookCategories:
+          await updateSyncStatusBookCategories(upResult[key], bookCategories);
+          break;
+        case DBNames.publisher:
+          await updateSyncStatusBookPublishers(upResult[key], bookPublisher);
+          break;
+        case DBNames.bookPurchase:
+          await updateSyncStatusBookPurchases(upResult[key], bookPurchase);
+          break;
+        case DBNames.book:
+          await updateSyncStatusBooks(upResult[key], book);
+          break;
+        case DBNames.loginHistory:
+          await updateSyncStatusLoginHistory(upResult[key], loginHistory);
+          break;
+        case DBNames.misc:
+          await updateSyncStatusMisc(upResult[key], misc);
+          break;
+        case DBNames.sale:
+          await updateSyncStatusSales(upResult[key], sales);
+          break;
+        case DBNames.stationaryItem:
+          await updateSyncStatusStationaryItems(upResult[key], stationaryItems);
+          break;
+        case DBNames.stationaryPurchase:
+          await updateSyncStatusStationaryPurchases(
+              upResult[key], stationaryPurchases);
+          break;
+        case DBNames.userBatch:
+          await updateSyncStatusUserBatches(upResult[key], userBatches);
+          break;
+        case DBNames.users:
+          await updateSyncStatusUsers(upResult[key], users);
+          break;
+      }
+    }
 
     final downResult = await createPost(
         EndPoints.downSync, {'lastDownSyncTime': lastDownSyncTime});

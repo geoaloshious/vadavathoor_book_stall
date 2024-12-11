@@ -1,6 +1,19 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/models/book.dart';
 
+updateSyncStatusBooks(Map<String, bool> jsonResult, Box<BookModel> box) async {
+  for (String itemID in jsonResult.keys) {
+    for (int key in box.keys) {
+      var existingData = box.get(key);
+      if (existingData != null && existingData.bookID == itemID) {
+        existingData.synced = true;
+        await box.put(key, existingData);
+        break;
+      }
+    }
+  }
+}
+
 downSyncBooks(
     Map<String, dynamic> jsonResult, String key, Box<BookModel> box) async {
   for (var itm in jsonResult['data'][key]) {
