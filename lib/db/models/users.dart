@@ -4,20 +4,20 @@ import '../constants.dart';
 part 'users.g.dart';
 
 UserModel emptyUserModel() => UserModel(
-      userID: '',
-      name: '',
-      username: '',
-      password: '',
-      role: 0,
-      batchID: '',
-      emailID: '',
-      notes: '',
-      createdDate: 0,
-      createdBy: '',
-      modifiedDate: 0,
-      modifiedBy: '',
-      status: 0,
-    );
+    userID: '',
+    name: '',
+    username: '',
+    password: '',
+    role: 0,
+    batchID: '',
+    emailID: '',
+    notes: '',
+    createdDate: 0,
+    createdBy: '',
+    modifiedDate: 0,
+    modifiedBy: '',
+    status: 0,
+    synced: false);
 
 @HiveType(typeId: DBItemHiveType.users)
 class UserModel {
@@ -60,6 +60,9 @@ class UserModel {
   @HiveField(13)
   int status;
 
+  @HiveField(14)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'userID': userID,
@@ -93,5 +96,6 @@ class UserModel {
       required this.createdBy,
       required this.modifiedDate,
       required this.modifiedBy,
-      required this.status});
+      required this.status,
+      required this.synced});
 }

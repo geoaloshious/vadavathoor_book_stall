@@ -21,13 +21,14 @@ class LoginHistoryModelAdapter extends TypeAdapter<LoginHistoryModel> {
       userID: fields[1] as String,
       logInTime: fields[2] as int,
       logOutTime: fields[3] as int,
+      synced: fields[4] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, LoginHistoryModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class LoginHistoryModelAdapter extends TypeAdapter<LoginHistoryModel> {
       ..writeByte(2)
       ..write(obj.logInTime)
       ..writeByte(3)
-      ..write(obj.logOutTime);
+      ..write(obj.logOutTime)
+      ..writeByte(4)
+      ..write(obj.synced);
   }
 
   @override

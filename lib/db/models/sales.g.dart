@@ -108,13 +108,14 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       status: fields[11] as int,
       billNo: fields[1] as String,
       saleID: fields[0] as String,
+      synced: fields[12] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SaleModel obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.saleID)
       ..writeByte(1)
@@ -138,7 +139,9 @@ class SaleModelAdapter extends TypeAdapter<SaleModel> {
       ..writeByte(10)
       ..write(obj.modifiedBy)
       ..writeByte(11)
-      ..write(obj.status);
+      ..write(obj.status)
+      ..writeByte(12)
+      ..write(obj.synced);
   }
 
   @override

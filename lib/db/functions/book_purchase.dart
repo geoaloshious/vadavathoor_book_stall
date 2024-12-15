@@ -36,7 +36,8 @@ Future<void> addBookPurchase(
       createdBy: loggedInUser,
       modifiedDate: currentTS,
       modifiedBy: loggedInUser,
-      status: DBRowStatus.active));
+      status: DBRowStatus.active,
+      synced: false));
 }
 
 Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
@@ -79,6 +80,7 @@ Future<Map<String, String>> editBookPurchase(String purchaseID, String bookID,
       existingData.purchaseDate = purchaseDate;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await purchaseBox.put(key, existingData);
       break;
@@ -114,6 +116,7 @@ Future<Map<String, String>> deleteBookPurchase(String purchaseID) async {
       existingData.status = DBRowStatus.deleted;
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await box.put(key, existingData);
       break;

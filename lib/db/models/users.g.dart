@@ -30,13 +30,14 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       modifiedDate: fields[11] as int,
       modifiedBy: fields[12] as String,
       status: fields[13] as int,
+      synced: fields[14] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.userID)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(12)
       ..write(obj.modifiedBy)
       ..writeByte(13)
-      ..write(obj.status);
+      ..write(obj.status)
+      ..writeByte(14)
+      ..write(obj.synced);
   }
 
   @override

@@ -3,6 +3,19 @@ import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/models/sales.dart';
 
+updateSyncStatusSales(Map<String, bool> jsonResult, Box<SaleModel> box) async {
+  for (String itemID in jsonResult.keys) {
+    for (int key in box.keys) {
+      var existingData = box.get(key);
+      if (existingData != null && existingData.saleID == itemID) {
+        existingData.synced = true;
+        await box.put(key, existingData);
+        break;
+      }
+    }
+  }
+}
+
 downSyncSales(
     Map<String, dynamic> jsonResult, String key, Box<SaleModel> box) async {
   for (var itm in jsonResult['data'][key]) {
@@ -25,6 +38,7 @@ downSyncSales(
           existingData.modifiedDate = int.tryParse(itm['modifiedDate']) ?? 0;
           existingData.modifiedBy = itm['modifiedBy'];
           existingData.status = itm['status'];
+          existingData.synced = true;
 
           await box.put(key, existingData);
           break;
@@ -46,7 +60,8 @@ downSyncSales(
           createdBy: itm['createdBy'],
           modifiedDate: int.tryParse(itm['modifiedDate']) ?? 0,
           modifiedBy: itm['modifiedBy'],
-          status: itm['status']));
+          status: itm['status'],
+          synced: true));
     }
   }
 }

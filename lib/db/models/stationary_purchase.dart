@@ -38,6 +38,9 @@ class StationaryPurchaseModel {
   @HiveField(10)
   int status;
 
+  @HiveField(11)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'purchaseID': purchaseID,
@@ -65,5 +68,6 @@ class StationaryPurchaseModel {
       required this.createdBy,
       required this.modifiedDate,
       required this.modifiedBy,
-      required this.status});
+      required this.status,
+      required this.synced});
 }

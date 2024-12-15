@@ -16,7 +16,6 @@ class MiscDBKeys {
   static const String bankIFSC = 'bankIFSC';
   static const String bankBranch = 'bankBranch';
   static const String visitAgain = 'visitAgain';
-  static const String lastUpSyncTime = 'lastUpSyncTime';
   static const String lastDownSyncTime = 'lastDownSyncTime';
 }
 

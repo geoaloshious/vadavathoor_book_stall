@@ -1,6 +1,19 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:vadavathoor_book_stall/db/models/users.dart';
 
+updateSyncStatusUsers(Map<String, bool> jsonResult, Box<UserModel> box) async {
+  for (String itemID in jsonResult.keys) {
+    for (int key in box.keys) {
+      var existingData = box.get(key);
+      if (existingData != null && existingData.userID == itemID) {
+        existingData.synced = true;
+        await box.put(key, existingData);
+        break;
+      }
+    }
+  }
+}
+
 downSyncUsers(
     Map<String, dynamic> jsonResult, String key, Box<UserModel> box) async {
   for (var itm in jsonResult['data'][key]) {
@@ -20,6 +33,7 @@ downSyncUsers(
           existingData.modifiedDate = int.tryParse(itm['modifiedDate']) ?? 0;
           existingData.modifiedBy = itm['modifiedBy'];
           existingData.status = itm['status'];
+          existingData.synced = true;
 
           await box.put(key, existingData);
           break;
@@ -39,7 +53,8 @@ downSyncUsers(
           createdBy: itm['createdBy'],
           modifiedDate: int.tryParse(itm['modifiedDate']) ?? 0,
           modifiedBy: itm['modifiedBy'],
-          status: itm['status']));
+          status: itm['status'],
+          synced: true));
     }
   }
 }

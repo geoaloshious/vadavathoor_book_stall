@@ -17,6 +17,9 @@ class LoginHistoryModel {
   @HiveField(3)
   int logOutTime;
 
+  @HiveField(4)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -30,5 +33,6 @@ class LoginHistoryModel {
       {required this.id,
       required this.userID,
       required this.logInTime,
-      required this.logOutTime});
+      required this.logOutTime,
+      required this.synced});
 }

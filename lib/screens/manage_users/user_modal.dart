@@ -60,20 +60,20 @@ class _UserModalState extends State<UsermodalWidget> {
       final fn = widget.mode == UserModalMode.add ? addUser : editUser;
 
       final res = await fn(UserModel(
-        userID: widget.data?.userID ?? '',
-        name: name,
-        username: username,
-        password: password,
-        role: int.tryParse(_role) ?? UserRole.normal,
-        batchID: _batchID,
-        emailID: emailID,
-        notes: notes,
-        createdDate: 0,
-        createdBy: '',
-        modifiedDate: 0,
-        modifiedBy: '',
-        status: int.tryParse(_status) ?? UserStatus.enabled,
-      ));
+          userID: widget.data?.userID ?? '',
+          name: name,
+          username: username,
+          password: password,
+          role: int.tryParse(_role) ?? UserRole.normal,
+          batchID: _batchID,
+          emailID: emailID,
+          notes: notes,
+          createdDate: 0,
+          createdBy: '',
+          modifiedDate: 0,
+          modifiedBy: '',
+          status: int.tryParse(_status) ?? UserStatus.enabled,
+          synced: false));
 
       if (res['error'] != null) {
         setState(() {

@@ -57,20 +57,20 @@ Future<Map<String, String>> getCustomerIDAndBatchID(
     }
 
     customerID = (await addUser(UserModel(
-          userID: '',
-          name: customerName,
-          username: '',
-          password: '',
-          role: UserRole.normal,
-          batchID: userBatchID,
-          emailID: '',
-          notes: '',
-          createdDate: 0,
-          createdBy: '',
-          modifiedDate: 0,
-          modifiedBy: '',
-          status: UserStatus.enabled,
-        )))['userID'] ??
+            userID: '',
+            name: customerName,
+            username: '',
+            password: '',
+            role: UserRole.normal,
+            batchID: userBatchID,
+            emailID: '',
+            notes: '',
+            createdDate: 0,
+            createdBy: '',
+            modifiedDate: 0,
+            modifiedBy: '',
+            status: UserStatus.enabled,
+            synced: false)))['userID'] ??
         '';
   } else {
     userBatchID =
@@ -110,7 +110,8 @@ Future<void> addSale(
       createdBy: loggedInUser,
       modifiedDate: currentTS,
       modifiedBy: loggedInUser,
-      status: DBRowStatus.active));
+      status: DBRowStatus.active,
+      synced: false));
 
   final bkPurchaseBox = await getBookPurchaseBox();
   final bkPurchaseKeys = await getPurchaseKeysAndIDs(bkPurchaseBox);
@@ -122,6 +123,7 @@ Future<void> addSale(
       if (existingData != null) {
         existingData.quantityLeft = existingData.quantityLeft - pv.quantity;
         existingData.modifiedDate = currentTS;
+        existingData.synced = false;
         await bkPurchaseBox.put(bkPurchaseKeys[pv.purchaseID], existingData);
       }
     }
@@ -137,6 +139,7 @@ Future<void> addSale(
       if (existingData != null) {
         existingData.quantityLeft = existingData.quantityLeft - pv.quantity;
         existingData.modifiedDate = currentTS;
+        existingData.synced = false;
         await siPurchaseBox.put(siPurchaseKeys[pv.purchaseID], existingData);
       }
     }
@@ -183,6 +186,7 @@ Future<void> editSale(
 
               existingPurchase.quantityLeft = newBalance;
               existingPurchase.modifiedDate = currentTS;
+              existingPurchase.synced = false;
               await purchaseBox.put(
                   purchaseKeys[espv.purchaseID], existingPurchase);
             }
@@ -203,6 +207,7 @@ Future<void> editSale(
 
       existingSale.modifiedDate = currentTS;
       existingSale.modifiedBy = loggedInUser;
+      existingSale.synced = false;
 
       await salesBox.put(saleKey, existingSale);
       break;
@@ -221,6 +226,7 @@ Future<void> editSale(
 
           existingPurchase.quantityLeft = newBalance;
           existingPurchase.modifiedDate = currentTS;
+          existingPurchase.synced = false;
           await purchaseBox.put(purchaseKeys[pv.purchaseID], existingPurchase);
         }
       }
@@ -257,6 +263,7 @@ Future<void> deleteSale(String saleID) async {
 
               existingPurchase.quantityLeft = newCount;
               existingPurchase.modifiedDate = currentTS;
+              existingPurchase.synced = false;
               await purchaseBox.put(
                   purchaseKeys[espv.purchaseID], existingPurchase);
             }
@@ -271,6 +278,7 @@ Future<void> deleteSale(String saleID) async {
       existingSale.status = DBRowStatus.deleted;
       existingSale.modifiedDate = getCurrentTimestamp();
       existingSale.modifiedBy = loggedInUser;
+      existingSale.synced = false;
 
       await salesBox.put(saleKey, existingSale);
       break;

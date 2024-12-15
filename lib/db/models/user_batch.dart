@@ -26,6 +26,9 @@ class UserBatchModel {
   @HiveField(6)
   String modifiedBy;
 
+  @HiveField(7)
+  bool synced;
+
   Map<String, dynamic> toJson() {
     return {
       'batchID': batchID,
@@ -49,5 +52,6 @@ class UserBatchModel {
       required this.createdDate,
       required this.createdBy,
       required this.modifiedDate,
-      required this.modifiedBy});
+      required this.modifiedBy,
+      required this.synced});
 }

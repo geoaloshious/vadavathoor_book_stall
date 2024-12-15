@@ -30,7 +30,8 @@ Future<String> addBookAuthor(String authorName) async {
       createdBy: loggedInUser,
       modifiedDate: currentTS,
       modifiedBy: loggedInUser,
-      status: DBRowStatus.active));
+      status: DBRowStatus.active,
+      synced: false));
 
   return authorID;
 }
@@ -51,6 +52,7 @@ Future<void> editBookAuthor(
 
       existingData.modifiedDate = getCurrentTimestamp();
       existingData.modifiedBy = loggedInUser;
+      existingData.synced = false;
 
       await box.put(key, existingData);
       break;

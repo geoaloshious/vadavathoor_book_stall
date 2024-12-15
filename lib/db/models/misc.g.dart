@@ -23,13 +23,14 @@ class MiscModelAdapter extends TypeAdapter<MiscModel> {
       createdBy: fields[3] as String,
       modifiedDate: fields[4] as int,
       modifiedBy: fields[5] as String,
+      synced: fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, MiscModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.itemKey)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class MiscModelAdapter extends TypeAdapter<MiscModel> {
       ..writeByte(4)
       ..write(obj.modifiedDate)
       ..writeByte(5)
-      ..write(obj.modifiedBy);
+      ..write(obj.modifiedBy)
+      ..writeByte(6)
+      ..write(obj.synced);
   }
 
   @override
