@@ -93,7 +93,10 @@ void syncData(BuildContext context) async {
       DBNames.book: book.values.where((i) => i.synced == false).toList(),
       DBNames.loginHistory:
           loginHistory.values.where((i) => i.synced == false).toList(),
-      DBNames.misc: misc.values.where((i) => i.synced == false).toList(),
+      DBNames.misc: misc.values
+          .where((i) =>
+              i.synced == false && i.itemKey != MiscDBKeys.lastDownSyncTime)
+          .toList(),
       DBNames.sale: sales.values
           .where((i) => i.synced == false)
           .toList()
